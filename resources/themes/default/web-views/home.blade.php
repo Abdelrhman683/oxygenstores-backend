@@ -63,6 +63,7 @@
 
         @include('web-views.partials._category-section-home')
 
+
          @if(getFeaturedDealsProductList() && (count(getFeaturedDealsProductList()) > 0))
             <section class="featured_deal pb-3">
                 <div class="container">
@@ -174,6 +175,7 @@
                 </div>
             </div>
         @endif
+        @include('web-views.partials._banner-grid')
 
         @if($web_config['brand_setting'] && $brands->count() > 0)
             <section class="container rtl">
@@ -210,11 +212,26 @@
             </section>
         @endif
 
+        {{--
+            =========================================================
+            سكشن منتجات ننصح بها - Recommended Products Tabs
+            يعرض التصنيفات الرئيسية في شكل تابات مع منتجاتها
+            =========================================================
+        --}}
+        @include('web-views.partials._recommended-products')
+
+        {{--
+            =========================================================
+            سكشن الفئات الفردية - Category Wise Products
+            كل فئة تظهر في سكشن مستقل بسلايدر منتجاتها
+            =========================================================
+        --}}
         @if ($homeCategories->count() > 0)
             @foreach($homeCategories as $category)
                 @include('web-views.partials._category-wise-product', ['decimal_point_settings'=>$decimalPointSettings])
             @endforeach
         @endif
+
 
         @php($companyReliability = getWebConfig(name: 'company_reliability'))
         @if($companyReliability != null)

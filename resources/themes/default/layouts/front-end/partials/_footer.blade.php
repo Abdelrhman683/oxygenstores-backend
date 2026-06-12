@@ -1,4 +1,6 @@
 <div class="__inline-9 rtl">
+    {{-- Commented out top slider --}}
+    {{--
     <div class="text-center pb-4">
         <div class="max-w-1160px mx-auto footer-slider-container">
             <div class="container">
@@ -19,7 +21,7 @@
                                        </h2>
                                        <p class="d-none d-sm-block des mb-0">{{ translate('Know_about_our_company_more.') }}</p>
                                    </div>
-                               </a>
+                                </a>
                            </div>
                        </div>
                    </div>
@@ -89,8 +91,150 @@
             </div>
         </div>
     </div>
+    --}}
 
     <footer class="page-footer font-small mdb-color rtl">
+        {{-- New Custom 3-Column Footer Layout --}}
+        <div class=" custom-light-primary-color-20" style="padding: 40px 0 25px;">
+            <div class="container text-start">
+                <div class="row">
+
+                    
+                    <!-- Right Column: Logo, About, Social, Payments -->
+                    <div class="col-md-6 mb-4 mb-md-0 d-flex flex-column gap-4 text-start">
+                        <div class="footer-web-logo">
+                            <a class="d-inline-block" href="{{ route('home') }}">
+                                <img src="{{ getStorageImages(path: $web_config['footer_logo'], type: 'logo') }}"
+                                     alt="{{ $web_config['company_name'] }}" style="max-height: 70px;"/>
+                            </a>
+                        </div>
+                        
+                        <div>
+                            <h6 class="text-uppercase font-weight-bold text-white mb-3 fs-18" style="font-weight: 700 !important; letter-spacing: 0.5px;">{{ translate('عن المتجر') }}</h6>
+                            <p class="text-white opacity-80 fs-15 mb-0" style="text-align: justify; line-height: 1.85 !important;">
+                                نحن ذرة أكسجين من كبرى الشركات والمؤسسات التي تعمل في مجال التكييف والتي بفضل الله ثم بثقة عملائنا بخدماتنا نمتلك علامات تجارية Oxygen - Yonan نحن موزعون لأكبر العلامات التجارية في مجال التكييف والأجهزة الكهربائية نتطلع لكسب عملاء مميزين ونحن شغوفين لتقديم أفضل الخدمات نقدم خدمات إضافية مع كل مكيف وخدمات الصيانة وخدمات ما بعد البيع.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h6 class="text-white font-weight-bold fs-16 mb-2">يمكنك متابعتنا من خلال</h6>
+                            <div class="d-flex gap-3">
+                                @if($web_config['social_media'])
+                                    @foreach ($web_config['social_media'] as $item)
+                                        <a class="text-white d-flex justify-content-center align-items-center"
+                                           target="_blank" href="{{ $item->link }}" style="width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.12); transition: 0.3s;">
+                                            <i class="{{ $item->icon }} fs-16" aria-hidden="true"></i>
+                                        </a>
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <div class="mt-2">
+                            <div class="d-flex flex-wrap gap-2">
+                                <img src="{{ theme_asset(path: 'public/assets/front-end/img/payments.webp') }}" alt="payments" style="max-height: 45px; width: auto; object-fit: contain;" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Column: General Info -->
+                    <div class="col-md-3 mb-4 mb-md-0 text-start">
+                        <h6 class="text-uppercase font-weight-bold text-white mb-3 fs-18" style="font-weight: 700 !important; letter-spacing: 0.5px;">معلومات عامة</h6>
+                        <ul class="widget-list p-0 d-flex flex-column gap-3" style="list-style: none;">
+                            <li>
+                                <a class="widget-list-link fs-16 hover-yellow" href="{{ route('business-page.view', ['slug' => 'about-us']) }}">
+                                    من نحن
+                                </a>
+                            </li>
+                            <li>
+                                <a class="widget-list-link fs-16 hover-yellow" href="{{ route('business-page.view', ['slug' => 'privacy-policy']) }}">
+                                    سياسة الخصوصية
+                                </a>
+                            </li>
+                            <li>
+                                <a class="widget-list-link fs-16 hover-yellow" href="{{ route('business-page.view', ['slug' => 'terms-and-conditions']) }}">
+                                    الشروط والأحكام
+                                </a>
+                            </li>
+                            <li>
+                                <a class="widget-list-link fs-16 hover-yellow" href="{{ route('business-page.view', ['slug' => 'refund-policy']) }}">
+                                    سياسة الاسترداد
+                                </a>
+                            </li>
+                            <li>
+                                <a class="widget-list-link fs-16 hover-yellow" href="{{ route('business-page.view', ['slug' => 'return-policy']) }}">
+                                    سياسة الإرجاع
+                                </a>
+                            </li>
+                            <li>
+                                <a class="widget-list-link fs-16 hover-yellow" href="{{ route('business-page.view', ['slug' => 'cancellation-policy']) }}">
+                                    سياسة الإلغاء
+                                </a>
+                            </li>
+                            <li>
+                                <a class="widget-list-link fs-16 hover-yellow" href="{{ route('business-page.view', ['slug' => 'shipping-policy']) }}">
+                                    سياسة الشحن
+                                </a>
+                            </li>
+                            <li>
+                                <a class="widget-list-link fs-16 hover-yellow" href="{{ route('helpTopic') }}">
+                                    الأسئلة الشائعة
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+
+
+                    <!-- Left Column: Contact Us -->
+                    <div class="col-md-3 text-start">
+                        <h6 class="text-uppercase font-weight-bold text-white mb-3 fs-18" style="font-weight: 700 !important; letter-spacing: 0.5px;">أتصل بنا</h6>
+                        <ul class="widget-list p-0 d-flex flex-column gap-3 text-white opacity-80 fs-15" style="list-style: none;">
+                            <li class="d-flex align-items-start gap-3">
+                                <i class="fa fa-map-marker mt-1 fs-18 text-yellow" style="font-size: 1.25rem !important;"></i>
+                                <span>{{ getWebConfig(name: 'shop_address') }}</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-3">
+                                <i class="fa fa-phone fs-18 text-yellow" style="font-size: 1.25rem !important;"></i>
+                                <span class="direction-ltr">{{ getWebConfig(name: 'company_phone') }}</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-3">
+                                <i class="fa fa-envelope fs-18 text-yellow" style="font-size: 1.25rem !important;"></i>
+                                <span>{{ getWebConfig(name: 'company_email') }}</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-3">
+                                <span class="d-flex align-items-center justify-content-center rounded-circle border border-white fw-bold" style="width: 24px; height: 24px; min-width: 24px; font-size: 11px; border-width: 1.5px !important;">R</span>
+                                <span>301157358600003</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-3">
+                                <span class="d-flex align-items-center justify-content-center rounded-circle border border-white fw-bold" style="width: 24px; height: 24px; min-width: 24px; font-size: 11px; border-width: 1.5px !important;">%</span>
+                                <span>301157358600003</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-3 mt-3">
+                                <i class="fa fa-map-marker fs-18 text-yellow" style="font-size: 1.25rem !important;"></i>
+                                <a href="#" class="text-white text-decoration-underline fw-bold hover-yellow fs-15">يمكنك الإطلاع على معارضنا</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        {{-- Bottom Copyright Bar with Yellow Background --}}
+        <div class="py-3" style="background-color: var(--bg-yellow) !important; color: var(--bg-blue) !important; font-weight: bold; border-top: 1px solid rgba(0,0,0,0.05);">
+            <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <div class="fs-14 text-center text-md-start">
+                    {{ $web_config['company_name'] }} - جميع الحقوق محفوظة
+                </div>
+                <div class="fs-14 text-center text-md-end">
+                   صنع بكل حب 💚 في  Digital-Spot
+                </div>
+            </div>
+        </div>
+
+        {{-- Commented out original footer contents --}}
+        {{--
         <div class="pt-4 custom-light-primary-color-20">
             <div class="container text-center __pb-13px">
 
@@ -375,6 +519,7 @@
                 </div>
             </div>
         </div>
+        --}}
 
         @php($cookie = $web_config['cookie_setting'] ? json_decode($web_config['cookie_setting']['value'], true) : null)
         @if($cookie && $cookie['status']==1)

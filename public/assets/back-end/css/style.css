@@ -62,11 +62,15 @@
   color-scheme: dark;
   --bg-shade: #222324;
 }
+:root {
+    --bg-blue: #264F74;
+    --bg-yellow: #FFE14D;
+}
 
 html {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  accent-color: var(--bs-primary);
+  accent-color: var(--web-primary);
   scroll-behavior: smooth;
 }
 

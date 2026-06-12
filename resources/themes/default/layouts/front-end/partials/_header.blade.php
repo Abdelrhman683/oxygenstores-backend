@@ -8,7 +8,7 @@
     </div>
 @endif
 <header class="rtl __inline-10">
-    <div class="topbar">
+    <!-- <div class="topbar">
         <div class="container">
             <div>
                 <div class="topbar-text dropdown d-md-none ms-auto">
@@ -84,486 +84,191 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="navbar-sticky bg-light mobile-head">
-        <div class="navbar navbar-expand-md navbar-light">
-            <div class="container ">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
+        <div class="navbar navbar-expand-lg top_navbar">
+            <!-- ===== Row 1: Toggle + Logo + Actions ===== -->
+            <div class="top-navbar-row1 d-flex align-items-center justify-content-between w-100">
+
+                <!-- Toggle menu button (Mobile only) -->
+                <button class="navbar-toggler p-0 text-white border-0 d-lg-none flex-shrink-0" type="button" data-toggle="collapse" data-target="#navbarCollapse">
+                    <i class="czi-menu fs-20" style="color: #fff !important;"></i>
                 </button>
-                <a class="navbar-brand d-none d-sm-block me-3 flex-shrink-0 __min-w-7rem"
-                   href="{{route('home')}}">
+
+                <!-- Logo: desktop -->
+                <a class="navbar-brand d-none d-sm-block flex-shrink-0 __min-w-7rem" href="{{route('home')}}">
                     <img class="__inline-11"
                          src="{{ getStorageImages(path: $web_config['web_logo'], type: 'logo') }}"
                          alt="{{$web_config['company_name']}}">
                 </a>
-                <a class="navbar-brand d-sm-none"
-                   href="{{route('home')}}">
-                    <img class="mobile-logo-img"
+                <!-- Logo: mobile -->
+                <a class="navbar-brand d-sm-none flex-grow-1 text-center" href="{{route('home')}}">
+                    <img class="__inline-12"
                          src="{{ getStorageImages(path: $web_config['mob_logo'], type: 'logo') }}"
-                         alt="{{$web_config['company_name']}}"/>
+                         alt="{{$web_config['company_name']}}">
                 </a>
 
-                <div class="input-group-overlay mx-lg-4 search-form-mobile text-align-direction">
-                    <form action="{{route('products')}}" type="submit" class="search_form">
-                        <div class="d-flex align-items-center gap-2">
-                            <input class="form-control appended-form-control search-bar-input" type="search"
-                                   autocomplete="off" data-given-value=""
-                                   placeholder="{{ translate("search_for_items")}}..."
-                                   name="name" value="{{ request('name') }}">
-
-                            <input type="hidden" name="global_search_input" value="1">
-
-                            <button class="input-group-append-overlay search_button d-none d-md-block" type="submit">
-                                <span class="input-group-text __text-20px">
-                                    <i class="czi-search text-white"></i>
-                                </span>
-                            </button>
-
-                            <span class="close-search-form-mobile fs-14 font-semibold text-muted d-md-none text-nowrap" type="submit">
-                                {{ translate('cancel') }}
-                            </span>
-                        </div>
-
+                <!-- Search: Desktop only (inline) -->
+                <div class="search-section flex-grow-1 mx-3 mx-lg-5 d-none d-lg-block">
+                    <form action="{{route('products')}}" type="submit" class="search_form m-0">
+                        <input type="hidden" name="global_search_input" value="1">
                         <input name="data_from" value="search" hidden>
                         <input name="page" value="1" hidden>
-                        <diV class="card search-card mobile-search-card">
-                            <div class="card-body">
+                        <div class="custom-search-input-group">
+                            <input class="form-control search-bar-input custom-search-field text-align-direction"
+                                   type="search" autocomplete="off" data-given-value=""
+                                   placeholder="كيف نقدر نساعدك؟ ابحث هنا"
+                                   name="name" value="{{ request('name') }}">
+                            <button class="custom-search-btn" type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                        <!-- Autocomplete -->
+                        <div class="card search-card position-absolute w-100 mt-1" style="display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <div class="card-body p-2">
                                 <div class="search-result-box __h-400px overflow-x-hidden overflow-y-auto"></div>
                             </div>
-                        </diV>
+                        </div>
                     </form>
                 </div>
 
-                <div class="navbar-toolbar d-flex flex-shrink-0 align-items-center">
-                    <a class="navbar-tool navbar-stuck-toggler" href="#">
-                        <span class="navbar-tool-tooltip">{{ translate('expand_Menu') }}</span>
-                        <div class="navbar-tool-icon-box">
-                            <i class="navbar-tool-icon czi-menu open-icon"></i>
-                            <i class="navbar-tool-icon czi-close close-icon"></i>
-                        </div>
+                <!-- Actions -->
+                <div class="actions-section d-flex align-items-center text-white flex-shrink-0">
+                    @php($selected_region = $_COOKIE['selected_region'] ?? 'الرياض')
+                    <div class="action-item d-none d-md-inline-flex cursor-pointer" data-toggle="modal" data-target="#regionModal" style="cursor: pointer;">
+                        <i class="fa fa-map-marker"></i>
+                        <span class="d-none d-lg-block">المنطقة (<span id="current-region-name">{{ $selected_region }}</span>)</span>
+                    </div>
+                    <span class="separator-line d-none d-md-inline-block">|</span>
+                    <a href="{{route('wishlists')}}" class="action-item d-none d-md-inline-flex">
+                        <i class="fa fa-heart-o"></i>
+                        <span class="d-none d-lg-block">المفضلة</span>
                     </a>
-                    <div class="navbar-tool open-search-form-mobile d-lg-none {{Session::get('direction') === "rtl" ? 'mr-md-3' : 'ml-md-3'}}">
-                        <a class="navbar-tool-icon-box bg-secondary" href="javascript:">
-                            <i class="tio-search"></i>
-                        </a>
-                    </div>
-                    <div class="navbar-tool dropdown d-none d-md-block {{Session::get('direction') === "rtl" ? 'mr-md-3' : 'ml-md-3'}}">
-                        <a class="navbar-tool-icon-box bg-secondary dropdown-toggle" href="{{route('wishlists')}}">
-                            <span class="navbar-tool-label">
-                                <span class="countWishlist">
-                                    {{session()->has('wish_list')?count(session('wish_list')):0}}
-                                </span>
-                           </span>
-                            <i class="navbar-tool-icon czi-heart"></i>
-                        </a>
-                    </div>
+                    <span class="separator-line d-none d-md-inline-block">|</span>
+                    <a href="{{route('products')}}" class="action-item d-none d-md-inline-flex">
+                        <i class="fa fa-shopping-bag"></i>
+                        <span class="d-none d-lg-block">المتجر</span>
+                    </a>
+                    <span class="separator-line d-none d-md-inline-block">|</span>
                     @if(auth('customer')->check())
-                        <div class="dropdown">
-                            <a class="navbar-tool ml-3" type="button" data-toggle="dropdown" aria-haspopup="true"
-                               aria-expanded="false">
-                                <div class="navbar-tool-icon-box bg-secondary">
-                                    <div class="navbar-tool-icon-box bg-secondary">
-                                        <img class="img-profile rounded-circle __inline-14" alt=""
-                                             src="{{ getStorageImages(path: auth('customer')->user()->image_full_url, type: 'avatar') }}">
-                                    </div>
-                                </div>
-                                <div class="navbar-tool-text">
-                                    <small>
-                                        {{ translate('hello')}}, {{ Str::limit(auth('customer')->user()->f_name, 10) }}
-                                    </small>
-                                    {{ translate('dashboard')}}
-                                </div>
+                        <div class="dropdown d-none d-md-inline-block">
+                            <a class="action-item dropdown-toggle cursor-pointer" data-toggle="dropdown">
+                                <i class="fa fa-user-circle"></i>
+                                <span>{{ Str::limit(auth('customer')->user()->f_name, 10) }}</span>
                             </a>
-                            <div class="dropdown-menu dropdown-menu-{{Session::get('direction') === "rtl" ? 'left' : 'right'}}"
-                                 aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item"
-                                   href="{{route('account-oder')}}"> {{ translate('my_Order')}} </a>
-                                <a class="dropdown-item"
-                                   href="{{route('user-account')}}"> {{ translate('my_Profile')}}</a>
+                            <div class="dropdown-menu dropdown-menu-{{Session::get('direction') === "rtl" ? 'left' : 'right'}}">
+                                <a class="dropdown-item" href="{{route('account-oder')}}"> {{ translate('my_Order')}} </a>
+                                <a class="dropdown-item" href="{{route('user-account')}}"> {{ translate('my_Profile')}}</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item"
-                                   href="{{route('customer.auth.logout')}}">{{ translate('logout')}}</a>
+                                <a class="dropdown-item" href="{{route('customer.auth.logout')}}">{{ translate('logout')}}</a>
                             </div>
                         </div>
                     @else
-                        <div class="dropdown">
-                            <a class="navbar-tool {{Session::get('direction') === "rtl" ? 'mr-md-3' : 'ml-md-3'}}"
-                               type="button" data-toggle="dropdown" aria-haspopup="true" href="#" rel="nofollow"
-                               aria-expanded="false">
-                                <div class="navbar-tool-icon-box bg-secondary">
-                                    <div class="navbar-tool-icon-box bg-secondary">
-                                        <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M4.25 4.41675C4.25 6.48425 5.9325 8.16675 8 8.16675C10.0675 8.16675 11.75 6.48425 11.75 4.41675C11.75 2.34925 10.0675 0.666748 8 0.666748C5.9325 0.666748 4.25 2.34925 4.25 4.41675ZM14.6667 16.5001H15.5V15.6667C15.5 12.4509 12.8825 9.83341 9.66667 9.83341H6.33333C3.11667 9.83341 0.5 12.4509 0.5 15.6667V16.5001H14.6667Z"
-                                                  fill="{{ $web_config['primary_color'] ?? '#1B7FED'}}"/>
-                                        </svg>
-
-                                    </div>
-                                </div>
-                            </a>
-                            <div class="text-align-direction dropdown-menu __auth-dropdown dropdown-menu-{{Session::get('direction') === "rtl" ? 'left' : 'right'}}"
-                                 aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="{{route('customer.auth.login')}}">
-                                    <i class="fa fa-sign-in mr-2"></i> {{ translate('sign_in')}}
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{{route('customer.auth.sign-up')}}">
-                                    <i class="fa fa-user-circle mr-2"></i>{{ translate('sign_up')}}
-                                </a>
-                            </div>
-                        </div>
+                        <a href="{{route('customer.auth.login')}}" class="action-item d-none d-md-inline-flex">
+                            <i class="fa fa-user-o"></i>
+                            <span class="d-none d-lg-block">تسجيل الدخول</span>
+                        </a>
                     @endif
-                    <div id="cart_items">
+                    <span class="separator-line d-none d-md-inline-block">|</span>
+                    <!-- Cart (visible on all screens) -->
+                    <div id="cart_items" class="m-0">
                         @include('layouts.front-end.partials._cart')
                     </div>
                 </div>
+
             </div>
+
+            <!-- ===== Row 2: Search bar (Mobile only) ===== -->
+            <div class="top-navbar-row2 d-lg-none w-100 px-2 pb-2">
+                <form action="{{route('products')}}" type="submit" class="search_form m-0">
+                    <input type="hidden" name="global_search_input" value="1">
+                    <input name="data_from" value="search" hidden>
+                    <input name="page" value="1" hidden>
+                    <div class="custom-search-input-group">
+                        <input class="form-control search-bar-input custom-search-field text-align-direction"
+                               type="search" autocomplete="off" data-given-value=""
+                               placeholder="كيف نقدر نساعدك؟ ابحث هنا"
+                               name="name" value="{{ request('name') }}">
+                        <button class="custom-search-btn" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                    <!-- Autocomplete -->
+                    <div class="card search-card mobile-search-card position-absolute w-100 mt-1" style="display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                        <div class="card-body p-2">
+                            <div class="search-result-box __h-400px overflow-x-hidden overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
         </div>
 
-        <div class="navbar navbar-expand-md navbar-stuck-menu">
+        <div class="navbar navbar-expand-lg navbar-stuck-menu bottom_navbar">
             <div class="container px-10px">
                 <div class="collapse navbar-collapse text-align-direction" id="navbarCollapse">
-                    <div class="w-100 d-md-none text-align-direction">
-                        <button class="navbar-toggler p-0" type="button" data-toggle="collapse"
-                                data-target="#navbarCollapse">
-                            <i class="tio-clear __text-26px"></i>
+                    <!-- Drawer Header (Mobile close button) -->
+                    <div class="mobile-drawer-header d-lg-none">
+                        <span class="mobile-drawer-title">القائمة</span>
+                        <button class="mobile-drawer-close" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-label="Close menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
                         </button>
                     </div>
 
-                    <ul class="navbar-nav d-block d-md-none">
-                        <li class="nav-item dropdown {{request()->is('/')?'active':''}}">
-                            <a class="nav-link" href="{{route('home')}}">{{ translate('home')}}</a>
+                    <ul class="navbar-nav w-100  header-categories-nav align-items-center" >
+                        <li class="nav-item {{request()->is('/')?'active':''}}">
+                            <a class="nav-link" href="{{route('home')}}">{{ translate('الرئيسية')}}</a>
                         </li>
-                    </ul>
 
-                    @php($categories = \App\Utils\CategoryManager::getCategoriesWithCountingAndPriorityWiseSorting(dataLimit: 11))
-
-                    <ul class="navbar-nav mega-nav pr-lg-2 pl-lg-2 mr-2 d-none d-md-block __mega-nav">
-                        <li class="nav-item {{!request()->is('/')?'dropdown':''}}">
-
-                            <a class="nav-link dropdown-toggle category-menu-toggle-btn ps-0"
-                               href="javascript:">
-                                <svg width="21" height="21" viewBox="0 0 21 21" fill="none"
-                                     xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd"
-                                          d="M9.875 12.9195C9.875 12.422 9.6775 11.9452 9.32563 11.5939C8.97438 11.242 8.4975 11.0445 8 11.0445C6.75875 11.0445 4.86625 11.0445 3.625 11.0445C3.1275 11.0445 2.65062 11.242 2.29937 11.5939C1.9475 11.9452 1.75 12.422 1.75 12.9195V17.2945C1.75 17.792 1.9475 18.2689 2.29937 18.6202C2.65062 18.972 3.1275 19.1695 3.625 19.1695H8C8.4975 19.1695 8.97438 18.972 9.32563 18.6202C9.6775 18.2689 9.875 17.792 9.875 17.2945V12.9195ZM19.25 12.9195C19.25 12.422 19.0525 11.9452 18.7006 11.5939C18.3494 11.242 17.8725 11.0445 17.375 11.0445C16.1337 11.0445 14.2413 11.0445 13 11.0445C12.5025 11.0445 12.0256 11.242 11.6744 11.5939C11.3225 11.9452 11.125 12.422 11.125 12.9195V17.2945C11.125 17.792 11.3225 18.2689 11.6744 18.6202C12.0256 18.972 12.5025 19.1695 13 19.1695H17.375C17.8725 19.1695 18.3494 18.972 18.7006 18.6202C19.0525 18.2689 19.25 17.792 19.25 17.2945V12.9195ZM16.5131 9.66516L19.1206 7.05766C19.8525 6.32578 19.8525 5.13828 19.1206 4.4064L16.5131 1.79891C15.7813 1.06703 14.5937 1.06703 13.8619 1.79891L11.2544 4.4064C10.5225 5.13828 10.5225 6.32578 11.2544 7.05766L13.8619 9.66516C14.5937 10.397 15.7813 10.397 16.5131 9.66516ZM9.875 3.54453C9.875 3.04703 9.6775 2.57015 9.32563 2.2189C8.97438 1.86703 8.4975 1.66953 8 1.66953C6.75875 1.66953 4.86625 1.66953 3.625 1.66953C3.1275 1.66953 2.65062 1.86703 2.29937 2.2189C1.9475 2.57015 1.75 3.04703 1.75 3.54453V7.91953C1.75 8.41703 1.9475 8.89391 2.29937 9.24516C2.65062 9.59703 3.1275 9.79453 3.625 9.79453H8C8.4975 9.79453 8.97438 9.59703 9.32563 9.24516C9.6775 8.89391 9.875 8.41703 9.875 7.91953V3.54453Z"
-                                          fill="currentColor"/>
-                                </svg>
-                                <span class="category-menu-toggle-btn-text">
-                                    {{ translate('categories')}}
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <ul class="navbar-nav mega-nav1 pr-md-2 pl-md-2 d-block d-xl-none">
-                        <li class="nav-item dropdown d-md-none">
-                            <a class="nav-link dropdown-toggle ps-0"
-                               href="javascript:" data-toggle="dropdown">
-                                <i class="czi-menu align-middle mt-n1 me-2"></i>
-                                <span class="me-4">
-                                    {{ translate('categories')}}
-                                </span>
-                            </a>
-                            <ul class="dropdown-menu __dropdown-menu-2 text-align-direction">
-                                @php($categoryIndex=0)
-                                @foreach($categories as $category)
-                                    @php($categoryIndex++)
-                                    @if($categoryIndex < 10)
-                                        <li class="dropdown">
-
-                                            <a href="{{ route('category-products', ['slug' => $category['slug']]) }}" class="d-flex gap-10px align-items-center">
-                                                <img class="aspect-1 rounded-circle" width="20" src="{{ getStorageImages(path: $category?->icon_full_url, type: 'category') }}" alt="{{ $category['name'] }}">
-                                                <span>{{$category['name']}}</span>
-                                            </a>
-                                            @if ($category->childes->count() > 0)
-                                                <a data-toggle='dropdown' class='__ml-50px'>
-                                                    <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left' : 'right'}} __inline-16"></i>
+                        @foreach($categories as $category)
+                            @if ($category->childes->count() > 0)
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="{{ route('category-products', ['slug' => $category['slug']]) }}" data-toggle="dropdown">
+                                        {{ $category['name'] }}
+                                    </a>
+                                    <ul class="dropdown-menu text-align-direction">
+                                        @foreach($category['childes'] as $subCategory)
+                                            <li class="@if($subCategory->childes->count() > 0) dropdown @endif">
+                                                <a class="dropdown-item @if($subCategory->childes->count() > 0) dropdown-toggle @endif" href="{{ route('category-products', ['slug' => $subCategory['slug']]) }}" @if($subCategory->childes->count() > 0) data-toggle="dropdown" @endif>
+                                                    {{ $subCategory['name'] }}
                                                 </a>
-                                            @endif
-
-                                            @if($category->childes->count()>0)
-                                                <ul class="dropdown-menu text-align-direction">
-                                                    @foreach($category['childes'] as $subCategory)
-                                                        <li class="dropdown">
-                                                            <a href="{{ route('category-products', ['slug' => $subCategory['slug']]) }}">
-                                                                <span>{{$subCategory['name']}}</span>
-                                                            </a>
-
-                                                            @if($subCategory->childes->count()>0)
-                                                                <a class="header-subcategories-links"
-                                                                   data-toggle='dropdown'>
-                                                                    <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left' : 'right'}} __inline-16"></i>
+                                                @if($subCategory->childes->count() > 0)
+                                                    <ul class="dropdown-menu">
+                                                        @foreach($subCategory['childes'] as $subSubCategory)
+                                                            <li>
+                                                                <a class="dropdown-item" href="{{ route('category-products', ['slug' => $subSubCategory['slug']]) }}">
+                                                                    {{ $subSubCategory['name'] }}
                                                                 </a>
-                                                                <ul class="dropdown-menu">
-                                                                    @foreach($subCategory['childes'] as $subSubCategory)
-                                                                        <li>
-                                                                            <a class="dropdown-item"
-                                                                               href="{{ route('category-products', ['slug' => $subSubCategory['slug']]) }}">
-                                                                                {{ $subSubCategory['name'] }}
-                                                                            </a>
-                                                                        </li>
-                                                                    @endforeach
-                                                                </ul>
-                                                            @endif
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            @endif
-                                        </li>
-                                    @endif
-                                @endforeach
-                                <li class="__inline-17">
-                                    <div>
-                                        <a class="dropdown-item web-text-primary" href="{{ route('categories') }}">
-                                            {{ translate('view_more') }}
-                                        </a>
-                                    </div>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @endif
+                                            </li>
+                                        @endforeach
+                                    </ul>
                                 </li>
-                            </ul>
-                        </li>
-                    </ul>
-
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown d-none d-md-block {{request()->is('/')?'active':''}}">
-                            <a class="nav-link" href="{{route('home')}}">{{ translate('home')}}</a>
-                        </li>
-
-                        @if(getWebConfig(name: 'product_brand'))
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#"
-                                   data-toggle="dropdown">{{ translate('brand') }}</a>
-                                <ul class="text-align-direction dropdown-menu __dropdown-menu-sizing dropdown-menu-{{Session::get('direction') === "rtl" ? 'right' : 'left'}} scroll-bar">
-                                    @php($brandIndex=0)
-                                    @foreach(\App\Utils\BrandManager::getActiveBrandWithCountingAndPriorityWiseSorting() as $brand)
-                                        @php($brandIndex++)
-                                        @if($brandIndex < 10 && !empty($brand['slug']))
-                                            <li class="__inline-17">
-                                                <div>
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('brand-products', ['slug' => $brand['slug']]) }}">
-                                                        {{ $brand['name'] }}
-                                                    </a>
-                                                </div>
-                                                <div class="align-baseline">
-                                                    @if($brand['brand_products_count'] > 0 )
-                                                        <span class="count-value px-2">( {{ $brand['brand_products_count'] }} )</span>
-                                                    @endif
-                                                </div>
-                                            </li>
-                                        @endif
-                                    @endforeach
-                                    <li class="__inline-17">
-                                        <div>
-                                            <a class="dropdown-item web-text-primary" href="{{route('brands')}}">
-                                                {{ translate('view_more') }}
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endif
-
-                        @if(
-                            count(getFeaturedDealsProductList()) > 0 &&
-                            !(($web_config['flash_deals'] || count($web_config['flash_deals_products']) > 0) || $web_config['discount_product'] > 0 || $web_config['clearance_sale_product_count'] > 0))
-                            <li class="nav-item dropdown">
-                                <a class="nav-link text-capitalize"
-                                   href="{{ route('featured-deal-products') }}">
-                                    {{ translate('featured_Deal')}}
-                                </a>
-                            </li>
-                        @elseif(
-                            ($web_config['flash_deals'] && count($web_config['flash_deals_products']) > 0) &&
-                            !(count(getFeaturedDealsProductList()) > 0 || $web_config['discount_product'] > 0 || $web_config['clearance_sale_product_count'] > 0)
-                            )
-                            <li class="nav-item dropdown">
-                                <a class="nav-link text-capitalize"
-                                   href="{{ route('flash-deals', ['id' => $web_config['flash_deals']['id'] ?? 0]) }}">
-                                    {{ translate('flash_deal')}}
-                                </a>
-                            </li>
-                        @elseif(
-                            ($web_config['discount_product'] > 0) &&
-                            !(count(getFeaturedDealsProductList()) > 0 || ($web_config['flash_deals'] && count($web_config['flash_deals_products']) > 0) || $web_config['clearance_sale_product_count'] > 0)
-                            )
-                            <li class="nav-item dropdown">
-                                <a class="nav-link text-capitalize"
-                                   href="{{ route('discounted-products') }}">
-                                    {{ translate('discounted_products')}}
-                                </a>
-                            </li>
-                        @elseif(
-                            ($web_config['clearance_sale_product_count'] > 0) &&
-                            !(count(getFeaturedDealsProductList()) > 0 || ($web_config['flash_deals'] || count($web_config['flash_deals_products']) > 0) || $web_config['discount_product'] > 0)
-                            )
-                            <li class="nav-item dropdown">
-                                <a class="nav-link text-capitalize"
-                                   href="{{ route('clearance-sale-products') }}">
-                                    {{ translate('clearance_Sale')}}
-                                </a>
-                            </li>
-                        @elseif(count(getFeaturedDealsProductList()) > 0 || ($web_config['flash_deals'] && count($web_config['flash_deals_products']) > 0) || $web_config['discount_product'] > 0 || $web_config['clearance_sale_product_count'] > 0)
-                            <li class="nav-item">
-                                <div class="dropdown">
-                                    <button class="btn dropdown-toggle text-white text-max-md-dark text-capitalize ps-2"
-                                            type="button" id="dropdownMenuButton"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {{ translate('offers')}}
-                                    </button>
-                                    <div class="dropdown-menu __dropdown-menu-3 __min-w-165px text-align-direction"
-                                         aria-labelledby="dropdownMenuButton">
-                                        @if(count(getFeaturedDealsProductList()) > 0)
-                                            <a class="dropdown-item text-nowrap text-capitalize"
-                                               href="{{ route('featured-deal-products') }}">
-                                                {{ translate('featured_Deal')}}
-                                            </a>
-                                        @endif
-
-                                        @if($web_config['flash_deals'] && count($web_config['flash_deals_products']) > 0)
-                                            @if(count(getFeaturedDealsProductList()) > 0)
-                                                <div class="dropdown-divider"></div>
-                                            @endif
-                                            <a class="dropdown-item text-nowrap text-capitalize" href="{{ route('flash-deals',['id' => $web_config['flash_deals']['id'] ?? 0]) }}">
-                                                {{ translate('flash_deal')}}
-                                            </a>
-                                        @endif
-
-                                        @if($web_config['discount_product'] > 0)
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item text-nowrap text-capitalize"
-                                               href="{{ route('discounted-products') }}">
-                                                {{ translate('discounted_products')}}
-                                            </a>
-                                        @endif
-
-                                        @if($web_config['clearance_sale_product_count'] > 0)
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item text-nowrap"
-                                               href="{{ route('clearance-sale-products') }}">
-                                                {{ translate('clearance_Sale')}}
-                                            </a>
-                                        @endif
-
-                                    </div>
-                                </div>
-                            </li>
-                        @endif
-
-                        @if ($web_config['digital_product_setting'] && count($web_config['publishing_houses']) == 1)
-                            @php($firstPublisherID = is_array($web_config['publishing_houses']) && isset($web_config['publishing_houses']['id']) ? $web_config['publishing_houses']['id'] : $web_config['publishing_houses']?->first()?->id)
-                            <li class="nav-item dropdown d-none d-md-block {{request()->is('/')?'active':''}}">
-                                <a class="nav-link" href="{{ route('products',['publishing_house_id' => $firstPublisherID, 'product_type' => 'digital', 'page'=>1]) }}">
-                                    {{ translate('Publication_House') }}
-                                </a>
-                            </li>
-                        @elseif ($web_config['digital_product_setting'] && count($web_config['publishing_houses']) > 1)
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                                    {{ translate('Publication_House') }}
-                                </a>
-                                <ul class="text-align-direction dropdown-menu __dropdown-menu-sizing dropdown-menu-{{Session::get('direction') === "rtl" ? 'right' : 'left'}} scroll-bar">
-                                    @php($publishingHousesIndex=0)
-                                    @foreach($web_config['publishing_houses'] as $publishingHouseItem)
-                                        @if($publishingHousesIndex < 10 && $publishingHouseItem['name'] != 'Unknown')
-                                            @php($publishingHousesIndex++)
-                                            <li class="__inline-17">
-                                                <div>
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('products',['publishing_house_id' => $publishingHouseItem['id'], 'product_type' => 'digital', 'page'=>1]) }}">
-                                                        {{ $publishingHouseItem['name'] }}
-                                                    </a>
-                                                </div>
-                                                <div class="align-baseline">
-                                                    @if($publishingHouseItem['publishing_house_products_count'] > 0 )
-                                                        <span class="count-value px-2">( {{ $publishingHouseItem['publishing_house_products_count'] }} )</span>
-                                                    @endif
-                                                </div>
-                                            </li>
-                                        @endif
-                                    @endforeach
-                                    <li class="__inline-17">
-                                        <div>
-                                            <a class="dropdown-item web-text-primary"
-                                               href="{{ route('products', ['product_type' => 'digital', 'page' => 1]) }}">
-                                                {{ translate('view_more') }}
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endif
-
-                        @php($businessMode = getWebConfig(name: 'business_mode'))
-                        @if ($businessMode == 'multi')
-                            <li class="nav-item dropdown {{request()->is('/')?'active':''}}">
-                                <a class="nav-link text-capitalize"
-                                   href="{{route('vendors')}}">{{ translate('all_vendors')}}</a>
-                            </li>
-                        @endif
-
-                        @if(auth('customer')->check())
-                            <li class="nav-item d-md-none">
-                                <a href="{{route('user-account')}}" class="nav-link text-capitalize">
-                                    {{ translate('user_profile')}}
-                                </a>
-                            </li>
-                            <li class="nav-item d-md-none">
-                                <a href="{{route('wishlists')}}" class="nav-link">
-                                    {{ translate('Wishlist')}}
-                                </a>
-                            </li>
-                        @else
-                            <li class="nav-item d-md-none">
-                                <a class="dropdown-item pl-2" href="{{route('customer.auth.login')}}">
-                                    <i class="fa fa-sign-in mr-2"></i> {{ translate('sign_in')}}
-                                </a>
-                                <div class="dropdown-divider"></div>
-                            </li>
-                            <li class="nav-item d-md-none">
-                                <a class="dropdown-item pl-2" href="{{route('customer.auth.sign-up')}}">
-                                    <i class="fa fa-user-circle mr-2"></i>{{ translate('sign_up')}}
-                                </a>
-                            </li>
-                        @endif
-                        @if ($businessMode == 'multi')
-                            @if(getWebConfig(name: 'seller_registration'))
+                            @else
                                 <li class="nav-item">
-                                    <div class="dropdown">
-                                        <button class="btn dropdown-toggle text-white text-max-md-dark text-capitalize ps-2"
-                                                type="button" id="dropdownMenuButton"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{ translate('vendor_zone')}}
-                                        </button>
-                                        <div class="dropdown-menu __dropdown-menu-3 __min-w-165px text-align-direction"
-                                             aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item text-nowrap text-capitalize" href="{{route('vendor.auth.registration.index')}}">
-                                                {{ translate('become_a_vendor')}}
-                                            </a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item text-nowrap" href="{{route('vendor.auth.login')}}">
-                                                {{ translate('vendor_login')}}
-                                            </a>
-                                        </div>
-                                    </div>
+                                    <a class="nav-link" href="{{ route('category-products', ['slug' => $category['slug']]) }}">
+                                        {{ $category['name'] }}
+                                    </a>
                                 </li>
                             @endif
-                        @endif
+                        @endforeach
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('discounted-products') }}">عروض حصرية</a>
+                        </li>
                     </ul>
-                    @if(auth('customer')->check())
-                        <div class="logout-btn mt-auto d-md-none">
-                            <hr>
-                            <a href="{{route('customer.auth.logout')}}" class="nav-link">
-                                <strong class="text-base">{{ translate('logout')}}</strong>
-                            </a>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
 
+        <!--
         <div class="megamenu-wrap">
             <div class="container">
                 <div class="category-menu-wrap">
@@ -609,8 +314,46 @@
                 </div>
             </div>
         </div>
+        -->
     </div>
 </header>
+
+<!-- Region Selection Modal -->
+<div class="modal fade" id="regionModal" tabindex="-1" role="dialog" aria-labelledby="regionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 position-relative" style="border-radius: 8px; overflow: hidden; padding: 25px 20px;">
+            
+            <!-- Close Button -->
+            <button type="button" class="close-region-modal" data-dismiss="modal" aria-label="Close">
+                <i class="fa fa-times"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="text-center mb-4">
+                <h3 class="modal-title-custom">يرجى إختيار منطقتك لتخصيص العرض</h3>
+                <p class="modal-subtitle-custom">
+                    المنطقة الحالية: "<span class="text-primary-color">منطقة <span class="current-region-placeholder">{{ $selected_region }}</span> - <span class="current-region-placeholder">{{ $selected_region }}</span></span>"، يمكنك تغيير المنطقة أسفله.
+                </p>
+            </div>
+
+            <!-- Modal Body (Regions Grid) -->
+            <div class="regions-grid">
+                @php($regions = ['الرياض', 'الدمام', 'المجمعة', 'الخرج', 'الأحساء', 'الجبيل', 'حفر الباطن', 'المدينة المنورة', 'ينبع', 'الرس', 'بريدة', 'عنيزة', 'مكة المكرمة', 'جدة', 'الطائف', 'الباحة', 'القنفذة', 'الدوادمي'])
+                @foreach($regions as $region)
+                    <button type="button" class="region-card @if($region == $selected_region) active @endif" data-region="{{ $region }}">
+                        {{ $region }}
+                    </button>
+                @endforeach
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="text-center mt-4">
+                <button type="button" class="btn-save-region" id="save-region-btn">حفظ</button>
+            </div>
+            
+        </div>
+    </div>
+</div>
 
 @push('script')
     <script>
@@ -619,5 +362,81 @@
         $(".category-menu").find(".mega_menu").parents("li")
             .addClass("has-sub-item").find("> a")
             .append("<i class='czi-arrow-{{Session::get('direction') === "rtl" ? 'left' : 'right'}}'></i>");
+
+        $(document).ready(function() {
+            let tempSelectedRegion = "{{ $selected_region }}";
+
+            // Handle Region Card Click
+            $(document).on('click', '.region-card', function() {
+                $('.region-card').removeClass('active');
+                $(this).addClass('active');
+                tempSelectedRegion = $(this).data('region');
+            });
+
+            // Handle Save Button Click
+            $('#save-region-btn').on('click', function() {
+                // Set cookie (valid for 30 days)
+                document.cookie = "selected_region=" + encodeURIComponent(tempSelectedRegion) + "; path=/; max-age=" + (30*24*60*60);
+                
+                // Update placeholder text
+                $('#current-region-name').text(tempSelectedRegion);
+                $('.current-region-placeholder').text(tempSelectedRegion);
+                
+                // Close modal
+                $('#regionModal').modal('hide');
+                
+                // Reload the page to reflect new regional settings
+                location.reload();
+            });
+        });
+    </script>
+
+    <script>
+        // ===== Mobile Right-Side Drawer =====
+        (function () {
+            // Insert backdrop into body once
+            if (!document.getElementById('mobile-menu-backdrop')) {
+                var backdrop = document.createElement('div');
+                backdrop.id = 'mobile-menu-backdrop';
+                backdrop.className = 'mobile-menu-backdrop';
+                document.body.appendChild(backdrop);
+            }
+
+            var backdrop = document.getElementById('mobile-menu-backdrop');
+            var drawer   = document.getElementById('navbarCollapse');
+
+            function openDrawer() {
+                if (drawer) drawer.classList.add('show');
+                backdrop.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeDrawer() {
+                if (drawer) drawer.classList.remove('show');
+                backdrop.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            // Toggle button (hamburger) - intercept Bootstrap's default behavior
+            document.querySelectorAll('[data-target="#navbarCollapse"]').forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (drawer && drawer.classList.contains('show')) {
+                        closeDrawer();
+                    } else {
+                        openDrawer();
+                    }
+                });
+            });
+
+            // Backdrop click closes drawer
+            backdrop.addEventListener('click', closeDrawer);
+
+            // ESC key closes drawer
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') closeDrawer();
+            });
+        })();
     </script>
 @endpush

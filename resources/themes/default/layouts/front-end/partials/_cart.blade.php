@@ -11,7 +11,7 @@
         </a>
         <a class="navbar-tool-text ms-2"
            href="{{route('shop-cart') }}"><small>{{ translate('my_cart') }}</small>
-            <span class="cart-total-price font-bold fs-14">
+            <span class="cart-total-price font-bold fs-14 d-none d-lg-block">
                 {{ webCurrencyConverter(amount: \App\Utils\CartManager::getCartListTotalAppliedDiscount($cart)) }}
             </span>
         </a>
@@ -25,7 +25,7 @@
         <a class="navbar-tool-text ms-2"
            href="{{ route('customer.auth.login') }}">
             <small>{{ translate('my_cart') }}</small>
-            <span class="cart-total-price font-bold fs-14">
+            <span class="cart-total-price font-bold fs-14 d-none d-lg-block">
                 {{ webCurrencyConverter(amount: \App\Utils\CartManager::getCartListTotalAppliedDiscount($cartList)) }}
             </span>
         </a>

@@ -17,9 +17,38 @@ class Localization
      */
     public function handle(Request $request, Closure $next)
     {
-        if (session()->has('locale')) {
-            App::setLocale(session()->get('locale'));
+        if ($request->is('admin*') || $request->is('vendor*') || $request->is('seller*') || $request->is('change-language')) {
+            if (!session()->has('local')) {
+                session()->put('local', 'sa');
+            }
+            if (!session()->has('direction')) {
+                session()->put('direction', 'rtl');
+            }
+            App::setLocale(session()->get('local'));
+            return $next($request);
+        } else {
+            $originalLocal = session()->get('local');
+            $originalDirection = session()->get('direction');
+
+            session()->put('local', 'sa');
+            session()->put('direction', 'rtl');
+            App::setLocale('sa');
+
+            $response = $next($request);
+
+            if ($originalLocal !== null) {
+                session()->put('local', $originalLocal);
+            } else {
+                session()->forget('local');
+            }
+
+            if ($originalDirection !== null) {
+                session()->put('direction', $originalDirection);
+            } else {
+                session()->forget('direction');
+            }
+
+            return $response;
         }
-        return $next($request);
     }
 }

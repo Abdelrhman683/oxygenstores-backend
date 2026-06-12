@@ -487,6 +487,7 @@ a {
 
 .navbar-stuck-menu > .container {
     padding: 5px 15px !important;
+    margin: 0 50px;
 }
 
 @media (max-width: 991px) {
@@ -850,7 +851,7 @@ a {
 }
 
 .page-footer {
-    background: #183f56;
+    background: #1C344A;
 }
 
 .page-footer hr {

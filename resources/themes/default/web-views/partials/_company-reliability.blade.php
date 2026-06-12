@@ -1,6 +1,7 @@
 @if(count($companyReliability) > 0)
 <div class="container rtl pb-4 px-0 px-md-3">
     <div class="shipping-policy-web">
+        <h4 class="section-title-bars fw-bold mb-4 text-center">لماذا متجرنا</h4>
         <div class="footer-top-slider owl-theme owl-carousel" data-slide-items="4">
             @foreach ($companyReliability as $key=>$value)
                 @if ($value['status'] == 1 && !empty($value['title']))

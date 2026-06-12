@@ -1,4 +1,4 @@
-@if ($categories->count() > 0 )
+<!-- @if ($categories->count() > 0 )
     <section class="container py-0 rtl px-0 px-md-3">
         <div class="__inline-62">
             <div>
@@ -54,4 +54,4 @@
             </div>
         </div>
     </section>
-@endif
+@endif -->
