@@ -1,21 +1,22 @@
 @if(count($companyReliability) > 0)
 <div class="container rtl pb-4 px-0 px-md-3">
-    <div class="shipping-policy-web">
-        <h4 class="section-title-bars fw-bold mb-4 text-center">لماذا متجرنا</h4>
-        <div class="footer-top-slider owl-theme owl-carousel" data-slide-items="4">
+    <div class="benefits-section">
+        <div class="benefits-header">
+            <h4 class="benefits-title">لماذا متجرنا</h4>
+        </div>
+        
+        <div class="benefits-grid">
             @foreach ($companyReliability as $key=>$value)
                 @if ($value['status'] == 1 && !empty($value['title']))
-                    <div class="footer-top-slide-item">
-                        <div class="d-flex justify-content-center">
-                            <div class="shipping-method-system">
-                                <div class="shopping-method-icon d-flex mx-auto justify-content-center bg-white rounded-circle mb-20 d-center">
-                                    <img loading="lazy" alt="" class="object-contain" width="88" height="88" src="{{ getStorageImages(path: imagePathProcessing(imageData: $value['image'],path: 'company-reliability'), type: 'source', source: 'public/assets/front-end/img'.'/'.$value['item'].'.png') }}">
-                                </div>
-                                <div class="w-100 text-center">
-                                    <p class="m-0">{{ $value['title'] }}</p>
-                                </div>
-                            </div>
+                    <div class="benefits-item">
+                        <div class="benefits-icon-wrapper">
+                            <img loading="lazy" alt="" class="object-contain" width="250" height="250" src="{{ getStorageImages(path: imagePathProcessing(imageData: $value['image'],path: 'company-reliability'), type: 'source', source: 'public/assets/front-end/img'.'/'.$value['item'].'.png') }}">
                         </div>
+                        {{-- 
+                        <div class="benefits-text">
+                            <p class="m-0">{{ $value['title'] }}</p>
+                        </div>
+                        --}}
                     </div>
                 @endif
             @endforeach

@@ -625,31 +625,28 @@ $(document).ready(function () {
         ltr: directionFromSession === "ltr",
         responsive: {
             0: {
-                items: 3,
+                items: 2.2,
+                margin: 10,
             },
-            // 360: {
-            //     items: 3.2,
-            // },
-            // 375: {
-            //     items: 3.5,
-            // },
+            375: {
+                items: 2.5,
+                margin: 10,
+            },
             540: {
-                items: 4,
-            },
-            576: {
-                items: 5,
+                items: 3.5,
+                margin: 15,
             },
             768: {
-                items: 6,
+                items: 4.5,
+                margin: 20,
             },
             992: {
-                items: 8,
+                items: 5,
+                margin: 20,
             },
             1200: {
-                items: 10,
-            },
-            1400: {
-                items: 11,
+                items: 5,
+                margin: 25,
             },
         },
     });
