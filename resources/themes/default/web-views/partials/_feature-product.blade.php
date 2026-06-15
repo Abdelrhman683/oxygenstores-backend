@@ -27,7 +27,7 @@
                             </div>
                         @endif
                     </div>
-                    <a class="btn-circle stopPropagation action-product-quick-view" href="javascript:" data-product-id="{{$product->id}}">
+                    <a class="btn-circle action-product-quick-view" href="javascript:" data-product-id="{{$product->id}}">
                         <i class="czi-eye align-middle"></i>
                     </a>
                     @if($product->product_type == 'physical' && $product->current_stock <= 0)

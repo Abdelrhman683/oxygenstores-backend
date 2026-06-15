@@ -13,7 +13,7 @@ class CategoryManager
 {
     public static function parents(): Collection|array
     {
-        return Category::with(['childes.childes'])->where('position', 0)->orderBy('priority', 'desc')->get();
+        return Category::with(['childes.childes'])->where('parent_id', 0)->orderBy('priority', 'desc')->get();
     }
 
     public static function child($parent_id)
@@ -140,7 +140,7 @@ class CategoryManager
                             ->when(request('offer_type') == 'featured_deal', function ($query) use ($featuredDealProducts) {
                                 return $query->whereIn('id', $featuredDealProducts?->pluck('id')?->toArray() ?? [0]);
                             });
-                        }])->where('position', 2);
+                        }]);
                     }])->withCount(['subCategoryProduct' => function ($query) use ($dataForm, $featuredDealProducts) {
                         return $query->active()->when(request('offer_type') == 'clearance_sale', function ($query) {
                             return $query->whereHas('clearanceSale', function ($query) {
@@ -156,9 +156,8 @@ class CategoryManager
                         ->when($dataForm == 'flash-deals', function ($query) {
                             return $query->whereHas('flashDealProducts.flashDeal');
                         });
-                    }])
-                    ->where('position', 1);
-                }, 'childes.childes'])->where('position', 0)->get();
+                    }]);
+                }, 'childes.childes'])->where('parent_id', 0)->get();
         });
 
         $categoriesProcessed = self::getPriorityWiseCategorySortQuery(query: $categories);

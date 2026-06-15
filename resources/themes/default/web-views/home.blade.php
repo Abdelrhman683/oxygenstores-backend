@@ -62,6 +62,7 @@
         @endif
 
         @include('web-views.partials._category-section-home')
+        @include('web-views.partials._recommended-products')
 
 
          @if(getFeaturedDealsProductList() && (count(getFeaturedDealsProductList()) > 0))
@@ -257,7 +258,7 @@
         </div>
     </div>
 </section>
-        @include('web-views.partials._recommended-products')
+        @include('web-views.partials._custom-static-products')
 
    
         @if ($homeCategories->count() > 0)
@@ -277,50 +278,7 @@
 @endsection
 
 @push('script')
-    @if($orderSuccessIds)
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var modalEl = document.getElementById('order_successfully');
-                var orderModal = new bootstrap.Modal(modalEl, {
-                    backdrop: 'static',
-                    keyboard: false
-                });
-                orderModal.show();
 
-
-                document.querySelectorAll('.copy-order-id').forEach(function(copyBtn) {
-                    copyBtn.addEventListener('click', function() {
-                        let orderTextEl = null;
-                        orderTextEl = this.closest('tr')?.querySelector('.order-id-text');
-                        if (!orderTextEl) {
-                            orderTextEl = this.parentElement.querySelector('.order-id-text');
-                        }
-                        const orderText = orderTextEl?.textContent.trim();
-                        if (orderText) {
-                            navigator.clipboard.writeText(orderText).then(() => {
-                                toastr.success('Order ID copied successfully!');
-                            }).catch(err => {
-                                console.warn('Clipboard error:', err);
-                                toastr.warning('Unable to copy. Clipboard requires HTTPS or localhost.');
-                            });
-                        }
-                    });
-                });
-                document.getElementById('modal-close-btn').addEventListener('click', function() {
-                    setTimeout(() => { orderModal.hide(); }, 600);
-                });
-            });
-        </script>
-    @endif
-
-    @if(Request::is('/') && \Illuminate\Support\Facades\Cookie::has('popup_banner') == false && empty($orderSuccessIds))
-        <script>
-            $(document).ready(function () {
-                $('#popup-modal').modal('show');
-            });
-        </script>
-        @php(\Illuminate\Support\Facades\Cookie::queue('popup_banner', 'off', 1))
-    @endif
     <script src="{{theme_asset(path: 'public/assets/front-end/js/owl.carousel.min.js')}}"></script>
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/home.js') }}"></script>
 @endpush

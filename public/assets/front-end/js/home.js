@@ -693,4 +693,134 @@ $(document).ready(function () {
     $(".store-prev").on("click", function () {
         othersStore.trigger("prev.owl.carousel", [600]);
     });
+
+    $(".premium-product-carousel").owlCarousel({
+        loop: false,
+        autoplay: true,
+        margin: 20,
+        nav: false,
+        dots: true,
+        autoplayHoverPause: true,
+        rtl: directionFromSession === "rtl",
+        ltr: directionFromSession === "ltr",
+        responsive: {
+            0: {
+                items: 1.2,
+                margin: 10,
+            },
+            375: {
+                items: 1.5,
+                margin: 15,
+            },
+            540: {
+                items: 2.2,
+                margin: 15,
+            },
+            768: {
+                items: 3.2,
+                margin: 20,
+            },
+            992: {
+                items: 4,
+                margin: 20,
+            },
+            1200: {
+                items: 5,
+                margin: 20,
+            },
+            1400: {
+                items: 6,
+                margin: 20,
+            },
+        },
+    });
+
+    /* =========================================================
+       Recommended Products (Category Tabs) - Swiper & Tabs Logic
+       ========================================================= */
+    const rpSwiperConfig = {
+        dir: 'rtl',
+        loop: false,
+        spaceBetween: 12,
+        slidesPerView: 2,
+        pagination: {
+            el: '.rp-swiper-pagination',
+            clickable: true,
+        },
+        breakpoints: {
+            480:  { slidesPerView: 3, spaceBetween: 12 },
+            768:  { slidesPerView: 4, spaceBetween: 14 },
+            992:  { slidesPerView: 5, spaceBetween: 14 },
+            1200: { slidesPerView: 6, spaceBetween: 16 },
+        }
+    };
+
+    if (document.querySelector('#rp-swiper-washers')) {
+        const rpSwiperWashers      = new Swiper('#rp-swiper-washers',      rpSwiperConfig);
+        const rpSwiperFridges      = new Swiper('#rp-swiper-refrigerators', rpSwiperConfig);
+        const rpSwiperConditioners = new Swiper('#rp-swiper-conditioners',  rpSwiperConfig);
+
+        const tabBtns = document.querySelectorAll('#recommendedTabsNav .rp-tab-btn');
+        const tabPanes = document.querySelectorAll('#recommendedTabsContent .rp-tab-pane');
+
+        tabBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabPanes.forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                var target = document.getElementById(btn.getAttribute('data-target'));
+                if (target) {
+                    target.classList.add('active');
+                    [rpSwiperWashers, rpSwiperFridges, rpSwiperConditioners].forEach(s => {
+                        if (s && typeof s.update === 'function') s.update();
+                    });
+                }
+            });
+        });
+    }
+
+    /* =========================================================
+       Order Success Modal & Copy ID Logic
+       ========================================================= */
+    const orderModalEl = document.getElementById('order_successfully');
+    if (orderModalEl) {
+        const orderModal = new bootstrap.Modal(orderModalEl, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        orderModal.show();
+
+        document.querySelectorAll('.copy-order-id').forEach(function(copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                let orderTextEl = this.closest('tr')?.querySelector('.order-id-text');
+                if (!orderTextEl) {
+                    orderTextEl = this.parentElement.querySelector('.order-id-text');
+                }
+                const orderText = orderTextEl?.textContent.trim();
+                if (orderText) {
+                    navigator.clipboard.writeText(orderText).then(() => {
+                        if (typeof toastr !== 'undefined') toastr.success('Order ID copied successfully!');
+                    }).catch(err => {
+                        console.warn('Clipboard error:', err);
+                        if (typeof toastr !== 'undefined') toastr.warning('Unable to copy. Clipboard requires HTTPS or localhost.');
+                    });
+                }
+            });
+        });
+
+        const closeBtn = document.getElementById('modal-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                setTimeout(() => { orderModal.hide(); }, 600);
+            });
+        }
+    }
+
+    /* =========================================================
+       Popup Modal Logic
+       ========================================================= */
+    const popupModal = $('#popup-modal');
+    if (popupModal.length > 0) {
+        popupModal.modal('show');
+    }
 });
