@@ -267,6 +267,18 @@
         </div>
     </div>
 </section>
+<section class="custom-banner-section">
+        <div class="promo-wide-banner">
+            <a href="{{ route('products') }}" class="d-block">
+                <img
+                    loading="lazy"
+                    src="{{ theme_asset('public/assets/front-end/img/promo_ban.webp') }}"
+                    alt="Promotional Banner"
+                    class="promo-wide-banner__img"
+                >
+            </a>
+    </div>
+</section>
         @include('web-views.partials._custom-static-products')
 
    
@@ -281,6 +293,27 @@
         @if($companyReliability != null)
             @include('web-views.partials._company-reliability')
         @endif
+    
+
+
+        <section class="cat-promo-section container rtl">
+            <div class="cat-promo-grid">
+
+                <a href="{{ route('products') }}?category=large-appliances" class="cat-promo-card">
+                    <img loading="lazy" src="{{ theme_asset('public/assets/front-end/img/cat_1.webp') }}"alt="" >
+                </a>
+
+                <a href="{{ route('products') }}?category=screens" class="cat-promo-card">
+                    <img loading="lazy" src="{{ theme_asset('public/assets/front-end/img/cat_2.webp') }}"alt="" >
+                </a>
+
+                <a href="{{ route('products') }}?category=air-conditioners" class="cat-promo-card">
+                    <img loading="lazy" src="{{ theme_asset('public/assets/front-end/img/cat_2.webp') }}"alt="" >
+                </a>
+
+            </div>
+        </section>
+
     </div>
 
     <span id="direction-from-session" data-value="{{ session()->get('direction') }}"></span>
