@@ -33,7 +33,7 @@
 
     <div class="d-flex flex-nowrap gap-3 align-items-center flex-grow-1 justify-content-end">
         <div class="d-flex flex-wrap gap-3 flex-grow-1 justify-content-end">
-            @if(isset($searchBarSection) && $searchBarSection)
+            <!-- @if(isset($searchBarSection) && $searchBarSection)
                 @if(!request()->has('global_search_input'))
                     <div class="d-flex align-items-center gap-2 position-relative flex-grow-1">
                         <input class="form-control appended-form-control pe-5rem search-page-button-input" type="search" autocomplete="off"
@@ -45,7 +45,7 @@
                         </button>
                     </div>
                 @endif
-            @endif
+            @endif -->
 
             @if(isset($sortBySection) && $sortBySection)
             <div id="search-form" class="d-none d-lg-block">

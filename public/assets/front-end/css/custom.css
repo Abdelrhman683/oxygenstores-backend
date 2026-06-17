@@ -5274,3 +5274,15 @@ justify-content: center;
     transform: scale(1.02);
 }
 
+.breadcrumb-title ,
+.breadcrumb-item.active{
+    padding: 5px;
+    display: inline-block;
+    color: #7a808f;
+    font-size: 14px;
+}
+.breadcrumb-item i{
+  color: #1c344a;
+  font-size: 1rem;
+  font-weight: bold;
+}
