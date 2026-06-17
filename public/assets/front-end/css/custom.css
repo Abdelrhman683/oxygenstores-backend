@@ -1,3 +1,25 @@
+/* Global Scrollbar Styling - Forced Visibility */
+html {
+    scrollbar-color: #485462  !important;
+}
+
+::-webkit-scrollbar {
+    width: 12px !important;
+    display: block !important;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1 !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #485462 !important;
+    border: 2px solid #f1f1f1 !important;
+}
+
+
+
+
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
 
 @font-face {
@@ -3513,14 +3535,10 @@ body {
    ========================================================= */
 
 .recommended-products-section {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 16px rgba(38, 79, 116, 0.08);
     padding: 0 0 28px 0;
     overflow: hidden;
 }
 
-/* الشريط الأصفر للعنوان كامل العرض */
 .rp-header-bar {
     background-color: var(--bg-yellow);
     padding: 14px 24px;
@@ -3534,7 +3552,6 @@ body {
     color: var(--bg-blue) !important;
 }
 
-/* شريط التابات محاذي لليمين */
 .rp-tabs-nav {
     list-style: none;
     border-bottom: 2px solid var(--bg-blue);
@@ -3546,7 +3563,6 @@ body {
     margin-bottom: -2px;
 }
 
-/* زر التاب */
 .rp-tab-btn {
     background: transparent;
     border: none;
@@ -3566,14 +3582,12 @@ body {
     background: rgba(38, 79, 116, 0.05);
 }
 
-/* التاب النشط */
 .rp-tab-btn.active {
     color: #fff !important;
     background: var(--bg-blue) !important;
     font-weight: 700;
 }
 
-/* سهم يشير لأعلى ولونه أبيض للتاب النشط */
 .rp-tab-btn.active::after {
     content: '';
     position: absolute;
@@ -3588,7 +3602,6 @@ body {
     z-index: 10;
 }
 
-/* محتوى التابات */
 .rp-tab-pane {
     display: none;
     animation: rpFadeIn 0.3s ease;
@@ -3603,7 +3616,6 @@ body {
     to   { opacity: 1; transform: translateY(0); }
 }
 
-/* تقسيم 7 أعمدة للشاشات الكبيرة */
 @media (min-width: 1200px) {
     .col-xl-1-7 {
         flex: 0 0 14.2857%;
@@ -3611,7 +3623,6 @@ body {
     }
 }
 
-/* كارت المنتج المطور المطابق تماماً للصورة */
 .rp-card {
     background: #fff;
     border: 1px solid #e2e8f0;
@@ -3630,7 +3641,6 @@ body {
     box-shadow: 0 4px 20px rgba(38, 79, 116, 0.12);
 }
 
-/* الهيدر المخصص للكارت: الخصم والأيقونات */
 .rp-card-header {
     display: flex;
     justify-content: space-between;
@@ -3676,7 +3686,6 @@ body {
     border-color: var(--bg-blue);
 }
 
-/* صورة الكارت */
 .rp-card-image {
     display: flex;
     justify-content: center;
@@ -3727,7 +3736,6 @@ body {
     -webkit-box-orient: vertical;
 }
 
-/* السعر */
 .rp-card-price {
     display: flex;
     align-items: center;
@@ -3747,7 +3755,6 @@ body {
     color: var(--bg-blue);
 }
 
-/* زر أضف للعربة */
 .rp-card-footer {
     margin-top: 10px;
 }
@@ -3774,7 +3781,6 @@ body {
     color: var(--bg-blue);
 }
 
-/* مؤشرات السلايدر السفلية */
 .rp-carousel-dots {
     margin-top: 20px;
 }
@@ -3792,7 +3798,6 @@ body {
     background-color: var(--bg-blue);
 }
 
-/* Responsive */
 @media (max-width: 767px) {
     .recommended-products-section {
         padding-bottom: 16px;
@@ -4723,7 +4728,6 @@ body {
    Premium Static Product Section Styles
    ========================================================= */
 .premium-static-section {
-    padding: 40px 0;
     background-color: #f8f9fa;
 }
 
@@ -4904,16 +4908,12 @@ justify-content: center;
     background: #264F74;
 }
 
-.premium-product-carousel {
-    padding-bottom: 60px;
-}
 
 .premium-carousel-wrapper {
     position: relative;
     padding-bottom: 20px;
 }
 
-/* Dots Styling to match image */
 .premium-static-section .owl-dots {
     margin-top: 40px;
     text-align: center;
@@ -4950,7 +4950,6 @@ justify-content: center;
     }
 }
 
-/* Premium Static Quick View Modal Styles */
 .rp-quickview-modal-body {
     border-radius: 15px;
     overflow: hidden;
@@ -4987,7 +4986,6 @@ justify-content: center;
     width: 70px;
 }
 
-/* Custom Scrollbar for Modal Body */
 #premium-static-quickview .modal-body::-webkit-scrollbar {
     width: 6px;
 }
@@ -5016,4 +5014,171 @@ justify-content: center;
 
 .rp-qv-thumb.active, .rp-qv-thumb:hover {
     border-color: #1b2e4b;
+}
+
+.best-selling-section .premium-card,
+.top-rated-section .premium-card {
+    margin-bottom: 0;
+    height: 360px;
+}
+
+.best-selling-section .premium-card-image,
+.top-rated-section .premium-card-image {
+    height: 160px;
+    flex-shrink: 0;
+}
+
+.best-selling-section .premium-card-details,
+.top-rated-section .premium-card-details {
+    overflow: hidden;
+    flex: 1;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+.best-selling-section .premium-card-top-info,
+.top-rated-section .premium-card-top-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+.best-selling-section .premium-card-bottom-info,
+.top-rated-section .premium-card-bottom-info {
+    flex-shrink: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 8px;
+}
+
+.best-selling-section .premium-product-title,
+.top-rated-section .premium-product-title {
+    height: 36px;
+}
+
+@media (max-width: 767px) {
+    .best-selling-section .premium-card,
+    .top-rated-section .premium-card {
+        height: 320px;
+    }
+    .best-selling-section .premium-card-image,
+    .top-rated-section .premium-card-image {
+        height: 130px;
+    }
+}
+
+@media (max-width: 575px) {
+    .best-selling-section .premium-card,
+    .top-rated-section .premium-card {
+        height: 300px;
+    }
+    .best-selling-section .premium-card-image,
+    .top-rated-section .premium-card-image {
+        height: 120px;
+    }
+}
+
+.premium-product-carousel {
+    margin-bottom: 30px !important;
+}
+
+.premium-card-owl-item {
+    height: 360px;
+    padding: 2px;
+}
+
+.premium-card-owl-item .premium-card {
+    height: 100%;
+}
+
+.best-selling-section .owl-dots,
+.top-rated-section .owl-dots {
+    margin-top: 25px !important;
+    display: flex !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+}
+
+.best-selling-section .owl-dot,
+.top-rated-section .owl-dot {
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    border: none !important;
+    padding: 0 !important;
+    background: none !important;
+}
+
+.best-selling-section .owl-dot span,
+.top-rated-section .owl-dot span {
+    display: block !important;
+    width: 15px !important;
+    height: 15px !important;
+    background: transparent !important;
+    border: 1px solid #1b2e4b !important;
+    border-radius: 50% !important;
+    transition: all 0.3s ease !important;
+}
+
+.best-selling-section .owl-dot.active span,
+.top-rated-section .owl-dot.active span {
+    background: #1b2e4b !important;
+    border-color: #1b2e4b !important;
+    width: 15px !important;
+}
+
+@media (max-width: 767px) {
+    .premium-card-owl-item {
+        height: 320px;
+    }
+}
+
+@media (max-width: 575px) {
+    .premium-card-owl-item {
+        height: 300px;
+    }
+}
+.header_section_title {
+    font-size: 24px !important;
+    color: #1c344a !important;
+}
+.premium-card.w_border {
+        border-width: 0 3px 3px;
+    border-style: solid;
+    border-color: #ffe14d;
+}
+
+/* Yellow Navbar (Bottom Navbar) Responsiveness */
+@media (max-width: 1199px) {
+    .navbar-stuck-menu.bottom_navbar {
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        white-space: nowrap !important;
+        display: block !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    .navbar-stuck-menu.bottom_navbar .container {
+        display: block !important;
+        width: max-content !important;
+        padding: 0 15px !important;
+    }
+    
+    .navbar-stuck-menu.bottom_navbar .navbar-nav {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+    
+    .navbar-stuck-menu.bottom_navbar .nav-item {
+        margin: 0 5px !important;
+        flex-shrink: 0 !important;
+    }
 }

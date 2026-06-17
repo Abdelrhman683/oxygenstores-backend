@@ -34,9 +34,9 @@
                             {{ translate('featured_products') }}
                         </h2>
                         <div class="text-end d-none d-md-block">
-                            <a class="text-capitalize view-all-text web-text-primary" href="{{ route('featured-products') }}">
+                            <a class="view-all-btn-yellow" href="{{ route('featured-products') }}">
                                 {{ translate('view_all')}}
-                                <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i>
+                                <!-- <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i> -->
                             </a>
                         </div>
                     </div>
@@ -51,9 +51,9 @@
                             </div>
                         </div>
                         <div class="text-center pt-2 d-md-none">
-                            <a class="text-capitalize view-all-text web-text-primary" href="{{ route('featured-products') }}">
+                            <a class="view-all-btn-yellow" href="{{ route('featured-products') }}">
                                 {{ translate('view_all') }}
-                                <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i>
+                                <!-- <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i> -->
                             </a>
                         </div>
                     </div>
@@ -64,8 +64,15 @@
         @include('web-views.partials._category-section-home')
         @include('web-views.partials._recommended-products')
 
+      <div class="container rtl px-0 px-md-3">
+                <div class="row g-3 mx-max-md-0">
 
-         @if(getFeaturedDealsProductList() && (count(getFeaturedDealsProductList()) > 0))
+                    @if ($topRatedProducts->count() >0)
+                        @include('web-views.partials._top-rated')
+                    @endif
+                </div>
+            </div>
+         <!-- @if(getFeaturedDealsProductList() && (count(getFeaturedDealsProductList()) > 0))
             <section class="featured_deal pb-3">
                 <div class="container">
                     <div class="__featured-deal-wrap bg--light px-0-mobile">
@@ -76,7 +83,7 @@
                                 <span class="text-left">{{ translate('see_the_latest_deals_and_exciting_new_offers')}}!</span>
                             </div>
                             <div>
-                                <a class="text-capitalize view-all-text web-text-primary" href="{{ route('featured-deal-products') }}">
+                                <a class="view-all-btn-yellow" href="{{ route('featured-deal-products') }}">
                                     {{ translate('view_all')}}
                                     <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i>
                                 </a>
@@ -90,7 +97,7 @@
                     </div>
                 </div>
             </section>
-         @endif
+         @endif -->
 
         @include('web-views.partials._clearance-sale-products', ['clearanceSaleProducts' => $clearanceSaleProducts])
 
@@ -113,7 +120,7 @@
 
         <section class="new-arrival-section">
 
-            @if ($newArrivalProducts->count() >0 )
+            <!-- @if ($newArrivalProducts->count() >0 )
                 <div class="container rtl">
                     <div class="section-header">
                         <h2 class="arrival-title d-block mb-1">
@@ -136,7 +143,7 @@
                         </div>
                     </div>
                 </div>
-            @endif
+            @endif -->
 
             <div class="container rtl px-0 px-md-3">
                 <div class="row g-3 mx-max-md-0">
@@ -150,7 +157,9 @@
                     @endif
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
+
 
 
         @if (count($bannerTypeFooterBanner) > 1)
@@ -181,14 +190,14 @@
         @if($web_config['brand_setting'] && $brands->count() > 0)
             <section class="container rtl">
 
-                <div class="section-header align-items-center mb-1">
-                    <h2 class="text-black font-bold __text-22px mb-0">
+                <div class="section-header d-flex justify-content-between align-items-center mb-1">
+                    <h2 class="header_section_title mb-0">
                         <span> {{translate('brands')}}</span>
                     </h2>
                     <div class="__mr-2px">
-                        <a class="text-capitalize view-all-text web-text-primary" href="{{route('brands')}}">
+                        <a class="view-all-btn-yellow" href="{{route('brands')}}">
                             {{ translate('view_all')}}
-                            <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1 float-left' : 'right ml-1 mr-n1'}}"></i>
+                            <!-- <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1 float-left' : 'right ml-1 mr-n1'}}"></i> -->
                         </a>
                     </div>
                 </div>

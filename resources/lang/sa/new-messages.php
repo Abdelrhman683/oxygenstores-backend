@@ -10227,4 +10227,5 @@ return [
 	"Add_to_wishlist" => "Add to wishlist",
 	"Home_Category_Status" => "Home Category Status",
 	"Deleted_Successfully" => "Deleted Successfully",
+	"افضل_العروض" => "افضل العروض",
 ];

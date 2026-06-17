@@ -1,15 +1,15 @@
-<div class="container rtl pt-0 px-0 px-md-3">
+<!-- <div class="container rtl pt-0 px-0 px-md-3">
     <div class="seller-card">
         <div class="card __shadow h-100">
             <div class="card-body">
                 <div class="row d-flex justify-content-between">
                     <div class="seller-list-title">
-                        <h2 class="font-bold m-0 text-capitalize h5">
+                        <h2 class="header_section_title">
                             {{ translate('top_sellers')}}
                         </h2>
                     </div>
                     <div class="seller-list-view-all">
-                        <a class="text-capitalize view-all-text web-text-primary"
+                        <a class="view-all-btn-yellow"
                             href="{{ route('vendors', ['filter'=>'top-vendors']) }}">
                             {{ translate('view_all')}}
                             <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1 float-left' : 'right ml-1 mr-n1'}}"></i>
@@ -75,4 +75,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->

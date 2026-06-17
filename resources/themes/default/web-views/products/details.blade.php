@@ -969,10 +969,10 @@
                             <div class="view_all d-flex justify-content-center align-items-center">
                                 <div>
                                     @if(!empty($product?->category?->slug))
-                                        <a class="text-capitalize view-all-text web-text-primary me-1"
+                                        <a class="view-all-btn-yellow me-1"
                                            href="{{ route('category-products', ['slug' => $product?->category?->slug]) }}">
                                             {{ translate('view_all') }}
-                                            <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1 ' : 'right ml-1 mr-n1'}}"></i>
+                                            <!-- <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1 ' : 'right ml-1 mr-n1'}}"></i> -->
                                         </a>
                                     @endif
                                 </div>

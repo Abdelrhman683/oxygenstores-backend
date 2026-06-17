@@ -20,7 +20,7 @@
         </ul>
     </div>
 
-    <div class="rp-tabs-content mt-4 px-3" id="recommendedTabsContent">
+    <div class="rp-tabs-content mt-4 px-3 container" id="recommendedTabsContent">
 
         <div class="rp-tab-pane active" id="rp-pane-washers" role="tabpanel">
             <div class="swiper rp-swiper" id="rp-swiper-washers">

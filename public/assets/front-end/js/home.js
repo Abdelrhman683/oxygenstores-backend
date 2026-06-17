@@ -725,7 +725,7 @@ $(document).ready(function () {
                 margin: 20,
             },
             1200: {
-                items: 5,
+                items: 6,
                 margin: 20,
             },
             1400: {
