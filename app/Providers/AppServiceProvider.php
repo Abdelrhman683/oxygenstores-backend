@@ -9,6 +9,8 @@ use App\Models\StockClearanceProduct;
 use App\Traits\CacheManagerTrait;
 use App\Traits\FileManagerTrait;
 use App\Traits\UpdateClass;
+use App\Utils\CategoryManager;
+use App\Utils\BrandManager;
 use App\Utils\Helpers;
 use App\Enums\GlobalConstant;
 use App\Models\Currency;
@@ -222,7 +224,8 @@ class AppServiceProvider extends ServiceProvider
 
                     // Currency
                     Helpers::currency_load();
-                    View::share(['web_config' => $web_config, 'language' => $language]);
+                    $categories = CategoryManager::getCategoriesWithCountingAndPriorityWiseSorting();
+                    View::share(['web_config' => $web_config, 'language' => $language, 'categories' => $categories]);
                     Schema::defaultStringLength(191);
                 }
             } catch (Exception $exception) {
