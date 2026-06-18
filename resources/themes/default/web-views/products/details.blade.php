@@ -9,15 +9,39 @@
 
 @section('content')
     <div class="__inline-23">
-        <div class="container my-4 rtl text-align-direction">
+        <div class="container  rtl text-align-direction">
+                    <nav aria-label="breadcrumb">
+            <style>
+                .breadcrumb-item + .breadcrumb-item::before {
+                    display: none;
+                }
+            </style>
+            <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 3px 0;">
+                <li class="breadcrumb-item d-flex align-items-center ">
+                    <a href="{{route('home')}}" class="breadcrumb-title">
+                        {{translate('الرئيسية')}}
+                    </a>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                    sub Cate
+                  <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                    {{ $product->name }}
+                </li>
+            </ol>
+        </nav>
             <div class="row g-3 {{Session::get('direction') === "rtl" ? '__dir-rtl' : ''}}">
                 <div class="col-lg-9">
                     <div class="h-100 d-flex flex-column gap-4 pb-2">
-                        <div class="card card-body flex-grow-0">
+                        <div class="card card-body flex-grow-0" style="border: none ; background: transparent;">
                             <div class="row g-3">
                                 <div class="col-lg-5 col-md-4">
+                              <div class="gallery_wrapper_deta">
+
                                     <div class="pd-img-wrap position-relative">
-                                        <div class="swiper-container quickviewSlider2 border rounded aspect-1">
+                                        <div class="swiper-container quickviewSlider2  aspect-1">
                                             <div class="swiper-wrapper">
                                                 @php
                                                     $imageSources = ($product->product_type === 'physical' && !empty($product->color_image) && count($product->color_images_full_url) > 0)
@@ -45,14 +69,14 @@
                                         </div>
                                         @if (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                                         <div class="discount-badge-wrapper">
-                                            <span class="fs-13 text-white bg-primary text-nowrap fw-bold d-block discount-badge">
-                                                <span class="direction-ltr d-block">
+                                            <span class="">
+                                                <span class="direction-ltr d-block dic_">
                                                  -{{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
                                                 </span>
                                             </span>
                                         </div>
                                         @endif
-                                        <div class="cz-product-gallery-icons">
+                                        <!-- <div class="cz-product-gallery-icons">
                                             <div class="d-flex flex-column gap-12px pt-3">
                                                 @if($product->product_type == "physical")
                                                 <div class="bg-white btn-circle border" style="--size: 35px" data-toggle="tooltip" title="{{ translate('Physical_Product') }}" data-placement="left">
@@ -96,7 +120,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                         <div class="mt-3 user-select-none">
                                             <div class="quickviewSliderThumb2 swiper-container position-relative active-border">
                                                 <div class="swiper-wrapper auto-item-width justify-content-start">
@@ -106,7 +130,7 @@
                                                                 ? getStorageImages(path: $photo['image_name'], type: 'backend-product')
                                                                 : getStorageImages(path: $photo, type: 'backend-product');
                                                         @endphp
-                                                        <div class="swiper-slide position-relative rounded border" role="group">
+                                                        <div class="swiper-slide position-relative " role="group">
                                                             <img class="aspect-1" alt="" src="{{ $imagePath }}">
                                                         </div>
                                                     @endforeach
@@ -117,11 +141,28 @@
                                             </div>
                                         </div>
                                     </div>
+
+                              </div>
                                 </div>
 
                                 <div class="col-lg-7 col-md-8 mt-md-0 mt-sm-3 web-direction">
                                     <div class="details __h-100 product-cart-option-container p-0">
-                                        <h2 class="mb-4 __inline-24">{{ $product->name }}</h2>
+                                        <div class="head_det">
+                                           <a href="#" class="sub_cat_title">
+                                            مكيفات اسبليت
+                                        </a >  
+                                      <a href="javascript:void(0)"
+                                            class="head_fav product-action-add-wishlist"
+                                            data-product-id="{{ $product['id'] }}">
+
+                                                <i class="fa {{ ($wishlistStatus == 1 ? 'fa-heart' : 'fa-heart-o') }} wishlist_icon_{{ $product['id'] }}"></i>
+
+                                            </a>
+                                           
+                                       
+                                        </div>
+                                      
+                                        <h2 class=" __inline-24 cat_title_det">{{ $product->name }}</h2>
                                         <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
                                             @if($overallRating[0] !=0)
                                             <div class="star-rating me-2">
@@ -195,19 +236,47 @@
                                         <form class="addToCartDynamicForm add-to-cart-details-form d-flex flex-column gap-4">
 
                                             <div class="">
-                                                <h3 class="font-weight-normal text-accent d-flex align-items-end gap-2 mb-0">
+                                                <h3 class="font-weight-normal  d-flex align-items-end gap-2 mb-0">
+                                                          <span class="discounted-unit-price fs-18 font-bold">
+                                                        {{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'string') }}
+                                                    </span>
                                                     @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                                                         <del
-                                                            class="product-total-unit-price align-middle text-muted fs-18 font-semibold">
+                                                            class="product-total-unit-price align-middle text-muted fs-15 font-semibold">
                                                             {{ webCurrencyConverter(amount: $product->unit_price) }}
                                                         </del>
                                                     @endif
-                                                    <span class="discounted-unit-price fs-24 font-bold">
-                                                        {{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'string') }}
-                                                    </span>
+                                              
                                                 </h3>
+                                                <div class="summary_det">
+                                                    <p >السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</p>
+                                                </div>
+                                                <div class="brand">
+                                                    <img   loading="lazy"
+                                                 src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}" alt>
+                                                </div>
+                                                <div class="product-details__short-description">
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                </div>
                                             </div>
 
+                                            <div>
+                                                <div class="installment-box">
+
+                                                 <div class="installment-text">
+                                                         أو قسم فاتورتك بقيمة <strong>849.75 ر.س</strong> على 4 دفعات بدون رسوم تأخير،  متوافقة مع الشريعة الإسلامية
+                                                            <a href="#" class="more-link">اعرف أكثر</a>
+                                                 </div>
+                                                    <img  src="{{ theme_asset('public/assets/front-end/img/method_logo.svg') }}" loading="lazy"  alt="method_logo" class="method_logo">
+                                                    </div>
+                                            </div>
+
+                                     
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $product->id }}">
                                             <div
@@ -312,7 +381,7 @@
                                                 </div>
                                             @endforeach
 
-                                            <div class="">
+                                            <!-- <div class="">
                                                 <div class="product-quantity d-flex flex-column __gap-15">
                                                     <div class="d-flex align-items-center gap-4">
                                                         <div class="product-description-label __color-9B9B9B fs-14">
@@ -364,8 +433,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-
+                                            </div> -->
+{{--
                                             <div class="__btn-grp product-add-and-buy-section-parent">
 
                                                 <?php
@@ -432,7 +501,7 @@
                                                         </button>
                                                     </div>
                                                 @endif
-                                                <button type="button" data-product-id="{{ $product['id'] }}"
+                                                <!-- <button type="button" data-product-id="{{ $product['id'] }}"
                                                         class="btn __text-18px border product-action-add-wishlist">
                                                     <i class="fa {{($wishlistStatus == 1?'fa-heart':'fa-heart-o') }} wishlist_icon_{{ $product['id'] }} web-text-primary"
                                                        aria-hidden="true"></i>
@@ -445,7 +514,7 @@
                                                             <span class="remove">{{ translate('removed_from_wishlist') }}</span>
                                                         </div>
                                                     </div>
-                                                </button>
+                                                </button> -->
 
                                                 @if($product->added_by == 'admin')
                                                     @if(checkVendorAbility(type: 'inhouse', status: 'temporary_close') || checkVendorAbility(type: 'inhouse', status: 'vacation_status'))
@@ -461,15 +530,23 @@
                                                     @endif
                                                 @endif
                                             </div>
-
+--}}
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="rtl text-align-direction flex-grow-1">
-                            <div class="__review-overview card card-body h-100">
-                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-center gap-2" role="tablist">
+                            <div class="  h-100">
+                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-start gap-2 p-0" role="tablist">
+                                          <li class="nav-item">
+                                        <a class="nav-link __inline-27 mb-0 tab_link"
+                                        data-toggle="tab"
+                                        href="#specifications"
+                                        role="tab">
+                                            {{ translate('المواصفات') }}
+                                        </a>
+                                    </li>
                                     <li class="nav-item">
                                         <a class="nav-link __inline-27 mb-0 tab_link active"
                                         data-toggle="tab"
@@ -486,6 +563,15 @@
                                             {{ translate('reviews') }}
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link __inline-27 mb-0 tab_link"
+                                        data-toggle="tab"
+                                        href="#other_products"
+                                        role="tab">
+                                            {{ translate('منتجات اخرى') }}
+                                        </a>
+                                    </li>
+                          
                                 </ul>
 
 
@@ -716,13 +802,469 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="tab-pane fade" id="specifications" role="tabpanel">
+                                     
+                                    <div class="specs-table">
+    
+                                        <div class="spec-row">
+                                            <div class="spec-label">الشركة</div>
+                                            <div class="spec-value">جري</div>
+                                        </div>
+
+                                        <div class="spec-row">
+                                            <div class="spec-label">نوع الكمبروسر</div>
+                                            <div class="spec-value">روتري</div>
+                                        </div>
+
+                                        <div class="spec-row">
+                                            <div class="spec-label">الضمان</div>
+                                            <div class="spec-value">سنتين شامل وخمس سنوات على الكمبروسر</div>
+                                        </div>
+
+                                        <div class="spec-row">
+                                            <div class="spec-label"></div>
+                                            <div class="spec-value">حار / بارد - حار و بارد</div>
+                                        </div>
+
+                                        <div class="spec-row">
+                                            <div class="spec-label">الموديل</div>
+                                            <div class="spec-value">GWH24AVEXF-D3NTA1F/I</div>
+                                        </div>
+
+                                        <div class="spec-row">
+                                            <div class="spec-label">نوع التبريد</div>
+                                            <div class="spec-value">غاز فريون R32</div>
+                                        </div>
+
+                                        <div class="spec-row">
+                                            <div class="spec-label">سعة التبريد</div>
+                                            <div class="spec-value">23.200 وحدة</div>
+                                        </div>
+
+                                    </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="other_products" role="tabpanel">
+                           
+<section class="premium-static-section container rtl px-0 px-md-3">
+ 
+
+    <div class="premium-carousel-wrapper">
+        <div class="owl-carousel owl-theme other-product-carousel">
+            
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة دولابي">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة دولابي جنرال سوبريم، (21.6 قدم، 612...)</a>
+                        <div class="premium-product-prices">
+                            <del class="premium-price-old">2999 ريال</del>
+                            <span class="premium-price-new">2549 ريال</span>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة يوجين">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة يوجين دولابي 637 لتر، 22.4 قدم، ستيل</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2499 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1849 ريال</span>
+                            <del class="premium-price-old">2949 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1999 ريال</span>
+                            <del class="premium-price-old">2985 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم دولابي (15.4 قدم، 436...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2049 ريال</span>
+                            <del class="premium-price-old">2599 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة بابين جنرال سوبريم (21 قدم، 594...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2399 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="premium-static-quickview" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content rp-quickview-modal-body rtl">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-row-reverse p-2">
+                <button type="button" class="rp-qv-close-btn" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="d-flex gap-2">
+                                                            <span class="rp-qv-category-box">ثلاجات بابين</span>
+
+                </div>
+                <div class="d-flex gap-2">
+                                                            <span class="rp-qv-code-badge">خصم 28%</span>
+
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="row g-4 flex-row-reverse rp-qv-row">
+
+                    <div class="col-lg-7 col-md-7 col-12 text-right">
+                        <h2 class="rp-qv-title mb-3">ثلاجة جنرال سوبريم بابين مع فريزر علوي، 7.1 قدم، 200 لتر، ابيض، GS28MA</h2>
+                        <p class="rp-qv-desc mb-3">تقنية التبريد التام بدون تجميد توفير طاقة هائل تكنولوجيا تعدد تدفق الهواء</p>
+
+                        <div class="rp-qv-price-section mb-3">
+                            <div class="d-flex align-items-baseline gap-3">
+                                <span class="rp-qv-price-current">1349 ريال</span>
+                                <del class="rp-qv-price-old">1884 ريال</del>
+                            </div>
+                            <div class="rp-qv-tax-note mt-1">شاملاً ضريبة القيمة المضافة</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="badge badge-success px-3 py-2 rp-qv-stock-badge">متوفر في المخزون</span>
+                        </div>
+
+                        <div class="rp-qv-specs-container mb-4">
+                            <div class="row g-2">
+                                <div class="col-12"><strong>الشركة:</strong> <span>جنرال سوبريم</span></div>
+                                <div class="col-12"><strong>الحجم ( قدم مكعب / لتر):</strong> <span>7.1 قدم / 200 لتر</span></div>
+                                <div class="col-12"><strong>اللون:</strong> <span>ابيض</span></div>
+                                <div class="col-12"><strong>الضمان:</strong> <span>سنتين</span></div>
+                                <div class="col-12"><strong>الموديل:</strong> <span>GS28MA</span></div>
+                                <div class="col-12"><strong>الابعاد:</strong> <span>54.5*59*146.5 سم</span></div>
+                                <div class="col-12 text-muted small">الوزن الصافي: 42 كجم الوزن الإجمالي : 46كجم</div>
+                            </div>
+                        </div>
+
+                        <div class="rp-qv-action-row d-flex align-items-center gap-3 mb-4">
+                            <div class="rp-qv-qty-box d-flex align-items-center gap-2">
+                                <span class="rp-qv-qty-label">الكمية</span>
+                                <div class="d-flex align-items-center quantity-box rounded border">
+                                    <button type="button" class="btn-number btn-sm px-2 py-1">-</button>
+                                    <input type="text" value="1" class="form-control text-center border-0 p-0" style="width: 32px; background:transparent;" readonly>
+                                    <button type="button" class="btn-number btn-sm px-2 py-1">+</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn rp-qv-add-btn flex-grow-1">
+                                <i class="fa fa-shopping-cart ml-2"></i> أضف للعربة
+                            </button>
+                        </div>
+
+                        <div class="rp-qv-payments d-flex align-items-center gap-3 flex-wrap">
+                            <img src="https://emkan.com.sa/wp-content/themes/emkan/assets/images/logo-ar.svg" alt="Emkan" class="payment-logo-img" style="height: 30px;">
+                            <img src="https://cdn.tamara.co/assets/logo.svg" alt="Tamara" class="payment-logo-img" style="height: 30px;">
+                            <img src="https://cdn.tabby.ai/assets/imgs/tabby-logo.svg" alt="Tabby" class="payment-logo-img" style="height: 30px;">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5 col-md-5 col-12">
+                        <div class="pd-img-wrap position-relative">
+                            <div class="swiper-container quickviewSlider2 border rounded aspect-1">
+                                <div class="swiper-wrapper">
+                                    <div class="swiper-slide position-relative">
+                                        <div class="easyzoom easyzoom--overlay is-ready">
+                                            <a href="assets/front-end/img/Group-2-1.webp">
+                                                <img class="rounded h-100 aspect-1" src="assets/front-end/img/Group-2-1.webp" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="swiper-slide position-relative">
+                                        <div class="easyzoom easyzoom--overlay is-ready">
+                                            <a href="assets/front-end/img/Group-1-1.webp">
+                                                <img class="rounded h-100 aspect-1" src="assets/front-end/img/Group-1-1.webp" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="swiper-slide position-relative">
+                                        <div class="easyzoom easyzoom--overlay is-ready">
+                                            <a href="assets/front-end/img/Group-3.webp">
+                                                <img class="rounded h-100 aspect-1" src="assets/front-end/img/Group-3.webp" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 user-select-none">
+                                <div class="quickviewSliderThumb2 swiper-container position-relative active-border">
+                                    <div class="swiper-wrapper auto-item-width justify-content-start">
+                                        <div class="swiper-slide position-relative rounded border p-1 rp-qv-thumb-slide">
+                                            <img class="aspect-1 img-fluid" src="assets/front-end/img/Group-2-1.webp" alt="">
+                                        </div>
+                                        <div class="swiper-slide position-relative rounded border p-1 rp-qv-thumb-slide">
+                                            <img class="aspect-1 img-fluid" src="assets/front-end/img/Group-1-1.webp" alt="">
+                                        </div>
+                                        <div class="swiper-slide position-relative rounded border p-1 rp-qv-thumb-slide">
+                                            <img class="aspect-1 img-fluid" src="assets/front-end/img/Group-3.webp" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="swiper-button-next swiper-quickview-button-next"></div>
+                                    <div class="swiper-button-prev swiper-quickview-button-prev"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    @php($companyReliability = getWebConfig('company_reliability'))
+                   
+                        <div class="product-details-shipping-details px-3 py-3">
+                           
+                                    <div class="shipping-details-bottom-border">
+                                        <div class="">
+                                            <span class="store_name">البائع :</span>
+                                            <img
+                                                class="store_img"
+                                                  loading="lazy"
+                                                 src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}">
+                                           <a href="#" class="store_bold">   <span>متجر ذرة أكسجين اللإلكتروني</span></a>
+                                        </div>
+                                    </div>
+                                       <div class="d-flex align-items-center gap-4">
+                                                        <div class="product-description-label __color-9B9B9B fs-14">
+                                                            {{ translate('qty') }}
+                                                        </div>
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center quantity-box  overflow-hidden">
+                                                            <span class="input-group-btn h-100">
+                                                                <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 h-100 w-32px"
+                                                                        type="button"
+                                                                        data-type="minus" data-field="quantity"
+                                                                        disabled="disabled">
+                                                                    -
+                                                                </button>
+                                                            </span>
+                                                            <input type="text" name="quantity"
+                                                                   class="form-control input-number text-center product-details-cart-qty __inline-29 border-0 w-100 fs-12"
+                                                                   placeholder="{{ translate('1') }}"
+                                                                   value="{{ $initialProductConfig['quantity'] ?? 1 }}"
+                                                                   data-producttype="{{ $product->product_type }}"
+                                                                   min="{{ $product->minimum_order_qty ?? 1 }}"
+                                                                   max="{{ $product['product_type'] == 'physical' ? $product->current_stock : 100}}">
+                                                            <span class="input-group-btn h-100">
+                                                                <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 h-100 w-32px"
+                                                                        type="button"
+                                                                        data-producttype="{{ $product->product_type }}"
+                                                                        data-type="plus" data-field="quantity">
+                                                                        +
+                                                                </button>
+                                                            </span>
+                                                        </div>
+                                                        <input type="hidden" class="product-generated-variation-code"
+                                                               name="product_variation_code"
+                                                               data-product-id="{{ $product['id'] }}">
+                                                        <input type="hidden" value=""
+                                                               class="product-exist-in-cart-list form-control w-50" name="key">
+                                                    </div>
+                          
+                                                              <div class="add_cart my-2">
+          
+                                                        <button class="premium-add-to-cart " type="button"
+                                                            data-form=".add-to-cart-details-form"
+                                                            data-update="{{ translate('update_cart') }}"
+                                                            data-add="{{ translate('add_to_cart') }}">
+                                                                              <i class="fa fa-shopping-cart"></i>
+                                                                           <span class="ms-1"> {{ $initialProductConfig['first_variant_in_cart'] ? translate('update_cart') : translate('add_to_cart') }}</span>
+                                                                             </button>
+                                                                         </div>
+                                                                         <hr class="bar">
+                                                                <div class="shipping-info-card">
+                                                                    <div class="shipping-info-row">
+                                                                        <span class="shipping-label">منطقتك:</span>
+                                                                        <span class="shipping-value">الرياض</span>
+                                                                    </div>
+
+                                                                    <div class="shipping-info-row">
+                                                                        <span class="shipping-label">تكاليف الشحن:</span>
+                                                                        <span class="shipping-value">﷼ 0</span>
+                                                                    </div>
+
+                                                                    <div class="shipping-info-row">
+                                                                        <span class="shipping-label">الوقت المقدر للشحن:</span>
+                                                                        <span class="shipping-value">ثلاث إلى سبع أيام</span>
+                                                                    </div>
+                                                                </div>
+
+
+                                                </div>
+                    <!-- @php($companyReliability = getWebConfig('company_reliability'))
                     @if($companyReliability != null)
                         <div class="product-details-shipping-details">
                             @foreach ($companyReliability as $key=>$value)
@@ -739,9 +1281,9 @@
                                 @endif
                             @endforeach
                         </div>
-                    @endif
+                    @endif -->
 
-                    @if(getWebConfig(name: 'business_mode')=='multi')
+                    <!-- @if(getWebConfig(name: 'business_mode')=='multi')
                         <div class="__inline-31">
 
                             @if($product->added_by=='seller')
@@ -927,9 +1469,9 @@
                                 </div>
                             @endif
                         </div>
-                    @endif
+                    @endif -->
 
-                    <div class="pt-4 pb-3 d-flex justify-content-between align-items-center">
+                    <!-- <div class="pt-4 pb-3 d-flex justify-content-between align-items-center">
                         <h2 class="__text-16px font-bold text-capitalize mb-0">
                             @if(getWebConfig(name: 'business_mode') == 'multi')
                                 {{ translate('more_from_the_store') }}
@@ -953,8 +1495,9 @@
                         @foreach($moreProductFromSeller as $item)
                             @include('web-views.partials._seller-products-product-details',['product' => $item, 'decimal_point_settings' => $decimalPointSettings])
                         @endforeach
-                    </div>
+                    </div> -->
                 </div>
+                <!-- <div class="col-lg-3"></div> -->
             </div>
         </div>
 
@@ -1006,7 +1549,343 @@
                 </div>
             </div>
         </div>
+<div class="container">
+    <div class="row">
+        <section class="premium-static-section container rtl px-0 px-md-3">
+    <div class="premium-section-header">
+        <h2 class="premium-section-title">منتجات ذات صلة</h2>
+    </div>
 
+    <div class="premium-carousel-wrapper">
+        <div class="owl-carousel owl-theme related-product-carousel">
+            
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة دولابي">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة دولابي جنرال سوبريم، (21.6 قدم، 612...)</a>
+                        <div class="premium-product-prices">
+                            <del class="premium-price-old">2999 ريال</del>
+                            <span class="premium-price-new">2549 ريال</span>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة يوجين">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة يوجين دولابي 637 لتر، 22.4 قدم، ستيل</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2499 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1849 ريال</span>
+                            <del class="premium-price-old">2949 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1999 ريال</span>
+                            <del class="premium-price-old">2985 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم دولابي (15.4 قدم، 436...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2049 ريال</span>
+                            <del class="premium-price-old">2599 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة بابين جنرال سوبريم (21 قدم، 594...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2399 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="premium-static-quickview" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content rp-quickview-modal-body rtl">
+            
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-row-reverse p-2">
+                <button type="button" class="rp-qv-close-btn" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="d-flex gap-2">
+                                                            <span class="rp-qv-category-box">ثلاجات بابين</span>
+
+                </div>
+                <div class="d-flex gap-2">
+                                                            <span class="rp-qv-code-badge">خصم 28%</span>
+
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="row g-4 flex-row-reverse rp-qv-row">
+
+                    <div class="col-lg-7 col-md-7 col-12 text-right">
+                        <h2 class="rp-qv-title mb-3">ثلاجة جنرال سوبريم بابين مع فريزر علوي، 7.1 قدم، 200 لتر، ابيض، GS28MA</h2>
+                        <p class="rp-qv-desc mb-3">تقنية التبريد التام بدون تجميد توفير طاقة هائل تكنولوجيا تعدد تدفق الهواء</p>
+
+                        <div class="rp-qv-price-section mb-3">
+                            <div class="d-flex align-items-baseline gap-3">
+                                <span class="rp-qv-price-current">1349 ريال</span>
+                                <del class="rp-qv-price-old">1884 ريال</del>
+                            </div>
+                            <div class="rp-qv-tax-note mt-1">شاملاً ضريبة القيمة المضافة</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="badge badge-success px-3 py-2 rp-qv-stock-badge">متوفر في المخزون</span>
+                        </div>
+
+                        <div class="rp-qv-specs-container mb-4">
+                            <div class="row g-2">
+                                <div class="col-12"><strong>الشركة:</strong> <span>جنرال سوبريم</span></div>
+                                <div class="col-12"><strong>الحجم ( قدم مكعب / لتر):</strong> <span>7.1 قدم / 200 لتر</span></div>
+                                <div class="col-12"><strong>اللون:</strong> <span>ابيض</span></div>
+                                <div class="col-12"><strong>الضمان:</strong> <span>سنتين</span></div>
+                                <div class="col-12"><strong>الموديل:</strong> <span>GS28MA</span></div>
+                                <div class="col-12"><strong>الابعاد:</strong> <span>54.5*59*146.5 سم</span></div>
+                                <div class="col-12 text-muted small">الوزن الصافي: 42 كجم الوزن الإجمالي : 46كجم</div>
+                            </div>
+                        </div>
+
+                        <div class="rp-qv-action-row d-flex align-items-center gap-3 mb-4">
+                            <div class="rp-qv-qty-box d-flex align-items-center gap-2">
+                                <span class="rp-qv-qty-label">الكمية</span>
+                                <div class="d-flex align-items-center quantity-box rounded border">
+                                    <button type="button" class="btn-number btn-sm px-2 py-1">-</button>
+                                    <input type="text" value="1" class="form-control text-center border-0 p-0" style="width: 32px; background:transparent;" readonly>
+                                    <button type="button" class="btn-number btn-sm px-2 py-1">+</button>
+                                </div>
+                            </div>
+                            <button type="button" class="btn rp-qv-add-btn flex-grow-1">
+                                <i class="fa fa-shopping-cart ml-2"></i> أضف للعربة
+                            </button>
+                        </div>
+
+                        <div class="rp-qv-payments d-flex align-items-center gap-3 flex-wrap">
+                            <img src="https://emkan.com.sa/wp-content/themes/emkan/assets/images/logo-ar.svg" alt="Emkan" class="payment-logo-img" style="height: 30px;">
+                            <img src="https://cdn.tamara.co/assets/logo.svg" alt="Tamara" class="payment-logo-img" style="height: 30px;">
+                            <img src="https://cdn.tabby.ai/assets/imgs/tabby-logo.svg" alt="Tabby" class="payment-logo-img" style="height: 30px;">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5 col-md-5 col-12">
+                        <div class="pd-img-wrap position-relative">
+                            <div class="swiper-container quickviewSlider2 border rounded aspect-1">
+                                <div class="swiper-wrapper">
+                                    <div class="swiper-slide position-relative">
+                                        <div class="easyzoom easyzoom--overlay is-ready">
+                                            <a href="assets/front-end/img/Group-2-1.webp">
+                                                <img class="rounded h-100 aspect-1" src="assets/front-end/img/Group-2-1.webp" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="swiper-slide position-relative">
+                                        <div class="easyzoom easyzoom--overlay is-ready">
+                                            <a href="assets/front-end/img/Group-1-1.webp">
+                                                <img class="rounded h-100 aspect-1" src="assets/front-end/img/Group-1-1.webp" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="swiper-slide position-relative">
+                                        <div class="easyzoom easyzoom--overlay is-ready">
+                                            <a href="assets/front-end/img/Group-3.webp">
+                                                <img class="rounded h-100 aspect-1" src="assets/front-end/img/Group-3.webp" alt="">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 user-select-none">
+                                <div class="quickviewSliderThumb2 swiper-container position-relative active-border">
+                                    <div class="swiper-wrapper auto-item-width justify-content-start">
+                                        <div class="swiper-slide position-relative rounded border p-1 rp-qv-thumb-slide">
+                                            <img class="aspect-1 img-fluid" src="assets/front-end/img/Group-2-1.webp" alt="">
+                                        </div>
+                                        <div class="swiper-slide position-relative rounded border p-1 rp-qv-thumb-slide">
+                                            <img class="aspect-1 img-fluid" src="assets/front-end/img/Group-1-1.webp" alt="">
+                                        </div>
+                                        <div class="swiper-slide position-relative rounded border p-1 rp-qv-thumb-slide">
+                                            <img class="aspect-1 img-fluid" src="assets/front-end/img/Group-3.webp" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="swiper-button-next swiper-quickview-button-next"></div>
+                                    <div class="swiper-button-prev swiper-quickview-button-prev"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+</div>
     </div>
 
     @include("web-views.products._product-details-sticky", ['productDetails' => $product])

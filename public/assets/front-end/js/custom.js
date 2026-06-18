@@ -2757,3 +2757,84 @@ $(document).ready(function () {
     }
     initSliderWithZoom();
 });
+    $(".other-product-carousel").owlCarousel({
+        loop: false,
+        autoplay: true,
+        margin: 20,
+        nav: false,
+        dots: true,
+        autoplayHoverPause: true,
+        rtl: directionFromSession === "rtl",
+        ltr: directionFromSession === "ltr",
+        responsive: {
+            0: {
+                items: 1,
+                margin: 5,
+            },
+            375: {
+                items: 1,
+                margin: 5,
+            },
+            540: {
+                items: 1,
+                margin: 5,
+            },
+            768: {
+                items: 2,
+                margin: 10,
+            },
+            992: {
+                items: 4,
+                margin: 10,
+            },
+            1200: {
+                items: 4,
+                margin: 20,
+            },
+            1400: {
+                items: 4,
+                margin: 20,
+            },
+        },
+    });
+
+        $(".related-product-carousel").owlCarousel({
+        loop: false,
+        autoplay: true,
+        margin: 20,
+        nav: false,
+        dots: true,
+        autoplayHoverPause: true,
+        rtl: directionFromSession === "rtl",
+        ltr: directionFromSession === "ltr",
+        responsive: {
+            0: {
+                items: 1.2,
+                margin: 10,
+            },
+            375: {
+                items: 1.5,
+                margin: 15,
+            },
+            540: {
+                items: 2.2,
+                margin: 15,
+            },
+            768: {
+                items: 3.2,
+                margin: 20,
+            },
+            992: {
+                items: 4,
+                margin: 20,
+            },
+            1200: {
+                items: 6,
+                margin: 20,
+            },
+            1400: {
+                items: 6,
+                margin: 20,
+            },
+        },
+    });
