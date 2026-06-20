@@ -1,4 +1,9 @@
-/* Global Scrollbar Styling - Forced Visibility */
+html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    position: relative !important;
+}
+
 html {
     scrollbar-color: #485462  !important;
 }
@@ -3196,6 +3201,12 @@ body {
     flex-shrink: 1;
 }
 
+.mobile-head {
+    width: 100% !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
 /* Actions section: never shrink, keep consistent width */
 .top-navbar-row1 .actions-section {
     flex-shrink: 0;
@@ -3296,29 +3307,33 @@ body {
    ============================================= */
 @media (max-width: 991.98px) {
 
-    /* Fixed overlay backdrop */
     #navbarCollapse {
         position: fixed !important;
         top: 0 !important;
-        right: -320px !important;
+        right: 0 !important;
         width: 300px !important;
         height: 100vh !important;
         background-color: #fff !important;
         z-index: 9999 !important;
         overflow-y: auto !important;
-        transition: right 0.3s ease-in-out !important;
+        overflow-x: hidden !important;
+        transition: transform 0.3s ease-in-out, visibility 0.3s !important;
         box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2) !important;
-        display: block !important;
-        padding: 0 !important;
+        display: flex !important;
         flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 0 !important;
+        transform: translateX(100%) !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 
-    /* When open */
     #navbarCollapse.show {
-        right: 0 !important;
+        transform: translateX(0) !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
     }
 
-    /* Backdrop */
     .mobile-menu-backdrop {
         display: none;
         position: fixed;
@@ -3333,12 +3348,11 @@ body {
         opacity: 1;
     }
 
-    /* Drawer inner padding */
     #navbarCollapse .header-categories-nav {
         padding: 0 !important;
+        width: 100% !important;
     }
 
-    /* Close button row inside drawer */
     #navbarCollapse .w-100.d-lg-none {
         display: flex !important;
         justify-content: flex-start !important;
@@ -3356,7 +3370,7 @@ body {
         font-size: 22px !important;
     }
 
-    /* Nav items inside drawer */
+  
     #navbarCollapse .header-categories-nav .nav-item {
         border-bottom: 1px solid #f0f0f0 !important;
     }
@@ -3376,7 +3390,6 @@ body {
         background-color: #f8f9fa !important;
     }
 
-    /* Sub-menu inside drawer */
     #navbarCollapse .dropdown-menu {
         position: static !important;
         box-shadow: none !important;
@@ -3418,17 +3431,16 @@ body {
    Mobile Drawer Header & Close Button
    ============================================= */
 
-/* Force hide on desktop — overrides any accidental display */
 @media (min-width: 992px) {
     .mobile-drawer-header {
         display: none !important;
     }
 }
 
-/* Only show on mobile */
 @media (max-width: 991.98px) {
     .mobile-drawer-header {
         display: flex !important;
+        width: 100% !important;
         align-items: center !important;
         justify-content: space-between !important;
         padding: 14px 18px !important;
@@ -3475,7 +3487,6 @@ body {
     color: #fff !important;
 }
 
-/* Footer Background Image & Color Overlay */
 .page-footer {
     position: relative !important;
   
@@ -3527,13 +3538,7 @@ body {
 }
 
 
-/* =========================================================
-   Recommended Products Tabs Section - منتجات ننصح بها
-   =========================================================
-   يستخدم ألوان المتجر من متغيرات الـ root:
-   - --bg-blue  : لون التاب النشط والخلفية
-   - --bg-yellow: لون الخط السفلي للتاب النشط والـ hover
-   ========================================================= */
+
 
 .recommended-products-section {
     padding: 0 0 28px 0;
@@ -5155,7 +5160,8 @@ justify-content: center;
     border-color: #ffe14d;
 }
 
-/* Yellow Navbar (Bottom Navbar) Responsiveness */
+/* Yellow Navbar (Bottom Navbar) Responsiveness - Commented out to resolve conflict with vertical drawer menu and fix layout shift */
+/*
 @media (max-width: 1199px) {
     .navbar-stuck-menu.bottom_navbar {
         overflow-x: auto !important;
@@ -5183,6 +5189,7 @@ justify-content: center;
         flex-shrink: 0 !important;
     }
 }
+*/
 
 /* =========================================================
    Full-Width Promo Banner
