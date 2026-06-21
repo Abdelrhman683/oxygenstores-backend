@@ -7,12 +7,12 @@
 
 <div class="modal-body rtl">
     <div class="d-flex justify-content-end pb-2 mt-2">
-        <button class="close close-quick-view-modal z-index-99 p-0 pe-0 ps-0 w-24 h-24px rounded-circle bg-light" type="button" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+        <button class="close close-quick-view-modal z-index-99 p-0 pe-0 ps-0 w-24 h-24px rounded-circle bg-light " type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" style="font-size: 34px;cursor: pointer;color: #f44336;">&times;</span>
         </button>
     </div>
     <div class="row g-3">
-        <div class="col-lg-5 col-md-4 col-12">
+        <div class="col-lg-5 col-md-4 col-12" style="align-self: flex-start;">
 
             <div class="pd-img-wrap position-relative">
                 <div class="swiper-container quickviewSlider2 border rounded aspect-1">
@@ -44,14 +44,14 @@
                 </div>
                 @if (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                     <div class="discount-badge-wrapper">
-                    <span class="fs-13 text-white bg-primary text-nowrap fw-bold d-block discount-badge">
-                        <span class="direction-ltr d-block">
+                    <span class="">
+                        <span class="direction-ltr d-block dic_">
                            -{{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
                         </span>
                     </span>
                     </div>
                 @endif
-                <div class="cz-product-gallery-icons">
+                <!-- <div class="cz-product-gallery-icons">
                     <div class="d-flex flex-column gap-12px pt-3">
                         @if($product->product_type == "physical")
                         <div class="bg-white btn-circle border" style="--size: 35px" data-toggle="tooltip" title="{{ translate('Physical_Product') }}" data-placement="left">
@@ -97,9 +97,9 @@
                         </div>
 
                     </div>
-                </div>
+                </div> -->
                 <div class="mt-3 user-select-none">
-                    <div class="quickviewSliderThumb2 swiper-container position-relative active-border">
+                    <div class="quickviewSliderThumb2 swiper-container position-relative active-border" style="height: 50px;">
                         <div class="swiper-wrapper auto-item-width justify-content-start">
                             @foreach ($imageSources as $key => $photo)
                                 @php
@@ -129,8 +129,18 @@
                         <a href="{{route('vendor-shop',['slug'=> $product->seller?->shop?->slug])}}" class="d-block pb-2 text-truncate">{{$product->seller?->shop?->name ?? ""}}</a>
                     @endif
                 @endif
-
+                                    <div class="head_det mt-0">
+                                           <a href="#" class="sub_cat_title">
+                                            مكيفات اسبليت
+                                        </a >  
+                                           
+                                        </div>
                 <a href="{{route('product',$product->slug)}}" class="fs-18 fw-bold text-title mb-3">{{$product->name}}</a>
+                <div class="preview-description">
+                    <strong>الكهرباء والفريون: 220V-1Ph-60Hz - R32.</strong>
+                    <strong>الكهرباء والفريون: 220V-1Ph-60Hz - R32.</strong>
+                    <strong>الكهرباء والفريون: 220V-1Ph-60Hz - R32.</strong>
+                </div>
                 <div class="d-flex flex-wrap align-items-baseline gap-3 mb-3 pro">
                     @if($overallRating[0] != 0)
                         <div class="d-flex gap-1 align-items-baseline">
@@ -194,15 +204,35 @@
                         @endif
                     </div>
                 @endif
-                <form class="addToCartDynamicForm add-to-cart-details-form d-flex flex-column gap-3">
+                <form class="addToCartDynamicForm add-to-cart-details-form d-flex flex-column ">
                     @csrf
 
                     <div>
-                        <span class="font-weight-normal text-accent d-flex align-items-center gap-2">
+                        <span class="font-weight-normal d-flex align-items-center gap-2">
                             {!! getPriceRangeWithDiscount(product: $product) !!}
                         </span>
                     </div>
+                            <div class="summary_det">
+                              <p >السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</p>
+                                </div>
+<div class="preview-stock"><p class="stock in-stock">متوفر في المخزون</p>
+</div>
+                                <div class="specs-box">
+                                <ul class="specs-list p-0">
+                                    <li>
+                                        <span class="label">الشركة:</span> جري
+                                         <span class="label">نوع الكمبريسور:</span> روتاري
+                                         <span class="label">سعة التبريد:</span> 23.200 وحدة
+                                    </li>
 
+                                    <li>
+                                        <span class="label">الموديل:</span> GWC24AVEXF-D3NTA1F/I
+                                        • <span class="label">الضمان:</span> سنتين شامل و خمس سنوات على الكمبريسور
+                                        • <span class="label">حار و بارد / بارد:</span> بارد
+                                        • <span class="label">نوع التبريد:</span> غاز فريون R32
+                                    </li>
+                                </ul>
+                                    </div>
                     <input type="hidden" name="id" value="{{ $product->id }}">
                     <div class="position-relative {{count(json_decode($product->colors)) > 0 ? '' : 'd-none'}}">
                         @if (count(json_decode($product->colors)) > 0)
@@ -300,14 +330,14 @@
                         @endforeach
                     @endif
 
-                    <div class="mb-3">
+                    <div class="mb-3" style="display: flex; align-items: center;flex-wrap: wrap; gap:10px">
                         <div class="product-quantity d-flex flex-column">
-                            <div class="d-flex align-items-center gap-3 mb-30">
+                            <div class="d-flex align-items-center gap-3">
                                 <div class="product-description-label __color-9B9B9B fs-14 mt-0 text-nowrap">
                                     {{ translate('Qty') }} :
                                 </div>
                                 <div
-                                    class="d-flex justify-content-between align-items-center quantity-box w-130px h-40px overflow-hidden rounded border border-base web-text-primary">
+                                    class="d-flex justify-content-between align-items-center quantity-box w-130px h-40px overflow-hidden rounded border web-text-primary">
                                     <span class="input-group-btn h-100">
                                         <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 w-32px" type="button"
                                                 data-type="minus"
@@ -335,8 +365,11 @@
                                        name="product_variation_code" data-product-id="{{ $product['id'] }}">
                                 <input type="hidden" value="" class="product-exist-in-cart-list form-control w-50"
                                        name="key">
+
+
+
                             </div>
-                            <div class="product-details-chosen-price-section">
+                            <!-- <div class="product-details-chosen-price-section">
                                 <div class="d-flex justify-content-start align-items-center me-2">
                                     <div class="product-description-label text-dark font-bold text-capitalize">
                                         <strong>{{translate('total_price')}}</strong> :
@@ -345,13 +378,37 @@
                                         {{ webCurrencyConverter(amount: $initialProductConfig['total_quantity_price']) }}
                                     </strong>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
+
+<div  class="flex-grow-1">
+                <button class="btn btn--primary string-limit product-add-to-cart-button w-100"
+                                    type="button"
+                                    data-form=".add-to-cart-details-form"
+                                    data-update="{{ translate('update_cart') }}"
+                                    data-add="{{ translate('add_to_cart') }}"
+                            >
+                                {{ $initialProductConfig['first_variant_in_cart'] ? translate('update_cart') : translate('add_to_cart') }}
+                            </button>
+</div>
                     </div>
+                    <div class="payment-methods-modal">
+    <div class="payment-item">
+        <img src="{{ theme_asset('public/assets/front-end/img/tabby-icon.webp') }}" alt="Tabby">
+    </div>
+
+    <div class="payment-item">
+        <img src="{{ theme_asset('public/assets/front-end/img/tamara-icon.webp') }}" alt="Tamara">
+    </div>
+
+    <div class="payment-item">
+        <img src="{{ theme_asset('public/assets/front-end/img/emkan-icon.webp') }}" alt="Emkan">
+    </div>
+</div>
 
                     @php($guestCheckout = getWebConfig(name: 'guest_checkout'))
 
-                    <div
+                    <!-- <div
                         class="__btn-grp align-items-center product-add-and-buy-section" {!! $firstVariationQuantity <= 0 ? 'style="display: none;"' : '' !!}>
                         @if(($product->added_by == 'admin' && (checkVendorAbility(type: 'inhouse', status: 'temporary_close') || checkVendorAbility(type: 'inhouse', status: 'vacation_status'))) || ($product->added_by == 'seller' && (checkVendorAbility(type: 'vendor', status: 'temporary_close', vendor: $product->seller->shop) || checkVendorAbility(type: 'vendor', status: 'vacation_status', vendor: $product->seller->shop))))
                             <button class="btn btn-secondary" type="button" disabled>
@@ -395,7 +452,7 @@
                                 </div>
                             </div>
                         </button>
-                    </div>
+                    </div> -->
 
                     @if(($product['product_type'] == 'physical'))
                         <div

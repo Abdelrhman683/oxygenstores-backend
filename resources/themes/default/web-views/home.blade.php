@@ -18,7 +18,7 @@
 ?>
 @include("web-views.partials._order-success-modal",['orderSuccessIds' => $orderSuccessIds,'isNewCustomerInSession' => $isNewCustomerInSession])
 
-<div class="__inline-61 d-flex flex-column gap-20">
+<div class="__inline-61">
         @php($decimalPointSettings = !empty(getWebConfig(name: 'decimal_point_settings')) ? getWebConfig(name: 'decimal_point_settings') : 0)
 
         @include('web-views.partials._home-top-slider',['bannerTypeMainBanner'=>$bannerTypeMainBanner])
@@ -72,7 +72,7 @@
                     @endif
                 </div>
             </div>
-         <!-- @if(getFeaturedDealsProductList() && (count(getFeaturedDealsProductList()) > 0))
+        @if(getFeaturedDealsProductList() && (count(getFeaturedDealsProductList()) > 0))
             <section class="featured_deal pb-3">
                 <div class="container">
                     <div class="__featured-deal-wrap bg--light px-0-mobile">
@@ -97,7 +97,7 @@
                     </div>
                 </div>
             </section>
-         @endif -->
+         @endif
 
         @include('web-views.partials._clearance-sale-products', ['clearanceSaleProducts' => $clearanceSaleProducts])
 
@@ -120,7 +120,7 @@
 
         <section class="new-arrival-section">
 
-            <!-- @if ($newArrivalProducts->count() >0 )
+            @if ($newArrivalProducts->count() >0 )
                 <div class="container rtl">
                     <div class="section-header">
                         <h2 class="arrival-title d-block mb-1">
@@ -143,7 +143,7 @@
                         </div>
                     </div>
                 </div>
-            @endif -->
+            @endif
 
             <div class="container rtl px-0 px-md-3">
                 <div class="row g-3 mx-max-md-0">
@@ -157,7 +157,6 @@
                     @endif
                 </div>
             </div>
-        </div>
     </section>
 
 
