@@ -45,7 +45,7 @@
 
             <div class=" mb-2 mb-md-4 rtl __inline-35" dir="{{ session('direction') }}">
                 <div class="row">
-                    <aside class="col-lg-3 hidden-xs col-md-3 col-sm-4 SearchParameters __search-sidebar" id="SearchParameters">
+                    <aside class="col-lg-2 hidden-xs col-md-3 col-sm-4 SearchParameters __search-sidebar" id="SearchParameters">
                         <div class="cz-sidebar __inline-35 p-4 overflow-hidden" id="shop-sidebar">
                             <div class="cz-sidebar-header p-0">
                                 <button class="close ms-auto fs-18-mobile" type="button" data-dismiss="sidebar" aria-label="Close">
@@ -83,7 +83,7 @@
                         <div class="sidebar-overlay"></div>
                     </aside>
 
-                    <section class="col-lg-9">
+                    <section class="col-lg-10">
                         <div>
                             @include('web-views.products.partials._product-list-header', [
                                     'pageTitleContent' => $pageTitleContent,
