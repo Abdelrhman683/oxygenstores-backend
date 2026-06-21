@@ -2733,26 +2733,36 @@ $(document).ready(function () {
     });
 
     // ---- swipper slider and zoom
-    function initSliderWithZoom() {
+    window.initSliderWithZoom = function() {
         $(".easyzoom").each(function () {
             $(this).easyZoom();
         });
 
-        new Swiper(".quickviewSlider2", {
-            slidesPerView: 1,
-            spaceBetween: 10,
-            loop: false,
-            thumbs: {
-                swiper: new Swiper(".quickviewSliderThumb2", {
-                    spaceBetween: 10,
-                    slidesPerView: 'auto',
-                    watchSlidesProgress: true,
-                    navigation: {
-                        nextEl: ".swiper-quickview-button-next",
-                        prevEl: ".swiper-quickview-button-prev",
-                    },
-                }),
-            },
+        $(".quickviewSlider2").each(function () {
+            const $mainSlider = $(this);
+            const $parent = $mainSlider.closest(".pd-img-wrap");
+            const $thumbSlider = $parent.find(".quickviewSliderThumb2");
+
+            if ($mainSlider[0] && $mainSlider[0].swiper) return;
+
+            const thumbSwiper = new Swiper($thumbSlider[0], {
+                spaceBetween: 10,
+                slidesPerView: "auto",
+                watchSlidesProgress: true,
+                navigation: {
+                    nextEl: $parent.find(".swiper-quickview-button-next")[0],
+                    prevEl: $parent.find(".swiper-quickview-button-prev")[0],
+                },
+            });
+
+            new Swiper($mainSlider[0], {
+                slidesPerView: 1,
+                spaceBetween: 10,
+                loop: false,
+                thumbs: {
+                    swiper: thumbSwiper,
+                },
+            });
         });
     }
     initSliderWithZoom();

@@ -141,7 +141,7 @@
                     <strong>الكهرباء والفريون: 220V-1Ph-60Hz - R32.</strong>
                     <strong>الكهرباء والفريون: 220V-1Ph-60Hz - R32.</strong>
                 </div>
-                <div class="d-flex flex-wrap align-items-baseline gap-3 mb-3 pro">
+                <!-- <div class="d-flex flex-wrap align-items-baseline gap-3 mb-3 pro">
                     @if($overallRating[0] != 0)
                         <div class="d-flex gap-1 align-items-baseline">
                             <div class="star-rating">
@@ -170,7 +170,7 @@
                         <span class="web-text-primary fw-semibold countWishlist-{{ $product->id }}"> {{$countWishlist}}</span> {{translate('wish_listed')}}
                     </span>
 
-                </div>
+                </div> -->
 
                 @if($product['product_type'] == 'digital')
                     <div class="digital-product-authors mb-2">
