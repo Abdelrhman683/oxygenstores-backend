@@ -2742,12 +2742,14 @@ $(document).ready(function () {
             const $mainSlider = $(this);
             const $parent = $mainSlider.closest(".pd-img-wrap");
             const $thumbSlider = $parent.find(".quickviewSliderThumb2");
+            const isVertical = $parent.find(".thumb-vertical-wrapper").length > 0;
 
             if ($mainSlider[0] && $mainSlider[0].swiper) return;
 
             const thumbSwiper = new Swiper($thumbSlider[0], {
+                direction: isVertical ? "vertical" : "horizontal",
                 spaceBetween: 10,
-                slidesPerView: "auto",
+                slidesPerView: isVertical ? 5 : "auto",
                 watchSlidesProgress: true,
                 navigation: {
                     nextEl: $parent.find(".swiper-quickview-button-next")[0],

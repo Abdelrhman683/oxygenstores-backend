@@ -9,7 +9,7 @@
 
 @section('content')
     <div class="__inline-23">
-        <div class="container  rtl text-align-direction">
+        <div class="container-fluid  rtl text-align-direction">
                     <nav aria-label="breadcrumb">
             <style>
                 .breadcrumb-item + .breadcrumb-item::before {
@@ -37,11 +37,11 @@
                     <div class="h-100 d-flex flex-column gap-4 pb-2">
                         <div class="card card-body flex-grow-0" style="border: none ; background: transparent;">
                             <div class="row g-3">
-                                <div class="col-lg-5 col-md-4">
+                                <div class="col-lg-6 col-md-4">
                               <div class="gallery_wrapper_deta">
 
-                                    <div class="pd-img-wrap position-relative">
-                                        <div class="swiper-container quickviewSlider2  aspect-1">
+                                    <div class="pd-img-wrap position-relative d-flex gap-3 flex-row-reverse">
+                                        <div class="swiper-container quickviewSlider2 flex-grow-1  aspect-1">
                                             <div class="swiper-wrapper">
                                                 @php
                                                     $imageSources = ($product->product_type === 'physical' && !empty($product->color_image) && count($product->color_images_full_url) > 0)
@@ -76,62 +76,18 @@
                                             </span>
                                         </div>
                                         @endif
-                                        <!-- <div class="cz-product-gallery-icons">
-                                            <div class="d-flex flex-column gap-12px pt-3">
-                                                @if($product->product_type == "physical")
-                                                <div class="bg-white btn-circle border" style="--size: 35px" data-toggle="tooltip" title="{{ translate('Physical_Product') }}" data-placement="left">
-                                                    <img class="h-16px aspect-1 svg" src="{{theme_asset(path: "public/assets/front-end/img/icons/physical-product.svg")}}" alt="">
-                                                </div>
-                                                @else
-                                                    <div class="bg-white btn-circle border" style="--size: 35px" data-toggle="tooltip" title="{{ translate('Digital_Product') }}" data-placement="left">
-                                                        <img class="h-16px aspect-1 svg" src="{{theme_asset(path: "public/assets/front-end/img/icons/digital-product.svg")}}" alt="">
-                                                    </div>
-                                                @endif
-                                                <button type="button" data-product-id="{{ $product['id'] }}"
-                                                    class="btn __text-18px border position-static rounded-circle wishList-pos-btn d-sm-none product-action-add-wishlist">
-                                                    <i class="fa {{($wishlistStatus == 1?'fa-heart':'fa-heart-o') }} wishlist_icon_{{ $product['id'] }} web-text-primary"
-                                                    aria-hidden="true"></i>
-                                                    <div class="wishlist-tooltip" x-placement="top">
-                                                        <div class="arrow"></div>
-                                                        <div class="inner">
-                                                            <span class="add">{{ translate('added_to_wishlist') }}</span>
-                                                            <span class="remove">{{ translate('removed_from_wishlist') }}</span>
-                                                        </div>
-                                                    </div>
-                                                </button>
-
-                                                <div class="share_dropdown_wrapper">
-                                                    <button type="button" class="btn btn-outline-primary btn-circle p-0 share_btn" style="--size: 35px" tabindex="0">
-                                                        <i class="fa fa-share-alt"></i>
-                                                    </button>
-                                                    <div class="share_dropdown bg-white d-flex gap-3 align-items-center flex-column">
-                                                        <a href="#"  class="flex-shrink-0 btn btn-circle p-0 bg-facebook text-white share-on-social-media share_btn facebook" style="--size: 20px"   data-action="{{route('product',$product->slug)}}"    data-social-media-name="facebook.com/sharer/sharer.php?u=">
-                                                            <i class="czi-facebook lh-1 fs-10"></i>
-                                                        </a>
-                                                        <a href="#" class="flex-shrink-0 btn btn-circle p-0 bg-twitter text-white share-on-social-media share_btn twitter" style="--size: 20px"    data-action="{{route('product',$product->slug)}}" data-social-media-name="twitter.com/intent/tweet?text=">
-                                                            <i class="czi-twitter lh-1 fs-10"></i>
-                                                        </a>
-                                                        <a href="#" class="flex-shrink-0 btn btn-circle p-0 bg-linkedin text-white share-on-social-media share_btn linkedin" style="--size: 20px"  data-action="{{route('product',$product->slug)}}" data-social-media-name="linkedin.com/shareArticle?mini=true&url=">
-                                                            <i class="czi-linkedin lh-1 fs-10"></i>
-                                                        </a>
-                                                        <a href="#" class="flex-shrink-0 btn btn-circle p-0 bg-whatsapp text-white share-on-social-media share_btn whatsapp" style="--size: 20px"  data-action="{{route('product',$product->slug)}}" data-social-media-name="api.whatsapp.com/send?text=">
-                                                            <i class="fa fa-whatsapp lh-1 fs-10"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
-                                        <div class="mt-3 user-select-none">
-                                            <div class="quickviewSliderThumb2 swiper-container position-relative active-border">
-                                                <div class="swiper-wrapper auto-item-width justify-content-start">
+                                        
+                                        <div class="user-select-none thumb-vertical-wrapper" style="width: 65px;">
+                                            <div class="quickviewSliderThumb2 swiper-container position-relative active-border h-100">
+                                                <div class="swiper-wrapper justify-content-start">
                                                     @foreach ($imageSources as $key => $photo)
                                                         @php
                                                             $imagePath = isset($photo['image_name'])
                                                                 ? getStorageImages(path: $photo['image_name'], type: 'backend-product')
                                                                 : getStorageImages(path: $photo, type: 'backend-product');
                                                         @endphp
-                                                        <div class="swiper-slide position-relative " role="group">
-                                                            <img class="aspect-1" alt="" src="{{ $imagePath }}">
+                                                        <div class="swiper-slide position-relative mb-2" role="group">
+                                                            <img class="aspect-1 rounded" alt="" src="{{ $imagePath }}">
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -145,7 +101,7 @@
                               </div>
                                 </div>
 
-                                <div class="col-lg-7 col-md-8 mt-md-0 mt-sm-3 web-direction">
+                                <div class="col-lg-6 col-md-8 mt-md-0 mt-sm-3 web-direction">
                                     <div class="details __h-100 product-cart-option-container p-0">
                                         <div class="head_det">
                                            <a href="#" class="sub_cat_title">
@@ -163,7 +119,7 @@
                                         </div>
                                       
                                         <h2 class=" __inline-24 cat_title_det">{{ $product->name }}</h2>
-                                        <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
+                                        <!-- <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
                                             @if($overallRating[0] !=0)
                                             <div class="star-rating me-2">
                                                 @for($inc=1;$inc<=5;$inc++)
@@ -199,7 +155,7 @@
                                                 class="font-weight-normal fs-14 font-for-tab d-inline-block font-size-sm text-body align-middle text-capitalize">
                                                 <span class="web-text-primary fw-semibold countWishlist-{{ $product->id }}"> {{ $countWishlist}}</span> {{ translate('wish_listed') }}
                                             </span>
-                                        </div>
+                                        </div> -->
 
                                         @if($product['product_type'] == 'digital')
                                             <div class="digital-product-authors mb-2">
