@@ -5706,3 +5706,27 @@ content: "";
         width: 80px !important;
     }
 }
+.premium-card-bottom-info {
+    width: 100%;
+}
+.shipping-alert {
+padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    gap: 5px;
+    row-gap: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    background-color: #fff2ef;
+       font-size: .9rem;
+}
+
+.region-link {
+    color: #333;
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 0;
+    text-decoration-style: dashed;
+    cursor: pointer;
+}

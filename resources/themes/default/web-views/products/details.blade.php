@@ -211,14 +211,28 @@
                                                     <img   loading="lazy"
                                                  src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}" alt>
                                                 </div>
+                                                <!-- <div class="product-details__short-description">
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                </div> -->
                                                 <div class="product-details__short-description">
-                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
-                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
-                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
-                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
-                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
-                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                   @if ($product['details'])
+                                                    <div
+                                                        class="p-details-description text-body col-lg-12 col-md-12 fs-14 text-justify details-text-justify rich-editor-html-content" style="max-height: 525px">
+                                                        {!! $product['details'] !!}
+                                                    </div>
+                                                @endif
                                                 </div>
+                                                <div class="shipping-alert">
+                                                        عذرًا، لا يمكن شحن هذا المنتج إلى منطقتك الحالية.
+                                                        يُرجى التأكد من
+                                                        <a href="#" class="region-link">اختيار المنطقة الصحيحة</a>
+                                                        لضمان توفر الشحن.
+                                                    </div>
                                             </div>
 
                                             <div>
