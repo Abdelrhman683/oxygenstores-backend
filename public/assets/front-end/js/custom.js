@@ -2772,7 +2772,7 @@ $(document).ready(function () {
     $(".other-product-carousel").owlCarousel({
         loop: false,
         autoplay: true,
-        margin: 20,
+        margin: 10,
         nav: false,
         dots: true,
         autoplayHoverPause: true,
@@ -2800,11 +2800,11 @@ $(document).ready(function () {
             },
             1200: {
                 items: 4,
-                margin: 20,
+                margin: 10,
             },
             1400: {
                 items: 4,
-                margin: 20,
+                margin: 10,
             },
         },
     });
@@ -2812,7 +2812,7 @@ $(document).ready(function () {
         $(".related-product-carousel").owlCarousel({
         loop: false,
         autoplay: true,
-        margin: 20,
+        margin: 10,
         nav: false,
         dots: true,
         autoplayHoverPause: true,
@@ -2828,23 +2828,23 @@ $(document).ready(function () {
             },
             540: {
                 items: 2.2,
-                margin: 15,
+                margin: 5,
             },
             768: {
                 items: 3.2,
-                margin: 20,
+                margin: 10,
             },
             992: {
                 items: 4,
-                margin: 20,
+                margin: 10,
             },
             1200: {
                 items: 6,
-                margin: 20,
+                margin: 10,
             },
             1400: {
                 items: 6,
-                margin: 20,
+                margin: 10,
             },
         },
     });
