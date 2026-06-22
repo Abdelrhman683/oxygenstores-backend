@@ -728,9 +728,10 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 85px;
-    border-radius: 50%;
-    aspect-ratio: 1;
+    /* max-width: 85px; */
+    max-width: 100%;
+    /* aspect-ratio: 1; */
+      aspect-ratio: 4 / 3;
     overflow: hidden;
     background-color: var(--white-clr);
     box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
@@ -744,7 +745,9 @@ a {
 
 .__brand-item img {
     width: 100%;
-    aspect-ratio: 1;
+    /* aspect-ratio: 1; */
+          aspect-ratio: 4 / 3;
+
     -o-object-fit: cover;
     object-fit: cover;
     transition: all 300ms ease-in-out;

@@ -5,7 +5,6 @@ setInterval(updateFlashDealProgressBar, 10000);
 
 $(document).ready(function () {
     var directionFromSession = $("#direction-from-session").data("value");
-    directionFromSession = directionFromSession === 'rtl' ? true : false;
 
     $(".flash-deal-slider").owlCarousel({
         loop: false,
@@ -532,32 +531,32 @@ $(document).ready(function () {
             
             responsive: {
                 0: {
+                    items: 2,
+                    loop: maxItems > 2
+                },
+                360: {
+                    items: 2,
+                    loop: maxItems > 2
+                },
+                576: {
+                    items: 3,
+                    loop: maxItems > 3
+                },
+                768: {
+                    items: 3,
+                    loop: maxItems > 3
+                },
+                992: {
                     items: 4,
                     loop: maxItems > 4
                 },
-                360: {
+                1200: {
                     items: 5,
                     loop: maxItems > 5
                 },
-                576: {
-                    items: 6,
-                    loop: maxItems > 6
-                },
-                768: {
-                    items: 7,
-                    loop: maxItems > 7
-                },
-                992: {
-                    items: 9,
-                    loop: maxItems > 9
-                },
-                1200: {
-                    items: 11,
-                    loop: maxItems > 11
-                },
                 1400: {
-                    items: 12,
-                    loop: maxItems > 12
+                    items: 5,
+                    loop: maxItems > 5
                 },
             },            
         });
