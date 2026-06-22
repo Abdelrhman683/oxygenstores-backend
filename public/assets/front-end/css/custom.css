@@ -5730,3 +5730,13 @@ padding: 10px;
     text-decoration-style: dashed;
     cursor: pointer;
 }
+.out-of-stock-danger {
+    background-color: #ba6f6f;
+    width: max-content;
+    padding: 3px 10px 4px;
+    border-radius: 20px;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.2;
+    color: #fff;
+}

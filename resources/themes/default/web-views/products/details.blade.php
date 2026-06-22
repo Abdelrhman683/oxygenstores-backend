@@ -1036,7 +1036,7 @@
                 <div class="col-lg-3">
                    
                         <div class="product-details-shipping-details px-3 py-3">
-                           
+                           <p class="stock out-of-stock-danger">غير متوفر في المخزون</p>
                                     <div class="shipping-details-bottom-border">
                                         <div class="">
                                             <span class="store_name">البائع :</span>
