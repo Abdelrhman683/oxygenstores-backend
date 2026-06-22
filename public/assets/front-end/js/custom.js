@@ -2776,8 +2776,7 @@ $(document).ready(function () {
         nav: false,
         dots: true,
         autoplayHoverPause: true,
-        rtl: directionFromSession === "rtl",
-        ltr: directionFromSession === "ltr",
+        rtl: themeDirection === "rtl",
         responsive: {
             0: {
                 items: 1,
@@ -2817,8 +2816,7 @@ $(document).ready(function () {
         nav: false,
         dots: true,
         autoplayHoverPause: true,
-        rtl: directionFromSession === "rtl",
-        ltr: directionFromSession === "ltr",
+        rtl: themeDirection === "rtl",
         responsive: {
             0: {
                 items: 1.2,

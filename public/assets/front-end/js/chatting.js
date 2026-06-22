@@ -228,6 +228,7 @@ $(document).ready(function () {
                     mouseDrag: slideCount > 1,
                     touchDrag: slideCount > 1,
                     autoplay: false,
+                    rtl: $("html").attr("dir") === "rtl",
                     smartSpeed: 500,
                     onChanged: function(event) {
                         // Get current item index

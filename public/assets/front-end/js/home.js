@@ -738,7 +738,7 @@ $(document).ready(function () {
        Recommended Products (Category Tabs) - Swiper & Tabs Logic
        ========================================================= */
     const rpSwiperConfig = {
-        dir: 'rtl',
+        dir: $('html').attr('dir') || 'rtl',
         loop: false,
         spaceBetween: 12,
         slidesPerView: 2,

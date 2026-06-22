@@ -4845,7 +4845,7 @@ width: max-content;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-align-items: start;
+    align-items: start;
 justify-content: center;
 }
 
@@ -5056,7 +5056,7 @@ justify-content: center;
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: start;
     overflow: hidden;
 }
 
