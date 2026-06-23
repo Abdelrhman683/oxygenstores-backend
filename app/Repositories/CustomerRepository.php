@@ -60,7 +60,18 @@ class CustomerRepository implements CustomerRepositoryInterface
 
     public function getListWhere(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {
-        $query = $this->user->with($relations)
+        $query = $this->prepareCustomerQuery($searchValue, $filters, $relations, $orderBy);
+        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends(['searchValue' => $searchValue]);
+    }
+
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int
+    {
+        return $this->prepareCustomerQuery($searchValue, $filters)->count();
+    }
+
+    protected function prepareCustomerQuery(?string $searchValue = null, array $filters = [], array $relations = [], array $orderBy = [])
+    {
+        return $this->user->with($relations)
             ->when(empty($filters['withCount']), function ($query) use ($filters) {
                 $filters = array_filter($filters, function ($key) {
                     return $key !== 'avoid_walking_customer';
@@ -68,10 +79,12 @@ class CustomerRepository implements CustomerRepositoryInterface
                 return $query->where($filters);
             })
             ->when($searchValue, function ($query) use ($searchValue) {
-                $query->orWhere('f_name', 'like', "%$searchValue%")
-                    ->orWhere('l_name', 'like', "%$searchValue%")
-                    ->orWhere('phone', 'like', "%$searchValue%")
-                    ->orWhere('email', 'like', "%$searchValue%");
+                $query->where(function ($query) use ($searchValue) {
+                    $query->orWhere('f_name', 'like', "%$searchValue%")
+                        ->orWhere('l_name', 'like', "%$searchValue%")
+                        ->orWhere('phone', 'like', "%$searchValue%")
+                        ->orWhere('email', 'like', "%$searchValue%");
+                });
             })
             ->when(isset($filters['withCount']), function ($query) use ($filters) {
                 return $query->withCount($filters['withCount']);
@@ -82,8 +95,8 @@ class CustomerRepository implements CustomerRepositoryInterface
             ->when(!empty($orderBy), function ($query) use ($orderBy) {
                 $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
             });
-        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends(['searchValue' => $searchValue]);
     }
+
 
     public function getListWhereBetween(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $relations = [], ?string $whereBetween = null, array $whereBetweenFilters = [], int|string|null $takeItem = null, int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null, array|object $appends = []): Collection|LengthAwarePaginator
     {

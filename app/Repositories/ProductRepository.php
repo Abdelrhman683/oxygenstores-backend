@@ -143,7 +143,19 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function getListWhere(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {
-        $query = $this->product->with($relations)->when(isset($filters['added_by']) && $this->isAddedByInHouse(addedBy: $filters['added_by']), function ($query) {
+        $query = $this->prepareProductQuery($searchValue, $filters, $relations, $orderBy);
+        $filters += ['searchValue' => $searchValue];
+        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
+    }
+
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int
+    {
+        return $this->prepareProductQuery($searchValue, $filters)->count();
+    }
+
+    protected function prepareProductQuery(?string $searchValue = null, array $filters = [], array $relations = [], array $orderBy = [])
+    {
+        return $this->product->with($relations)->when(isset($filters['added_by']) && $this->isAddedByInHouse(addedBy: $filters['added_by']), function ($query) {
             return $query->where(['added_by' => 'admin']);
         })->when(isset($filters['added_by']) && !$this->isAddedByInHouse($filters['added_by']), function ($query) use ($filters) {
             return $query->where(['added_by' => 'seller'])
@@ -208,10 +220,8 @@ class ProductRepository implements ProductRepositoryInterface
         })->when(!empty($orderBy), function ($query) use ($orderBy) {
             $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
         });
-
-        $filters += ['searchValue' => $searchValue];
-        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
     }
+
 
     public function getListWithScope(array $orderBy = [], ?string $searchValue = null, ?string $scope = null, array $filters = [], array $whereIn = [], array $whereNotIn = [], array $relations = [], array $withCount = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {

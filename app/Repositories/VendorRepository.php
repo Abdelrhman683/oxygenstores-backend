@@ -54,7 +54,19 @@ class VendorRepository implements VendorRepositoryInterface
 
     public function getListWhere(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {
-        $query = $this->vendor->with($relations)
+        $query = $this->prepareVendorQuery($searchValue, $filters, $relations, $orderBy);
+        $filters += ['searchValue' => $searchValue];
+        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
+    }
+
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int
+    {
+        return $this->prepareVendorQuery($searchValue, $filters)->count();
+    }
+
+    protected function prepareVendorQuery(?string $searchValue = null, array $filters = [], array $relations = [], array $orderBy = [])
+    {
+        return $this->vendor->with($relations)
             ->where($filters)
             ->when($searchValue, function ($query) use ($searchValue) {
                 $searchTerms = explode(' ', $searchValue);
@@ -86,10 +98,8 @@ class VendorRepository implements VendorRepositoryInterface
             ->when(!empty($orderBy), function ($query) use ($orderBy) {
                 return $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
             });
-
-        $filters += ['searchValue' => $searchValue];
-        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
     }
+
 
     public function update(string $id, array $data): bool
     {

@@ -382,18 +382,8 @@ $(document).ready(function () {
         $(this).owlCarousel({
             autoplay: true,
             margin: 20,
-            nav: true,
-            navText:
-                directionFromSession === "rtl"
-                    ? [
-                          "<i class='czi-arrow-right'></i>",
-                          "<i class='czi-arrow-left'></i>",
-                      ]
-                    : [
-                          "<i class='czi-arrow-left'></i>",
-                          "<i class='czi-arrow-right'></i>",
-                      ],
-            dots: false,
+            nav: false,
+            dots: true,
             autoplayHoverPause: true,
             rtl: directionFromSession === "rtl",
             responsive: {
@@ -426,14 +416,20 @@ $(document).ready(function () {
                     loop: maxItems > 6
                 },
             },
-            onInitialized: checkNavigationButtons,
+            // onInitialized: checkNavigationButtons,
         });
     })
 
     function checkNavigationButtons(event) {
         var itemCount = event.item.count;
-        let owlNav = $(".owl-nav");
-        itemCount > 1 ? owlNav.show() : owlNav.hide();
+        let owlNav = $(event.target).find(".owl-nav");
+        let settings = $(event.target).data('owl.carousel').settings;
+        
+        if (itemCount > 1 && settings.nav) {
+            owlNav.show();
+        } else {
+            owlNav.hide();
+        }
     }
 
     let isLoopHeroSlider = $(".hero-slider").data('loop')?.toString() === '1';
@@ -696,7 +692,7 @@ $(document).ready(function () {
     $(".premium-product-carousel").owlCarousel({
         loop: false,
         autoplay: true,
-        margin: 20,
+        margin: 10,
         nav: false,
         dots: true,
         autoplayHoverPause: true,
@@ -705,78 +701,55 @@ $(document).ready(function () {
         responsive: {
             0: {
                 items: 1.2,
-                margin: 10,
+                margin:5,
             },
             375: {
-                items: 1.5,
-                margin: 15,
+                items: 2,
+                margin: 5,
             },
             540: {
                 items: 2.2,
-                margin: 15,
+                margin: 5,
             },
             768: {
                 items: 3.2,
-                margin: 20,
+                margin: 10,
             },
             992: {
                 items: 4,
-                margin: 20,
+                margin: 10,
             },
             1200: {
                 items: 6,
-                margin: 20,
+                margin: 10,
             },
             1400: {
                 items: 6,
-                margin: 20,
+                margin: 10,
             },
         },
     });
 
     /* =========================================================
-       Recommended Products (Category Tabs) - Swiper & Tabs Logic
+       Recommended Products (Category Tabs) - Owl Carousel & Tabs Logic
        ========================================================= */
-    const rpSwiperConfig = {
-        dir: $('html').attr('dir') || 'rtl',
-        loop: false,
-        spaceBetween: 12,
-        slidesPerView: 2,
-        pagination: {
-            el: '.rp-swiper-pagination',
-            clickable: true,
-        },
-        breakpoints: {
-            480:  { slidesPerView: 3, spaceBetween: 12 },
-            768:  { slidesPerView: 4, spaceBetween: 14 },
-            992:  { slidesPerView: 5, spaceBetween: 14 },
-            1200: { slidesPerView: 6, spaceBetween: 16 },
-        }
-    };
+    const tabBtns = document.querySelectorAll('#recommendedTabsNav .rp-tab-btn');
+    const tabPanes = document.querySelectorAll('#recommendedTabsContent .rp-tab-pane');
 
-    if (document.querySelector('#rp-swiper-washers')) {
-        const rpSwiperWashers      = new Swiper('#rp-swiper-washers',      rpSwiperConfig);
-        const rpSwiperFridges      = new Swiper('#rp-swiper-refrigerators', rpSwiperConfig);
-        const rpSwiperConditioners = new Swiper('#rp-swiper-conditioners',  rpSwiperConfig);
-
-        const tabBtns = document.querySelectorAll('#recommendedTabsNav .rp-tab-btn');
-        const tabPanes = document.querySelectorAll('#recommendedTabsContent .rp-tab-pane');
-
-        tabBtns.forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                tabPanes.forEach(p => p.classList.remove('active'));
-                btn.classList.add('active');
-                var target = document.getElementById(btn.getAttribute('data-target'));
-                if (target) {
-                    target.classList.add('active');
-                    [rpSwiperWashers, rpSwiperFridges, rpSwiperConditioners].forEach(s => {
-                        if (s && typeof s.update === 'function') s.update();
-                    });
-                }
-            });
+    tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabPanes.forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            var targetId = btn.getAttribute('data-target');
+            var target = document.getElementById(targetId);
+            if (target) {
+                target.classList.add('active');
+                // Refresh the owl carousel inside the active tab to ensure correct layout
+                $(target).find('.owl-carousel').trigger('refresh.owl.carousel');
+            }
         });
-    }
+    });
 
     /* =========================================================
        Order Success Modal & Copy ID Logic

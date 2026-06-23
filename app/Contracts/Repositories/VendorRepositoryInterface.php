@@ -14,4 +14,11 @@ interface VendorRepositoryInterface extends RepositoryInterface
      * @return Collection|array|LengthAwarePaginator
      */
     public function getByStatusExcept(string $status, array $relations = [], int $paginateBy = DEFAULT_DATA_LIMIT): Collection|array|LengthAwarePaginator;
+
+    /**
+     * @param string|null $searchValue
+     * @param array $filters
+     * @return int
+     */
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int;
 }
