@@ -2,7 +2,7 @@
 
 <section class="recommended-products-section  rtl py-4 px-0">
 
-    <div class="rp-header-bar">
+    <div class="rp-header-bar   ">
         <h2 class="rp-section-title mb-0">منتجات ننصح بها</h2>
     </div>
 

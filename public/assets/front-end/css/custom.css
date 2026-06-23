@@ -5148,7 +5148,7 @@ justify-content: center;
 }
 .header_section_title {
     font-size: 24px !important;
-    color: #1c344a !important;
+    color: var(--web-primary) !important;
 }
 .premium-card.w_border {
         border-width: 0 3px 3px;
