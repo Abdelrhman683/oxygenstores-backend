@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\VendorRepositoryInterface;
 use App\Models\Seller;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -66,8 +67,39 @@ class VendorRepository implements VendorRepositoryInterface
 
     protected function prepareVendorQuery(?string $searchValue = null, array $filters = [], array $relations = [], array $orderBy = [])
     {
+        $baseFilters = array_filter($filters, function ($key) {
+            return !in_array($key, ['date_type', 'from', 'to', 'searchValue'], true);
+        }, ARRAY_FILTER_USE_KEY);
+
         return $this->vendor->with($relations)
-            ->where($filters)
+            ->when(!empty($baseFilters), function ($query) use ($baseFilters) {
+                return $query->where($baseFilters);
+            })
+            ->when(isset($filters['date_type']) && $filters['date_type'] == "today", function ($query) {
+                return $query->whereDate('created_at', Carbon::today());
+            })
+            ->when(isset($filters['date_type']) && $filters['date_type'] == "this_year", function ($query) {
+                $current_start_year = date('Y-01-01');
+                $current_end_year = date('Y-12-31');
+                return $query->whereDate('created_at', '>=', $current_start_year)
+                    ->whereDate('created_at', '<=', $current_end_year);
+            })
+            ->when(isset($filters['date_type']) && $filters['date_type'] == "this_month", function ($query) {
+                $current_month_start = date('Y-m-01');
+                $current_month_end = date('Y-m-t');
+                return $query->whereDate('created_at', '>=', $current_month_start)
+                    ->whereDate('created_at', '<=', $current_month_end);
+            })
+            ->when(isset($filters['date_type']) && $filters['date_type'] == "this_week", function ($query) {
+                $start_week = Carbon::now()->startOfWeek()->format('Y-m-d');
+                $end_week = Carbon::now()->endOfWeek()->format('Y-m-d');
+                return $query->whereDate('created_at', '>=', $start_week)
+                    ->whereDate('created_at', '<=', $end_week);
+            })
+            ->when(isset($filters['date_type']) && $filters['date_type'] == "custom_date" && isset($filters['from']) && isset($filters['to']), function ($query) use ($filters) {
+                return $query->whereDate('created_at', '>=', $filters['from'])
+                    ->whereDate('created_at', '<=', $filters['to']);
+            })
             ->when($searchValue, function ($query) use ($searchValue) {
                 $searchTerms = explode(' ', $searchValue);
                 return $query->where(function ($query) use ($searchTerms) {
