@@ -7,7 +7,7 @@
 
 <div class="modal-body rtl">
     <div class="d-flex justify-content-end pb-2 mt-2">
-        <button class="close close-quick-view-modal z-index-99 p-0 pe-0 ps-0 w-24 h-24px rounded-circle bg-light " type="button" data-dismiss="modal" aria-label="Close">
+        <button class="close close-quick-view-modal z-index-99 p-0 pe-0 ps-0 w-24 h-24px " type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true" style="font-size: 34px;cursor: pointer;color: #f44336;">&times;</span>
         </button>
     </div>

@@ -38,7 +38,19 @@ class DeliveryManRepository implements DeliveryManRepositoryInterface
 
     public function getListWhere(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {
-        $query = $this->deliveryMan->with($relations)
+        $query = $this->prepareDeliveryManQuery($searchValue, $filters, $relations, $orderBy);
+        $filters += ['searchValue' => $searchValue];
+        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
+    }
+
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int
+    {
+        return $this->prepareDeliveryManQuery($searchValue, $filters)->count();
+    }
+
+    protected function prepareDeliveryManQuery(?string $searchValue = null, array $filters = [], array $relations = [], array $orderBy = [])
+    {
+        return $this->deliveryMan->with($relations)
             ->withCount('orders')
             ->when($searchValue, function ($query) use ($searchValue) {
                 $searchTerms = explode(' ', $searchValue);
@@ -69,15 +81,13 @@ class DeliveryManRepository implements DeliveryManRepositoryInterface
                 return $query->orderBy('id', 'asc');
             })
             ->when(in_array('deliveredOrders', $relations), function ($query) {
-                return $query->whereHas('deliveredOrders',);
+                return $query->whereHas('deliveredOrders');
             })
             ->when(!empty($orderBy), function ($query) use ($orderBy) {
                 $query->orderBy(key($orderBy), current($orderBy));
             });
-        $filters += ['searchValue' => $searchValue];
-        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
-
     }
+
 
     public function getTopRatedList(array $orderBy = [], array $filters = [], array $whereHasFilters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {

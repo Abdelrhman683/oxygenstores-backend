@@ -2848,3 +2848,42 @@ $(document).ready(function () {
             },
         },
     });
+        $(".filter-product-carousel").owlCarousel({
+        loop: false,
+        autoplay: true,
+        margin: 10,
+        nav: false,
+        dots: true,
+        autoplayHoverPause: true,
+        rtl: themeDirection === "rtl",
+        responsive: {
+            0: {
+                items: 1.2,
+                margin: 10,
+            },
+            375: {
+                items: 1.5,
+                margin: 15,
+            },
+            540: {
+                items: 2.2,
+                margin: 5,
+            },
+            768: {
+                items: 3.2,
+                margin: 10,
+            },
+            992: {
+                items: 4,
+                margin: 10,
+            },
+            1200: {
+                items: 6,
+                margin: 10,
+            },
+            1400: {
+                items: 6,
+                margin: 10,
+            },
+        },
+    });

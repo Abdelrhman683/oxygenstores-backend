@@ -32,4 +32,11 @@ interface DeliveryManRepositoryInterface extends RepositoryInterface
      * @return Collection|LengthAwarePaginator
      */
     public function getListWhereIn(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $relations = [], array $nullFields = [], array $withCounts = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator;
+
+    /**
+     * @param string|null $searchValue
+     * @param array $filters
+     * @return int
+     */
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int;
 }

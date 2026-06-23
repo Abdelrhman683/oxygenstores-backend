@@ -47,6 +47,22 @@ interface OrderRepositoryInterface extends RepositoryInterface
      */
     public function getListWhereCount(?string $searchValue = null, array $filters = [], array $relations = []): int;
 
+    /**
+     * @param string|null $searchValue
+     * @param array $filters
+     * @return int
+     */
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int;
+
+    /**
+     * @param string|null $searchValue
+     * @param array $filters
+     * @param array $whereIn
+     * @param array $nullFields
+     * @return int
+     */
+    public function getCountWhereIn(?string $searchValue = null, array $filters = [], array $whereIn = [], array $nullFields = []): int;
+
 
     /**
      * @param object $request

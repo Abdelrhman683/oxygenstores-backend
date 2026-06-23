@@ -89,7 +89,7 @@
     <div class="navbar-sticky bg-light mobile-head">
         <div class="navbar navbar-expand-lg top_navbar">
             <!-- ===== Row 1: Toggle + Logo + Actions ===== -->
-            <div class="top-navbar-row1 d-flex align-items-center justify-content-between w-100">
+            <div class="top-navbar-row1 d-flex align-items-center justify-content-between w-100 " >
 
                 <!-- Toggle menu button (Mobile only) -->
                 <button class="navbar-toggler p-0 text-white border-0 d-lg-none flex-shrink-0" type="button" data-toggle="collapse" data-target="#navbarCollapse">
