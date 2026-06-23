@@ -14,8 +14,7 @@ class CustomerRepository implements CustomerRepositoryInterface
 {
     public function __construct(
         private readonly User $user,
-    )
-    {
+    ) {
     }
 
     public function add(array $data): string|object
@@ -137,7 +136,8 @@ class CustomerRepository implements CustomerRepositoryInterface
                 total: $allResults->count(),
                 perPage: $perPage,
                 currentPage: $page,
-                options: ['path' => request()->url(), 'query' => request()->query()]);
+                options: ['path' => request()->url(), 'query' => request()->query()]
+            );
             return $paginator->appends($appends);
         }
         return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($appends);
