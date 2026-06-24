@@ -46,7 +46,7 @@
             <div class=" mb-2 mb-md-4 rtl __inline-35" dir="{{ session('direction') }}">
                 <div class="row">
                     <aside class="col-lg-2 hidden-xs col-md-3 col-sm-4 SearchParameters __search-sidebar" id="SearchParameters">
-                        <div class="cz-sidebar __inline-35 p-4 overflow-hidden" id="shop-sidebar">
+                        <div class="cz-sidebar __inline-35 py-4 overflow-hidden" id="shop-sidebar">
                             <div class="cz-sidebar-header p-0">
                                 <button class="close ms-auto fs-18-mobile" type="button" data-dismiss="sidebar" aria-label="Close">
                                     <i class="tio-clear"></i>
