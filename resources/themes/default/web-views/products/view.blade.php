@@ -14,7 +14,7 @@
 @endpush
 
 @section('content')
-    <div class="container-fluid" dir="{{ session('direction') }}">
+    <div class="container" dir="{{ session('direction') }}">
         <nav aria-label="breadcrumb">
             <style>
                 .breadcrumb-item + .breadcrumb-item::before {

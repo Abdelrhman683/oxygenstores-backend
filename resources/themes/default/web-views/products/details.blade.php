@@ -9,7 +9,7 @@
 
 @section('content')
     <div class="__inline-23">
-        <div class="container-fluid  rtl text-align-direction">
+        <div class="container  rtl text-align-direction">
                     <nav aria-label="breadcrumb">
             <style>
                 .breadcrumb-item + .breadcrumb-item::before {
