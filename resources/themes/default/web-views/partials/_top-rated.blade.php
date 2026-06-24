@@ -1,4 +1,4 @@
-<div class="col-12 top-rated-section">
+<div class="col-12 top-rated-section custom_pd">
     <div class="">
         <!-- card card __shadow h-100 -->
         <div class="card-body p-0">
