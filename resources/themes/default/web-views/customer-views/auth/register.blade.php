@@ -8,10 +8,30 @@
 @endpush
 
 @section('content')
-    <div class="container py-4 __inline-7 text-align-direction">
-        <div class="login-card">
+    <div class="container  __inline-7 text-align-direction">
+          <nav aria-label="breadcrumb">
+            <style>
+                .breadcrumb-item + .breadcrumb-item::before {
+                    display: none;
+                }
+            </style>
+            <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 3px 0;">
+                <li class="breadcrumb-item d-flex align-items-center ">
+                    <a href="{{route('home')}}" class="breadcrumb-title">
+                        {{translate('home')}}
+                    </a>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                                        <a class="breadcrumb-title" href="{{ route('customer.auth.login') }}"> {{translate('حسابى')}}</a>
+
+               
+                </li>
+            </ol>
+        </nav>
+        <div class="">
             <div class="mx-auto __max-w-760">
-                <h2 class="text-center h4 mb-4 font-bold text-capitalize fs-18-mobile">{{ translate('sign_up') }}</h2>
+                <h2 class="text-center h4 mb-4 font-bold text-capitalize fs-18-mobile" style="color: var(--web-primary);">{{ translate('sign_up') }}</h2>
                 <form class="needs-validation_" id="customer-register-form" action="{{ route('customer.auth.sign-up') }}"
                     method="post">
                     @csrf
@@ -56,7 +76,7 @@
                                     {{ translate('phone_number') }}
                                     <span class="input-required-icon">*</span>
                                 </label>
-                                <input class="form-control text-align-direction phone-input-with-country-picker"
+                                <input class="form-control text-align-direction phone-input-with-country-picker" style="padding: 0.625rem 1rem;"
                                     type="tel" value="{{ old('phone') }}" name="phone"
                                     placeholder="{{ translate('enter_phone_number') }}" required>
                             </div>
@@ -186,10 +206,10 @@
                                 @endforeach
                             @endif
                         </div>
-                        <div class="text-black-50 mt-3 text-center">
-                            <small>
+                        <div class="text-black-50 mb-3 text-center">
+                            <bold>
                                 {{ translate('Already_have_account ') }}?
-                                <a class="text-primary text-underline" href="{{ route('customer.auth.login') }}">
+                                <a class=" text-underline" style="color: var(--web-primary);" href="{{ route('customer.auth.login') }}">
                                     {{ translate('sign_in') }}
                                 </a>
                             </small>
