@@ -5947,7 +5947,8 @@ padding: 10px;
         display: none;
     }
     .login-form-side {
-        padding: 2rem;
+        padding: 0px;
+        text-align: center;
     }
     .login-form-container {
         margin: 0 auto;
