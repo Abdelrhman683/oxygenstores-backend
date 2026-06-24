@@ -1,7 +1,7 @@
 <div class="col-12 top-rated-section">
     <div class="">
         <!-- card card __shadow h-100 -->
-        <div class="card-body p-xl-35">
+        <div class="card-body p-0">
             <div class="row d-flex justify-content-between align-items-center mx-1 mb-3">
                 <div class="d-flex gap-1 align-items-center">
                     <!-- <img loading="lazy" class="size-30" src="{{theme_asset(path: "public/assets/front-end/png/top-rated.png")}}"

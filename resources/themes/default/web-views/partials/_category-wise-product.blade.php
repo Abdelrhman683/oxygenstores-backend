@@ -1,7 +1,7 @@
 @if (count($category['products']) > 0)
-<section class="container rtl pb-0 px-max-sm-0">
+<section class="container rtl ">
     <div class="">
-        <div class="__p-20px  overflow-hidden">
+        <div class=" overflow-hidden">
             <div class="d-flex __gap-6px flex-between align-items-baseline px-sm-3">
                 <h2 class="category-product-view-title mb-0">
                     <span class="for-feature-title font-bold __text-20px text-uppercase">

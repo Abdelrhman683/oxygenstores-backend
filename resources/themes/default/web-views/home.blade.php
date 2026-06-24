@@ -95,7 +95,7 @@
         @include('web-views.partials._clearance-sale-products', ['clearanceSaleProducts' => $clearanceSaleProducts])
 
         @if (isset($bannerTypeMainSectionBanner))
-            <div class="container rtl pt-0 px-0 px-md-3">
+            <div class="container rtl ">
                 <a href="{{$bannerTypeMainSectionBanner->url}}" target="_blank"
                     class="cursor-pointer d-block">
                     <img loading="lazy" class="d-block footer_banner_img __inline-63" alt=""
@@ -138,7 +138,7 @@
                 </div>
             @endif -->
 
-            <div class="container rtl px-0 px-md-3">
+            <div class="container rtl custom_pd ">
                 <div class="row g-3 mx-max-md-0">
 
                     @if ($bestSellProduct->count() >0)
@@ -152,7 +152,7 @@
             </div>
     </section>
 
-<section class="premium-static-section container rtl px-0 px-md-3">
+<section class="premium-static-section container rtl custom_pd ">
     <div class="premium-section-header">
         <h2 class="premium-section-title">عروض المكيفات</h2>
     </div>
@@ -364,7 +364,7 @@
 
 
         @if (count($bannerTypeFooterBanner) > 1)
-            <div class="container rtl">
+            <div class="container rtl ">
                 <div class="promotional-banner-slider owl-carousel owl-theme">
                     @foreach($bannerTypeFooterBanner as $banner)
                         <a href="{{ $banner['url'] }}" class="d-block" target="_blank">
@@ -387,9 +387,13 @@
             </div>
         @endif
         @include('web-views.partials._banner-grid')
-<section class="premium-static-section  rtl ">
+<section class="premium-static-section  rtl  custom_pd">
        <div class="rp-header-bar">
+        
+        <div class="container">
         <h2 class="rp-section-title mb-0">الأكثر مبيعا</h2>
+
+        </div>
     </div>
 <div class="container">
  <div class="premium-carousel-wrapper">
@@ -597,9 +601,12 @@
     </div>
 </div>
 </section>
-<section class="premium-static-section  rtl ">
+<section class="premium-static-section  rtl custom_pd">
        <div class="rp-header-bar">
-        <h2 class="rp-section-title mb-0">الأكثر مبيعا هذا الشهر</h2>
+        <div class="container">
+                    <h2 class="rp-section-title mb-0">الأكثر مبيعا هذا الشهر</h2>
+
+        </div>
     </div>
 <div class="container">
  <div class="premium-carousel-wrapper">
@@ -807,7 +814,7 @@
     </div>
 </div>
 </section>
-<section class="custom-banner-section">
+<section class="custom-banner-section custom_pd">
         <div class="promo-wide-banner">
             <a href="{{ route('products') }}" class="d-block">
                 <img
@@ -831,7 +838,7 @@
         @if($companyReliability != null)
             @include('web-views.partials._company-reliability')
         @endif
-    <section class="premium-static-section container rtl px-0 px-md-3">
+    <section class="premium-static-section container rtl custom_pd  ">
     <div class="premium-section-header">
         <h2 class="premium-section-title">غسالات</h2>
     </div>
@@ -1041,7 +1048,7 @@
     </div>
 </section>
 
-<section class="banner-grid-section">
+<section class="banner-grid-section custom_pd">
     <div class="container rtl">
         <div class="banner-grid-wrapper">
 
@@ -1087,7 +1094,7 @@
     </div>
 </section>
         @if($web_config['brand_setting'] && $brands->count() > 0)
-            <section class="container rtl">
+            <section class="container rtl custom_pd">
 
                 <div class="section-header d-flex justify-content-between align-items-center mb-1">
                     <h2 class="header_section_title mb-0">
@@ -1123,7 +1130,7 @@
 
 
 
-<section class="premium-static-section container rtl px-0 px-md-3">
+<section class="premium-static-section container rtl custom_pd ">
     <div class="premium-section-header">
         <h2 class="premium-section-title">تخفيضات</h2>
     </div>
@@ -1333,13 +1340,10 @@
     </div>
 </section>
 
+        <section class="cat-promo-section  rtl py-3">
 
-   
-  
-
-
-        <section class="cat-promo-section container rtl">
-            <div class="cat-promo-grid">
+        <div class="container">
+     <div class="cat-promo-grid">
 
                 <a href="{{ route('products') }}?category=large-appliances" class="cat-promo-card">
                     <img loading="lazy" src="{{ theme_asset('public/assets/front-end/img/cat_1.webp') }}"alt="" >
@@ -1354,6 +1358,8 @@
                 </a>
 
             </div>
+        </div>
+       
         </section>
 
     </div>

@@ -1,12 +1,14 @@
 
 
-<section class="recommended-products-section  rtl py-4 px-0">
+<section class="recommended-products-section  rtl custom_pd">
 
-    <div class="rp-header-bar   ">
-        <h2 class="rp-section-title mb-0">منتجات ننصح بها</h2>
+    <div class="rp-header-bar">
+        <div class="container">
+            <h2 class="rp-section-title mb-0">منتجات ننصح بها</h2>
+        </div>
     </div>
 
-    <div class=" container rp-tabs-wrapper px-3 d-flex justify-content-center justify-content-lg-start">
+    <div class=" container rp-tabs-wrapper  d-flex justify-content-center justify-content-lg-start">
         <ul class="rp-tabs-nav d-flex p-0 mb-0" id="recommendedTabsNav" role="tablist">
             <li class="rp-tab-item" role="presentation">
                 <button class="rp-tab-btn" data-target="rp-pane-conditioners" type="button">مكيفات</button>
@@ -20,7 +22,7 @@
         </ul>
     </div>
 
-    <div class="rp-tabs-content mt-4 px-3 container" id="recommendedTabsContent">
+    <div class="rp-tabs-content mt-4  container" id="recommendedTabsContent">
 
         <div class="rp-tab-pane active" id="rp-pane-washers" role="tabpanel">
             <div class="owl-carousel owl-theme premium-product-carousel" id="rp-swiper-washers">

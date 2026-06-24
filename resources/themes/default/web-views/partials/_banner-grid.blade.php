@@ -1,4 +1,4 @@
-<section class="featured-banners-section">
+<section class="featured-banners-section custom_pd">
     <div class="container ">
         <h2 class="section-title">تسوق عبر الأقسام المميزة</h2>
 

@@ -1,5 +1,5 @@
 @if(count($companyReliability) > 0)
-<div class="container rtl pb-4 px-0 px-md-3">
+<div class="container rtl pb-4 custom_pd">
     <div class="benefits-section">
         <div class="benefits-header">
             <h4 class="benefits-title">لماذا متجرنا</h4>

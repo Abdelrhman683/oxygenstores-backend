@@ -3245,16 +3245,15 @@ body {
     box-sizing: border-box;
 }
 
-/* Ensure the search input fills the full row on mobile */
 .top-navbar-row2 .custom-search-input-group {
     width: 100%;
 }
 
-/* Below lg (991px): logo centered between toggle and cart */
 @media (max-width: 991.98px) {
     .top-navbar-row1 .navbar-brand {
         text-align: center;
     }
+
 }
 @media (max-width: 991.98px) {
     .separator-line{
@@ -3549,7 +3548,6 @@ body {
 
 
 .recommended-products-section {
-    padding: 0 0 28px 0;
     overflow: hidden;
 }
 
@@ -4034,9 +4032,7 @@ body {
     background: #e9dddd;
 }
 
-.banner-grid-section {
-    padding: 40px 0;
-}
+
 
 .banner-grid-wrapper {
     display: flex;
@@ -4352,9 +4348,7 @@ body {
 .custom-product-card .add-to-cart-btn:hover {
     opacity: .9;
 }
-.home-categories-section {
-    padding: 30px 0;
-}
+
 
 .home-categories-section .section-header {
     display: flex;
@@ -4475,9 +4469,6 @@ body {
     margin-top: 20px;
 }
 
-.featured-banners-section {
-    padding: 40px 0;
-}
 
 .featured-banners-section .section-title {
     font-size: 24px;
@@ -4640,9 +4631,7 @@ body {
     }
 }
 
-.benefits-section {
-    padding: 60px 0 40px;
-}
+
 
 .benefits-header {
     position: relative;
@@ -5086,9 +5075,7 @@ justify-content: center;
     }
 }
 
-.premium-product-carousel {
-    margin-bottom: 30px !important;
-}
+
 
 .premium-card-owl-item {
     height: 380px;
@@ -5192,7 +5179,6 @@ justify-content: center;
    ========================================================= */
 .promo-wide-banner {
     overflow: hidden;
-    margin-bottom: 20px;
     line-height: 0;
 }
 
@@ -5207,12 +5193,7 @@ justify-content: center;
     transform: scale(1.02);
 }
 
-/* =========================================================
-   Category Promo Banners Section
-   ========================================================= */
-.cat-promo-section {
-    padding: 30px 0;
-}
+
 
 .cat-promo-grid {
     display: grid;
@@ -5828,4 +5809,12 @@ padding: 10px;
     background-color: #f0fff4;
     color: #25d366 !important;
     transform: translateX(-5px);
+}
+.custom_pd{
+      padding: 30px 0px 0px 0px;
+}
+@media(min-width:768px){
+    .middle_item_footer {
+        padding-inline-start: 2rem;
+    }
 }

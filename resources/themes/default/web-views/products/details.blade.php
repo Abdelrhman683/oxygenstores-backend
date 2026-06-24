@@ -815,7 +815,7 @@
                                     </div>
                                     <div class="tab-pane fade" id="other_products" role="tabpanel">
                            
-<section class="premium-static-section container rtl px-0 px-md-3">
+<section class="premium-static-section container rtl custom_pd ">
  
 
     <div class="premium-carousel-wrapper">
@@ -1401,7 +1401,7 @@
         </div>
 <div class="container">
     <div class="row">
-        <section class="premium-static-section container rtl px-0 px-md-3">
+        <section class="premium-static-section container rtl custom_pd ">
     <div class="premium-section-header">
         <h2 class="premium-section-title">منتجات ذات صلة</h2>
     </div>

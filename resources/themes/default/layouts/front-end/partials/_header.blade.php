@@ -88,28 +88,24 @@
 
     <div class="navbar-sticky bg-light mobile-head">
         <div class="navbar navbar-expand-lg top_navbar">
-            <!-- ===== Row 1: Toggle + Logo + Actions ===== -->
-            <div class="top-navbar-row1 d-flex align-items-center justify-content-between w-100 " >
+            <div class="container">
+                          <div class="top-navbar-row1 d-flex align-items-center justify-content-between w-100  " >
 
-                <!-- Toggle menu button (Mobile only) -->
                 <button class="navbar-toggler p-0 text-white border-0 d-lg-none flex-shrink-0" type="button" data-toggle="collapse" data-target="#navbarCollapse">
                     <i class="czi-menu fs-20" style="color: #fff !important;"></i>
                 </button>
 
-                <!-- Logo: desktop -->
                 <a class="navbar-brand d-none d-sm-block flex-shrink-0 __min-w-7rem" href="{{route('home')}}">
                     <img class="__inline-11"
                          src="{{ getStorageImages(path: $web_config['web_logo'], type: 'logo') }}"
                          alt="{{$web_config['company_name']}}">
                 </a>
-                <!-- Logo: mobile -->
                 <a class="navbar-brand d-sm-none flex-grow-1 text-center" href="{{route('home')}}">
                     <img class="__inline-12"
                          src="{{ getStorageImages(path: $web_config['mob_logo'], type: 'logo') }}"
                          alt="{{$web_config['company_name']}}">
                 </a>
 
-                <!-- Search: Desktop only (inline) -->
                 <div class="search-section flex-grow-1 mx-3 mx-lg-5 d-none d-lg-block">
                     <form action="{{route('products')}}" type="submit" class="search_form m-0">
                         <input type="hidden" name="global_search_input" value="1">
@@ -124,7 +120,6 @@
                                 <i class="fa fa-search"></i>
                             </button>
                         </div>
-                        <!-- Autocomplete -->
                         <div class="card search-card position-absolute w-100 mt-1" style="display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                             <div class="card-body p-2">
                                 <div class="search-result-box __h-400px overflow-x-hidden overflow-y-auto"></div>
@@ -178,8 +173,9 @@
                 </div>
 
             </div>
+            </div>           
+   
 
-            <!-- ===== Row 2: Search bar (Mobile only) ===== -->
             <div class="top-navbar-row2 d-lg-none w-100 px-2 pb-2">
                 <form action="{{route('products')}}" type="submit" class="search_form m-0">
                     <input type="hidden" name="global_search_input" value="1">
@@ -194,7 +190,6 @@
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
-                    <!-- Autocomplete -->
                     <div class="card search-card mobile-search-card position-absolute w-100 mt-1" style="display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
                         <div class="card-body p-2">
                             <div class="search-result-box __h-400px overflow-x-hidden overflow-y-auto"></div>
@@ -208,7 +203,6 @@
         <div class="navbar navbar-expand-lg navbar-stuck-menu bottom_navbar">
             <div class="container px-10px">
                 <div class="collapse navbar-collapse text-align-direction" id="navbarCollapse">
-                    <!-- Drawer Header (Mobile close button) -->
                     <div class="mobile-drawer-header d-lg-none">
                         <span class="mobile-drawer-title">القائمة</span>
                         <button class="mobile-drawer-close" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-label="Close menu">
@@ -219,7 +213,7 @@
                         </button>
                     </div>
 
-                    <ul class="navbar-nav w-100  header-categories-nav align-items-center" >
+                    <ul class="navbar-nav w-100  header-categories-nav align-items-center justify-content-center" >
                         <li class="nav-item {{request()->is('/')?'active':''}}">
                             <a class="nav-link" href="{{route('home')}}">{{ translate('الرئيسية')}}</a>
                         </li>
@@ -314,17 +308,14 @@
     </div>
 </header>
 
-<!-- Region Selection Modal -->
 <div class="modal fade" id="regionModal" tabindex="-1" role="dialog" aria-labelledby="regionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content border-0 position-relative" style="border-radius: 8px; overflow: hidden; padding: 25px 20px;">
             
-            <!-- Close Button -->
             <button type="button" class="close-region-modal" data-dismiss="modal" aria-label="Close">
                 <i class="fa fa-times"></i>
             </button>
 
-            <!-- Modal Header -->
             <div class="text-center mb-4">
                 <h3 class="modal-title-custom">يرجى إختيار منطقتك لتخصيص العرض</h3>
                 <p class="modal-subtitle-custom">
@@ -332,7 +323,6 @@
                 </p>
             </div>
 
-            <!-- Modal Body (Regions Grid) -->
             <div class="regions-grid">
                 @php($regions = ['الرياض', 'الدمام', 'المجمعة', 'الخرج', 'الأحساء', 'الجبيل', 'حفر الباطن', 'المدينة المنورة', 'ينبع', 'الرس', 'بريدة', 'عنيزة', 'مكة المكرمة', 'جدة', 'الطائف', 'الباحة', 'القنفذة', 'الدوادمي'])
                 @foreach($regions as $region)
@@ -342,7 +332,6 @@
                 @endforeach
             </div>
 
-            <!-- Modal Footer -->
             <div class="text-center mt-4">
                 <button type="button" class="btn-save-region" id="save-region-btn">حفظ</button>
             </div>
@@ -362,35 +351,27 @@
         $(document).ready(function() {
             let tempSelectedRegion = "{{ $selected_region }}";
 
-            // Handle Region Card Click
             $(document).on('click', '.region-card', function() {
                 $('.region-card').removeClass('active');
                 $(this).addClass('active');
                 tempSelectedRegion = $(this).data('region');
             });
 
-            // Handle Save Button Click
             $('#save-region-btn').on('click', function() {
-                // Set cookie (valid for 30 days)
                 document.cookie = "selected_region=" + encodeURIComponent(tempSelectedRegion) + "; path=/; max-age=" + (30*24*60*60);
                 
-                // Update placeholder text
                 $('#current-region-name').text(tempSelectedRegion);
                 $('.current-region-placeholder').text(tempSelectedRegion);
                 
-                // Close modal
                 $('#regionModal').modal('hide');
                 
-                // Reload the page to reflect new regional settings
                 location.reload();
             });
         });
     </script>
 
     <script>
-        // ===== Mobile Right-Side Drawer =====
         (function () {
-            // Insert backdrop into body once
             if (!document.getElementById('mobile-menu-backdrop')) {
                 var backdrop = document.createElement('div');
                 backdrop.id = 'mobile-menu-backdrop';
@@ -413,7 +394,6 @@
                 document.body.style.overflow = '';
             }
 
-            // Toggle button (hamburger) - intercept Bootstrap's default behavior
             document.querySelectorAll('[data-target="#navbarCollapse"]').forEach(function (btn) {
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -426,10 +406,8 @@
                 });
             });
 
-            // Backdrop click closes drawer
             backdrop.addEventListener('click', closeDrawer);
 
-            // ESC key closes drawer
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') closeDrawer();
             });

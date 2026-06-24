@@ -1,4 +1,4 @@
-<!-- <div class="container rtl">
+{{-- <div class="container rtl">
     <div class="row g-4 pt-0 pb-0 mt-0 __deal-of align-items-start">
         @if(isset($dealOfTheDay->product) || isset($recommendedProduct->discount_type))
             <div class="col-xl-3 col-md-4 pt-0">
@@ -331,4 +331,4 @@
             </div>
         </div>
     </div>
-</div> -->
+</div> --}}
