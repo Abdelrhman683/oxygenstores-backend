@@ -88,7 +88,7 @@
 
     <div class="navbar-sticky bg-light mobile-head">
         <div class="navbar navbar-expand-lg top_navbar">
-            <div class="container">
+            <div class="my-container">
                           <div class="top-navbar-row1 d-flex align-items-center justify-content-between w-100  " >
 
                 <button class="navbar-toggler p-0 text-white border-0 d-lg-none flex-shrink-0" type="button" data-toggle="collapse" data-target="#navbarCollapse">
@@ -96,12 +96,12 @@
                 </button>
 
                 <a class="navbar-brand d-none d-sm-block flex-shrink-0 __min-w-7rem" href="{{route('home')}}">
-                    <img class="__inline-11"
+                    <img class="__inline-10-"
                          src="{{ getStorageImages(path: $web_config['web_logo'], type: 'logo') }}"
                          alt="{{$web_config['company_name']}}">
                 </a>
                 <a class="navbar-brand d-sm-none flex-grow-1 text-center" href="{{route('home')}}">
-                    <img class="__inline-12"
+                    <img class="__inline-12_header"
                          src="{{ getStorageImages(path: $web_config['mob_logo'], type: 'logo') }}"
                          alt="{{$web_config['company_name']}}">
                 </a>
