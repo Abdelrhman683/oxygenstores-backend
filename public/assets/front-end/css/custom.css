@@ -3554,12 +3554,6 @@ body {
 }
 
 
-
-
-.recommended-products-section {
-    overflow: hidden;
-}
-
 .rp-header-bar {
     background-color: var(--bg-yellow);
     padding: 14px 24px;
@@ -5820,7 +5814,7 @@ padding: 10px;
     transform: translateX(-5px);
 }
 .custom_pd{
-      padding: 50px 0px 0px 0px;
+      padding-top: 50px;
 }
 @media(min-width:768px){
     .middle_item_footer {

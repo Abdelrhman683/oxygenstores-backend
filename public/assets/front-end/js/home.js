@@ -612,7 +612,7 @@ $(document).ready(function () {
     $(".categories--slider").owlCarousel({
         loop: false,
         autoplay: true,
-        margin: 20,
+        margin: 0,
         nav: false,
         dots: false,
         autoplayHoverPause: true,
@@ -620,28 +620,28 @@ $(document).ready(function () {
         ltr: directionFromSession === "ltr",
         responsive: {
             0: {
-                items: 2.2,
-                margin: 10,
+                items: 2,
+                margin: 0,
             },
             375: {
-                items: 2.5,
-                margin: 10,
+                items: 3,
+                margin: 0,
             },
             540: {
-                items: 3.5,
-                margin: 15,
+                items: 3,
+                margin: 0,
             },
             768: {
-                items: 4.5,
-                margin: 20,
+                items: 4,
+                margin: 0,
             },
             992: {
                 items: 5,
-                margin: 20,
+                margin: 0,
             },
             1200: {
                 items: 5,
-                margin: 25,
+                margin: 0,
             },
         },
     });

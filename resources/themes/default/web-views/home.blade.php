@@ -1340,7 +1340,7 @@
     </div>
 </section>
 
-        <section class="cat-promo-section  rtl py-4">
+        <section class="cat-promo-section  rtl py-5">
 
         <div class="container">
      <div class="cat-promo-grid">
