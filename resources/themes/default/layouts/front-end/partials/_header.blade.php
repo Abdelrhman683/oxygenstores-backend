@@ -119,10 +119,10 @@
                             <button class="custom-search-btn" type="submit">
                                 <i class="fa fa-search"></i>
                             </button>
-                        </div>
-                        <div class="card search-card position-absolute w-100 mt-1" style="display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                            <div class="card-body p-2">
-                                <div class="search-result-box __h-400px overflow-x-hidden overflow-y-auto"></div>
+                            <div class="card search-card position-absolute w-100 mt-1" style="display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); top: 100%;">
+                                <div class="card-body p-2">
+                                    <div class="search-result-box __h-400px overflow-x-hidden overflow-y-auto"></div>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -182,17 +182,17 @@
                     <input name="data_from" value="search" hidden>
                     <input name="page" value="1" hidden>
                     <div class="custom-search-input-group">
-                        <input class="form-control search-bar-input custom-search-field text-align-direction"
+                        <input class="form-control search-bar-input search-bar-input-mobile custom-search-field text-align-direction"
                                type="search" autocomplete="off" data-given-value=""
                                placeholder="كيف نقدر نساعدك؟ ابحث هنا"
                                name="name" value="{{ request('name') }}">
                         <button class="custom-search-btn" type="submit">
                             <i class="fa fa-search"></i>
                         </button>
-                    </div>
-                    <div class="card search-card mobile-search-card position-absolute w-100 mt-1" style="display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                        <div class="card-body p-2">
-                            <div class="search-result-box __h-400px overflow-x-hidden overflow-y-auto"></div>
+                        <div class="card search-card mobile-search-card position-absolute w-100 mt-1" style="display: none; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); top: 100%;">
+                            <div class="card-body p-2">
+                                <div class="search-result-box __h-400px overflow-x-hidden overflow-y-auto"></div>
+                            </div>
                         </div>
                     </div>
                 </form>

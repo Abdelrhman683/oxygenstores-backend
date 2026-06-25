@@ -3223,19 +3223,17 @@ body {
     position: relative !important;
 }
 
-@media (max-width: 991.98px) {
+/* @media (max-width: 991.98px) {
     .mobile-head {
         overflow: hidden !important;
     }
-}
+} */
 
-/* Actions section: never shrink, keep consistent width */
 .top-navbar-row1 .actions-section {
     flex-shrink: 0;
     white-space: nowrap;
 }
 
-/* At medium-large sizes (lg only), tighten the search a bit */
 @media (min-width: 992px) and (max-width: 1199.98px) {
     .top-navbar-row1 .search-section {
         max-width: 320px;
@@ -3245,14 +3243,12 @@ body {
     }
 }
 
-/* Row 1: same padding as old container */
 .top-navbar-row1 {
     padding: 8px 15px;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* Row 2 (mobile search) already has d-md-none so it's hidden on desktop */
 .top-navbar-row2 {
     width: 100%;
     padding: 0 12px 8px 12px;
@@ -3279,7 +3275,6 @@ body {
    Full-Width Hero Slider
    ============================================= */
 
-/* Remove any top gap between navbar and slider */
 .__inline-61 {
     gap: 0 !important;
 }
@@ -3427,7 +3422,7 @@ body {
         display: block !important;
     }
     #navbarCollapse .dropdown-item {
-        padding: 10px 15px !important;
+        padding: 10px 25px !important;
         font-size: 14px !important;
         color: #555 !important;
         border-bottom: 1px solid #eee !important;
