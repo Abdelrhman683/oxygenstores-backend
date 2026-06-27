@@ -49,6 +49,7 @@ class ProductDetailsController extends Controller
      */
     public function index(string $slug): View|RedirectResponse
     {
+        $slug = self::normalizeProductSlug(slug: $slug);
         $theme_name = theme_root_path();
 
         return match ($theme_name) {
@@ -58,13 +59,44 @@ class ProductDetailsController extends Controller
         };
     }
 
+    public static function normalizeProductSlug(string $slug): string
+    {
+        return trim((string) rawurldecode($slug));
+    }
+
+    public static function findProductForWeb(string $slug, bool $forAster = false): mixed
+    {
+        $normalizedSlug = self::normalizeProductSlug(slug: $slug);
+
+        $query = Product::query()
+            ->active()
+            ->where('slug', $normalizedSlug);
+
+        if ($forAster) {
+            $query->with(['seoInfo', 'digitalVariation', 'reviews' => 'reviews', 'seller.shop' => 'seller.shop', 'wishList' => 'wishList', 'compareList' => 'compareList', 'digitalProductAuthors.author', 'digitalProductPublishingHouse.publishingHouse', 'clearanceSale' => 'clearanceSale'])
+                ->withCount(['orderDetails' => 'orderDetails', 'wishList' => 'wishList']);
+        } else {
+            $query->with(['seoInfo', 'digitalVariation' => 'digitalVariation', 'reviews', 'seller.shop', 'digitalProductAuthors.author',
+                'digitalProductPublishingHouse.publishingHouse', 'clearanceSale' => 'clearanceSale', 'brand', 'category']);
+        }
+
+        $product = $query->first();
+
+        if ($product) {
+            return $product;
+        }
+
+        return app(ProductRepositoryInterface::class)->getWebFirstWhereActive(
+            params: ['slug' => $normalizedSlug, 'customer_id' => Auth::guard('customer')->user()->id ?? 0],
+            relations: $forAster ? ['seoInfo', 'digitalVariation', 'reviews' => 'reviews', 'seller.shop' => 'seller.shop', 'wishList' => 'wishList', 'compareList' => 'compareList', 'digitalProductAuthors.author', 'digitalProductPublishingHouse.publishingHouse', 'clearanceSale' => 'clearanceSale'] : ['seoInfo', 'digitalVariation' => 'digitalVariation', 'reviews', 'seller.shop', 'digitalProductAuthors.author',
+                'digitalProductPublishingHouse.publishingHouse', 'clearanceSale' => 'clearanceSale', 'brand', 'category'],
+            withCount: $forAster ? ['orderDetails' => 'orderDetails', 'wishList' => 'wishList'] : []
+        );
+    }
+
     public function getDefaultTheme(string $slug): View|RedirectResponse
     {
-        $product = $this->productRepo->getWebFirstWhereActive(
-            params: ['slug' => $slug, 'customer_id' => Auth::guard('customer')->user()->id ?? 0],
-            relations: ['seoInfo', 'digitalVariation' => 'digitalVariation', 'reviews', 'seller.shop', 'digitalProductAuthors.author',
-                'digitalProductPublishingHouse.publishingHouse', 'clearanceSale' => 'clearanceSale']
-        );
+        $product = self::findProductForWeb(slug: $slug);
 
         if ($product) {
 
@@ -145,11 +177,7 @@ class ProductDetailsController extends Controller
 
     public function getThemeAster(string $slug): View|RedirectResponse
     {
-        $product = $this->productRepo->getWebFirstWhereActive(
-            params: ['slug' => $slug, 'customer_id' => Auth::guard('customer')->user()->id ?? 0],
-            relations: ['seoInfo', 'digitalVariation', 'reviews' => 'reviews', 'seller.shop' => 'seller.shop', 'wishList' => 'wishList', 'compareList' => 'compareList', 'digitalProductAuthors.author', 'digitalProductPublishingHouse.publishingHouse', 'clearanceSale' => 'clearanceSale'],
-            withCount: ['orderDetails' => 'orderDetails', 'wishList' => 'wishList']
-        );
+        $product = self::findProductForWeb(slug: $slug, forAster: true);
 
         if ($product ) {
             $initialProductConfig = ProductManager::getInitialProductQuantity($product);
@@ -262,11 +290,7 @@ class ProductDetailsController extends Controller
 
     public function getThemeFashion($slug): View|RedirectResponse
     {
-        $product = $this->productRepo->getWebFirstWhereActive(
-            params: ['slug' => $slug, 'customer_id' => Auth::guard('customer')->user()->id ?? 0],
-            relations: ['seoInfo', 'digitalVariation', 'reviews' => 'reviews', 'seller.shop' => 'seller.shop', 'wishList' => 'wishList', 'compareList' => 'compareList', 'digitalProductAuthors' => 'digitalProductAuthors', 'digitalProductPublishingHouse' => 'digitalProductPublishingHouse', 'clearanceSale' => 'clearanceSale'],
-            withCount: ['orderDetails' => 'orderDetails', 'wishList' => 'wishList']
-        );
+        $product = self::findProductForWeb(slug: $slug, forAster: true);
 
         if ($product != null) {
             $productDetailsMeta = $product?->seoInfo;

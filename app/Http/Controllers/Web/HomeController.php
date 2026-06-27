@@ -30,16 +30,15 @@ class HomeController extends Controller
     use CacheManagerTrait;
 
     public function __construct(
-        private readonly Product      $product,
-        private readonly Order        $order,
-        private readonly OrderDetail  $orderDetails,
-        private readonly Category     $category,
-        private readonly Seller       $seller,
-        private readonly Review       $review,
+        private readonly Product $product,
+        private readonly Order $order,
+        private readonly OrderDetail $orderDetails,
+        private readonly Category $category,
+        private readonly Seller $seller,
+        private readonly Review $review,
         private readonly DealOfTheDay $dealOfTheDay,
-        private readonly Banner       $banner,
-    )
-    {
+        private readonly Banner $banner,
+    ) {
     }
 
 
@@ -75,28 +74,214 @@ class HomeController extends Controller
         $bestSellProduct = $bestSellProduct->count() == 0 ? $latestProductsList : $bestSellProduct;
         $topRatedProducts = $topRatedProducts->count() == 0 ? $bestSellProduct : $topRatedProducts;
 
-        $featuredProductsList = ProductManager::getPriorityWiseFeaturedProductsQuery(query: $this->product->active()->with(['clearanceSale' => function ($query) {
-            return $query->active();
-        }]), dataLimit: 12);
-        $newArrivalProducts = ProductManager::getPriorityWiseNewArrivalProductsQuery(query: $this->product->active()->with(['clearanceSale' => function ($query) {
-            return $query->active();
-        }]), dataLimit: 8);
-
-        $dealOfTheDay = DealOfTheDay::with(['product' => function ($query) {
-            return $query->active()->with(['clearanceSale' => function ($query) {
+        $featuredProductsList = ProductManager::getPriorityWiseFeaturedProductsQuery(query: $this->product->active()->with([
+            'clearanceSale' => function ($query) {
                 return $query->active();
-            }]);
-        }])
+            }
+        ]), dataLimit: 12);
+        $newArrivalProducts = ProductManager::getPriorityWiseNewArrivalProductsQuery(query: $this->product->active()->with([
+            'clearanceSale' => function ($query) {
+                return $query->active();
+            }
+        ]), dataLimit: 8);
+
+        $dealOfTheDay = DealOfTheDay::with([
+            'product' => function ($query) {
+                return $query->active()->with([
+                    'clearanceSale' => function ($query) {
+                        return $query->active();
+                    }
+                ]);
+            }
+        ])
             ->join('products', 'products.id', '=', 'deal_of_the_days.product_id')
             ->select('deal_of_the_days.*', 'products.unit_price')
             ->where('products.status', 1)
             ->where('deal_of_the_days.status', 1)
             ->first();
-        return view(VIEW_FILE_NAMES['home'],
+
+        $airConditionerProducts = Cache::remember('air_conditioner_products_home', CACHE_FOR_3_HOURS, function () {
+            $acCategory = $this->category->where('parent_id', 0)
+                ->where('name', 'like', '%مكيف%')
+                ->first();
+
+            if (!$acCategory) {
+                return collect();
+            }
+
+            $childIds = $this->category->where('parent_id', $acCategory->id)->pluck('id')->toArray();
+            $allCategoryIds = array_merge([$acCategory->id], $childIds);
+
+            return $this->product->active()
+                ->whereIn('category_id', $allCategoryIds)
+                ->with([
+                    'clearanceSale' => function ($q) {
+                        return $q->active();
+                    }
+                ])
+                ->latest()
+                ->take(12)
+                ->get();
+        });
+
+        $bestSellerAllTimeProducts = Cache::remember('best_seller_all_time_products_home', CACHE_FOR_3_HOURS, function () {
+            return $this->product->active()
+                ->with(['clearanceSale' => function ($q) {
+                    return $q->active(); }])
+                ->withCount('orderDetails')
+                ->orderByDesc('order_details_count')
+                ->take(12)
+                ->get();
+        });
+
+        $bestSellerThisMonthProducts = Cache::remember('best_seller_this_month_products_home', CACHE_FOR_3_HOURS, function () {
+            $startOfMonth = now()->startOfMonth();
+            return $this->product->active()
+                ->with(['clearanceSale' => function ($q) {
+                    return $q->active(); }])
+                ->withCount([
+                    'orderDetails' => function ($q) use ($startOfMonth) {
+                        $q->where('created_at', '>=', $startOfMonth);
+                    }
+                ])
+                ->orderByDesc('order_details_count')
+                ->take(12)
+                ->get();
+        });
+
+        $twoDoorFridgeProducts = Cache::remember('two_door_fridge_products_home', CACHE_FOR_3_HOURS, function () {
+            $cat = $this->category
+                ->where(function ($q) {
+                    $q->where('name', 'like', '%بابين%')
+                        ->orWhere('name', 'like', '%two door%')
+                        ->orWhere('name', 'like', '%ثلاجات بابين%');
+                })
+                ->first();
+
+            if (!$cat) {
+                return collect();
+            }
+
+            $childIds = $this->category->where('parent_id', $cat->id)->pluck('id')->toArray();
+            $allIds = array_merge([$cat->id], $childIds);
+
+            return $this->product->active()
+                ->whereIn('category_id', $allIds)
+                ->with(['clearanceSale' => function ($q) {
+                    return $q->active(); }])
+                ->latest()
+                ->take(12)
+                ->get();
+        });
+
+
+        $washerProducts = Cache::remember('washer_products_home', CACHE_FOR_3_HOURS, function () {
+            $cat = $this->category
+                ->where('parent_id', 0)
+                ->where(function ($q) {
+                    $q->where('name', 'like', '%غسال%')
+                        ->orWhere('name', 'like', '%washer%');
+                })
+                ->first();
+
+            if (!$cat) {
+                return collect();
+            }
+
+            $childIds = $this->category->where('parent_id', $cat->id)->pluck('id')->toArray();
+            $allIds = array_merge([$cat->id], $childIds);
+
+            return $this->product->active()
+                ->whereIn('category_id', $allIds)
+                ->with(['clearanceSale' => function ($q) {
+                    return $q->active(); }])
+                ->latest()
+                ->take(12)
+                ->get();
+        });
+
+        $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
+            $cats = $this->category->where('parent_id', 0)
+                ->with([
+                    'product' => function ($query) {
+                        return $query->active()->with([
+                            'clearanceSale' => function ($q) {
+                                return $q->active();
+                            }
+                        ]);
+                    },
+                    'childes' => function ($q) {
+                        $q->with([
+                            'subCategoryProduct' => function ($q2) {
+                                return $q2->active()->with([
+                                    'clearanceSale' => function ($q3) {
+                                        return $q3->active();
+                                    }
+                                ]);
+                            }
+                        ]);
+                    }
+                ])
+                ->where(function ($query) {
+                    $query->whereHas('product', function ($q) {
+                        return $q->active();
+                    })->orWhereHas('childes.subCategoryProduct', function ($q) {
+                        return $q->active();
+                    });
+                })
+                ->orderBy('priority', 'desc')
+                ->get();
+
+            $cats->map(function ($category) {
+                $aggregated = collect();
+                if ($category->product && $category->product->count() > 0) {
+                    $aggregated = $aggregated->merge($category->product);
+                }
+                if ($category->childes) {
+                    foreach ($category->childes as $child) {
+                        if (isset($child->subCategoryProduct) && $child->subCategoryProduct->count() > 0) {
+                            $aggregated = $aggregated->merge($child->subCategoryProduct);
+                        }
+                    }
+                }
+                $category->product = $aggregated->unique('id')->values();
+                return $category;
+            });
+
+            $airCategory = $cats->firstWhere('name', 'like', '%مكيف%');
+            if ($airCategory) {
+                $cats = $cats->reject(fn($c) => $c->id === $airCategory->id)->prepend($airCategory)->values();
+            }
+
+            return $cats->take(3)->values();
+        });
+
+        return view(
+            VIEW_FILE_NAMES['home'],
             compact(
-                'flashDeal', 'featuredProductsList', 'topRatedProducts', 'bestSellProduct', 'latestProductsList', 'categories', 'brands',
-                'dealOfTheDay', 'topVendorsList', 'homeCategories', 'bannerTypeMainBanner', 'bannerTypeMainSectionBanner',
-                'current_date', 'recommendedProduct', 'bannerTypeFooterBanner', 'newArrivalProducts', 'clearanceSaleProducts'
+                'flashDeal',
+                'featuredProductsList',
+                'topRatedProducts',
+                'bestSellProduct',
+                'latestProductsList',
+                'categories',
+                'brands',
+                'dealOfTheDay',
+                'topVendorsList',
+                'homeCategories',
+                'bannerTypeMainBanner',
+                'bannerTypeMainSectionBanner',
+                'current_date',
+                'recommendedProduct',
+                'bannerTypeFooterBanner',
+                'newArrivalProducts',
+                'clearanceSaleProducts',
+                'recommendedCategories',
+                'airConditionerProducts',
+                'bestSellerAllTimeProducts',
+                'bestSellerThisMonthProducts',
+                'twoDoorFridgeProducts',
+                'washerProducts'
             )
         );
     }
@@ -117,14 +302,20 @@ class HomeController extends Controller
 
         $findWhatYouNeedCategoriesData = Cache::remember(FIND_WHAT_YOU_NEED_CATEGORIES_LIST, CACHE_FOR_3_HOURS, function () {
             return $this->category->where('parent_id', 0)
-                ->with(['childes' => function ($query) {
-                    $query->with(['subCategoryProduct' => function ($query) {
-                        return $query->active();
-                    }]);
-                }])
-                ->with(['product' => function ($query) {
-                    return $query->active()->withCount(['orderDetails']);
-                }])
+                ->with([
+                    'childes' => function ($query) {
+                        $query->with([
+                            'subCategoryProduct' => function ($query) {
+                                return $query->active();
+                            }
+                        ]);
+                    }
+                ])
+                ->with([
+                    'product' => function ($query) {
+                        return $query->active()->withCount(['orderDetails']);
+                    }
+                ])
                 ->get();
         });
 
@@ -156,9 +347,13 @@ class HomeController extends Controller
         }
         $category_slider = array_chunk($final_category, 4);
 
-        $featuredProductsList = $this->product->active()->with(['seller.shop', 'flashDealProducts.flashDeal', 'clearanceSale' => function ($query) {
-            return $query->active();
-        }])
+        $featuredProductsList = $this->product->active()->with([
+            'seller.shop',
+            'flashDealProducts.flashDeal',
+            'clearanceSale' => function ($query) {
+                return $query->active();
+            }
+        ])
             ->where('featured', 1)
             ->withCount(['orderDetails']);
         $featuredProductsList = ProductManager::getPriorityWiseFeaturedProductsQuery(query: $featuredProductsList, dataLimit: 10);
@@ -180,7 +375,9 @@ class HomeController extends Controller
             return $product;
         });
         $bestSellProduct = Product::active()->with([
-            'reviews', 'rating', 'seller.shop',
+            'reviews',
+            'rating',
+            'seller.shop',
             'flashDealProducts.flashDeal',
         ])->withCount(['reviews']);
 
@@ -254,7 +451,7 @@ class HomeController extends Controller
                     })->inRandomOrder()->take(8)->get()->each(function ($product) {
                         $product->reviews_count = $product->reviews->count();
                         $product->average_rating = $product->reviews->avg('rating');
-                        $product->total_rating   = $product->reviews->sum('rating');
+                        $product->total_rating = $product->reviews->sum('rating');
                     });
             }
         }
@@ -268,11 +465,15 @@ class HomeController extends Controller
         if ($topRatedProducts->count() == 0) {
             $topRatedProducts = $bestSellProduct;
         }
-        $dealOfTheDay = $this->dealOfTheDay->with(['product' => function ($query) {
-            return $query->active()->with(['clearanceSale' => function ($query) {
-                return $query->active();
-            }]);
-        }])
+        $dealOfTheDay = $this->dealOfTheDay->with([
+            'product' => function ($query) {
+                return $query->active()->with([
+                    'clearanceSale' => function ($query) {
+                        return $query->active();
+                    }
+                ]);
+            }
+        ])
             ->join('products', 'products.id', '=', 'deal_of_the_days.product_id')
             ->select('deal_of_the_days.*', 'products.unit_price')
             ->where('products.status', 1)
@@ -329,12 +530,94 @@ class HomeController extends Controller
             }
         }
 
-        return view(VIEW_FILE_NAMES['home'],
+        $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
+            $cats = $this->category->where('parent_id', 0)
+                ->with([
+                    'product' => function ($query) {
+                        return $query->active()->with([
+                            'clearanceSale' => function ($q) {
+                                return $q->active();
+                            }
+                        ]);
+                    },
+                    'childes' => function ($q) {
+                        $q->with([
+                            'subCategoryProduct' => function ($q2) {
+                                return $q2->active()->with([
+                                    'clearanceSale' => function ($q3) {
+                                        return $q3->active();
+                                    }
+                                ]);
+                            }
+                        ]);
+                    }
+                ])
+                ->where(function ($query) {
+                    $query->whereHas('product', function ($q) {
+                        return $q->active();
+                    })->orWhereHas('childes.subCategoryProduct', function ($q) {
+                        return $q->active();
+                    });
+                })
+                ->orderBy('priority', 'desc')
+                ->get();
+
+            // Aggregate each category's own products from its direct + child categories only
+            $cats->map(function ($category) {
+                $aggregated = collect();
+                // Add direct products of this category
+                if ($category->product && $category->product->count() > 0) {
+                    $aggregated = $aggregated->merge($category->product);
+                }
+                // Add products from immediate child categories only
+                if ($category->childes) {
+                    foreach ($category->childes as $child) {
+                        if (isset($child->subCategoryProduct) && $child->subCategoryProduct->count() > 0) {
+                            $aggregated = $aggregated->merge($child->subCategoryProduct);
+                        }
+                    }
+                }
+                $category->product = $aggregated->unique('id')->values();
+                return $category;
+            });
+
+            $airCategory = $cats->firstWhere('name', 'like', '%مكيف%');
+            if ($airCategory) {
+                $cats = $cats->reject(fn($c) => $c->id === $airCategory->id)->prepend($airCategory)->values();
+            }
+
+            return $cats->take(3)->values();
+        });
+
+        return view(
+            VIEW_FILE_NAMES['home'],
             compact(
-                'flashDeal', 'topRatedProducts', 'bestSellProduct', 'latestProductsList', 'featuredProductsList', 'dealOfTheDay', 'topVendorsList',
-                'homeCategories', 'bannerTypeMainBanner', 'bannerTypeFooterBanner', 'randomSingleProduct', 'decimal_point_settings', 'justForYouProducts', 'moreVendors',
-                'final_category', 'category_slider', 'order_again', 'bannerTypeSidebarBanner', 'bannerTypeMainSectionBanner', 'random_coupon', 'bannerTypeTopSideBanner',
-                'categories', 'topVendorsListSectionShowingStatus', 'clearanceSaleProducts', 'recommendedProduct'
+                'flashDeal',
+                'topRatedProducts',
+                'bestSellProduct',
+                'latestProductsList',
+                'featuredProductsList',
+                'dealOfTheDay',
+                'topVendorsList',
+                'homeCategories',
+                'bannerTypeMainBanner',
+                'bannerTypeFooterBanner',
+                'randomSingleProduct',
+                'decimal_point_settings',
+                'justForYouProducts',
+                'moreVendors',
+                'final_category',
+                'category_slider',
+                'order_again',
+                'bannerTypeSidebarBanner',
+                'bannerTypeMainSectionBanner',
+                'random_coupon',
+                'bannerTypeTopSideBanner',
+                'categories',
+                'topVendorsListSectionShowingStatus',
+                'clearanceSaleProducts',
+                'recommendedProduct',
+                'recommendedCategories'
             )
         );
     }
@@ -366,9 +649,11 @@ class HomeController extends Controller
         $recommendedProduct = $this->cacheHomePageRandomSingleProductItem();
 
         $featuredProductsList = Cache::remember(CACHE_FOR_FEATURED_PRODUCTS_LIST, CACHE_FOR_3_HOURS, function () {
-            $featuredProductsList = $this->product->with(['clearanceSale' => function ($query) {
-                $query->active();
-            }])
+            $featuredProductsList = $this->product->with([
+                'clearanceSale' => function ($query) {
+                    $query->active();
+                }
+            ])
                 ->active()
                 ->where('featured', 1)
                 ->withCount(['reviews']);
@@ -376,20 +661,28 @@ class HomeController extends Controller
         });
 
         $mostSearchingProducts = Cache::remember(CACHE_FOR_MOST_SEARCHING_PRODUCTS_LIST, CACHE_FOR_3_HOURS, function () {
-            return Product::active()->with(['category', 'clearanceSale' => function ($query) {
-                return $query->active();
-            }])
+            return Product::active()->with([
+                'category',
+                'clearanceSale' => function ($query) {
+                    return $query->active();
+                }
+            ])
                 ->withCount('reviews')
                 ->withSum('tags', 'visit_count')->orderBy('tags_sum_visit_count', 'desc')->get()->take(10);
         });
 
-        $dealOfTheDay = $this->dealOfTheDay->with(['product' => function ($query) {
-            $query->active()->with(['clearanceSale' => function ($query) {
+        $dealOfTheDay = $this->dealOfTheDay->with([
+            'product' => function ($query) {
+                $query->active()->with([
+                    'clearanceSale' => function ($query) {
+                        $query->active();
+                    }
+                ]);
+            },
+            'product.clearanceSale' => function ($query) {
                 $query->active();
-            }]);
-        }, 'product.clearanceSale' => function ($query) {
-            $query->active();
-        }])
+            }
+        ])
             ->where('status', 1)
             ->first();
 
@@ -397,9 +690,15 @@ class HomeController extends Controller
         $newSellers = $vendorList->sortByDesc('id')->take(12);
         $topRatedShops = $vendorList->where('review_count', '!=', 0)->sortByDesc('average_rating')->take(12);
 
-        $baseProductQuery = $this->product->with(['category', 'compareList', 'reviews', 'flashDealProducts.flashDeal', 'clearanceSale' => function ($query) {
-            $query->active();
-        }])
+        $baseProductQuery = $this->product->with([
+            'category',
+            'compareList',
+            'reviews',
+            'flashDealProducts.flashDeal',
+            'clearanceSale' => function ($query) {
+                $query->active();
+            }
+        ])
             ->withSum('orderDetails', 'qty')
             ->active();
 
@@ -446,11 +745,100 @@ class HomeController extends Controller
             })->whereNull('delivery_man_id')->count(),
         ];
 
+        $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
+            $cats = $this->category->where('parent_id', 0)
+                ->with([
+                    'product' => function ($query) {
+                        return $query->active()->with([
+                            'clearanceSale' => function ($q) {
+                                return $q->active();
+                            }
+                        ]);
+                    },
+                    'childes' => function ($q) {
+                        $q->with([
+                            'subCategoryProduct' => function ($q2) {
+                                return $q2->active()->with([
+                                    'clearanceSale' => function ($q3) {
+                                        return $q3->active();
+                                    }
+                                ]);
+                            }
+                        ]);
+                    }
+                ])
+                ->where(function ($query) {
+                    $query->whereHas('product', function ($q) {
+                        return $q->active();
+                    })->orWhereHas('childes.subCategoryProduct', function ($q) {
+                        return $q->active();
+                    });
+                })
+                ->orderBy('priority', 'desc')
+                ->get();
+
+            // Aggregate each category's own products from its direct + child categories only
+            $cats->map(function ($category) {
+                $aggregated = collect();
+                // Add direct products of this category
+                if ($category->product && $category->product->count() > 0) {
+                    $aggregated = $aggregated->merge($category->product);
+                }
+                // Add products from immediate child categories only
+                if ($category->childes) {
+                    foreach ($category->childes as $child) {
+                        if (isset($child->subCategoryProduct) && $child->subCategoryProduct->count() > 0) {
+                            $aggregated = $aggregated->merge($child->subCategoryProduct);
+                        }
+                    }
+                }
+                $category->product = $aggregated->unique('id')->values();
+                return $category;
+            });
+
+            $airCategory = $cats->firstWhere('name', 'like', '%مكيف%');
+            if ($airCategory) {
+                $cats = $cats->reject(fn($c) => $c->id === $airCategory->id)->prepend($airCategory)->values();
+            }
+
+            return $cats->take(3)->values();
+        });
+
         $data = [];
-        return view(VIEW_FILE_NAMES['home'],
+        return view(
+            VIEW_FILE_NAMES['home'],
             compact(
-                'activeBrands', 'latestProductsList', 'dealOfTheDay', 'topVendorsList', 'topRatedShops', 'bannerTypeMainBanner', 'mostVisitedCategories', 'randomSingleProduct', 'newSellers', 'bannerTypeSidebarBanner', 'bannerTypeTopSideBanner', 'recentOrderShopList',
-                'categories', 'allProductsColorList', 'allProductsGroupInfo', 'mostSearchingProducts', 'mostDemandedProducts', 'featuredProductsList', 'bannerTypePromoBannerLeft', 'bannerTypePromoBannerMiddleTop', 'bannerTypePromoBannerMiddleBottom', 'bannerTypePromoBannerRight', 'bannerTypePromoBannerBottom', 'currentDate', 'allProductsList', 'flashDeal', 'data', 'clearanceSaleProducts', 'singlePageProductCount', 'recommendedProduct'
+                'activeBrands',
+                'latestProductsList',
+                'dealOfTheDay',
+                'topVendorsList',
+                'topRatedShops',
+                'bannerTypeMainBanner',
+                'mostVisitedCategories',
+                'randomSingleProduct',
+                'newSellers',
+                'bannerTypeSidebarBanner',
+                'bannerTypeTopSideBanner',
+                'recentOrderShopList',
+                'categories',
+                'allProductsColorList',
+                'allProductsGroupInfo',
+                'mostSearchingProducts',
+                'mostDemandedProducts',
+                'featuredProductsList',
+                'bannerTypePromoBannerLeft',
+                'bannerTypePromoBannerMiddleTop',
+                'bannerTypePromoBannerMiddleBottom',
+                'bannerTypePromoBannerRight',
+                'bannerTypePromoBannerBottom',
+                'currentDate',
+                'allProductsList',
+                'flashDeal',
+                'data',
+                'clearanceSaleProducts',
+                'singlePageProductCount',
+                'recommendedProduct',
+                'recommendedCategories'
             )
         );
     }

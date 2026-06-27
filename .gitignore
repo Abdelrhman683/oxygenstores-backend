@@ -3,12 +3,15 @@
 /public/storage
 /public/themes
 #/storage/*.key
+/storage/*
 /storage/app/*
 /storage/framework/cache/*
 /vendor
 .vscode
 .idea
 .idea/*
+*.zip
+*.sql
 .env
 .env.backup
 .phpunit.result.cache
@@ -24,3 +27,4 @@ style-extended.css.map
 temp-data-folder/
 /Modules/Gateways
 /public/Modules/Gateways
+/6valy_db.sql

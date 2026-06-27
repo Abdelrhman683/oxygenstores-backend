@@ -39,8 +39,9 @@
                                             <span
                                                 class="badge text-bg-info badge-info badge-lg d-inline-flex justify-content-center fs-12 gap-1">
                                                     <div>{{ translate('orders') }} : </div>
-                                                    <div
-                                                        class="fw-bold text-wrap">{{ count($customer['orders']) }}</div>
+                                                    <div class="fw-bold text-wrap">
+                                                        {{ $customer['orders_count'] ?? (isset($customer['orders']) ? count($customer['orders']) : 0) }}
+                                                    </div>
                                                 </span>
                                         </div>
                                     </div>

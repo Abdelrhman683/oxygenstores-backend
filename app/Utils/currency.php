@@ -10,13 +10,25 @@ if (!function_exists('loadCurrency')) {
     {
         $defaultCurrency = getWebConfig(name: 'system_default_currency');
         $currentCurrencyInfo = session('system_default_currency_info');
-        if (!session()->has('system_default_currency_info') || $defaultCurrency != $currentCurrencyInfo['id']) {
-            $id = getWebConfig(name: 'system_default_currency');
-            $currency = Currency::find($id);
+        $currency = null;
+
+        if (!empty($defaultCurrency)) {
+            $currency = Currency::find($defaultCurrency);
+        }
+
+        if (!$currency) {
+            $currency = Currency::where('code', 'USD')->first();
+        }
+
+        if (!$currency) {
+            return;
+        }
+
+        if (!session()->has('system_default_currency_info') || (is_array($currentCurrencyInfo) ? ($defaultCurrency != ($currentCurrencyInfo['id'] ?? null)) : ($defaultCurrency != ($currentCurrencyInfo->id ?? null)))) {
             session()->put('system_default_currency_info', $currency);
-            session()->put('currency_code', $currency->code);
-            session()->put('currency_symbol', $currency->symbol);
-            session()->put('currency_exchange_rate', $currency->exchange_rate);
+            session()->put('currency_code', $currency->code ?? 'USD');
+            session()->put('currency_symbol', $currency->symbol ?? '$');
+            session()->put('currency_exchange_rate', $currency->exchange_rate ?? 1);
             session()->forget('usd');
             session()->forget('default');
             $usd = exchangeRate(USD);
@@ -201,7 +213,8 @@ if (!function_exists('exchangeRate')) {
      */
     function exchangeRate(string $currencyCode = USD): float|int
     {
-        return Currency::where('code', $currencyCode)->first()->exchange_rate ?? 1;
+        $currency = Currency::where('code', $currencyCode)->first();
+        return $currency->exchange_rate ?? 1;
     }
 }
 
@@ -255,10 +268,11 @@ if (!function_exists('getCurrencyCode')) {
             $currencyCode = session('currency_code');
         } else {
             if (session()->has('system_default_currency_info')) {
-                $currencyCode = session('system_default_currency_info')->code;
+                $currencyCode = session('system_default_currency_info')->code ?? 'USD';
             } else {
                 $currencyId = getWebConfig('system_default_currency');
-                $currencyCode = Currency::where('id', $currencyId)->first()->code;
+                $currency = $currencyId ? Currency::where('id', $currencyId)->first() : null;
+                $currencyCode = $currency?->code ?? 'USD';
             }
         }
         return $currencyCode;

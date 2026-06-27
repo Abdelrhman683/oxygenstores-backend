@@ -11,13 +11,18 @@
     =========================================================
 --}}
 
+<<<<<<< Updated upstream
 <section class="recommended-products-section container rtl py-4 px-0">
+=======
+<section class="recommended-products-section rtl custom_pd">
+>>>>>>> Stashed changes
 
     {{-- رأس السكشن: شريط أصفر كامل العرض --}}
     <div class="rp-header-bar">
         <h2 class="rp-section-title mb-0">منتجات ننصح بها</h2>
     </div>
 
+<<<<<<< Updated upstream
     {{-- شريط التابات --}}
     <div class="rp-tabs-wrapper px-3 d-flex justify-content-start">
         <ul class="rp-tabs-nav d-flex p-0 mb-0" id="recommendedTabsNav" role="tablist">
@@ -63,6 +68,125 @@
                                         data-spec-motor-guarantee="10 سنوات على المحرك"
                                         data-spec-origin="صيني">
                                     <i class="fa fa-eye"></i>
+=======
+    @php
+        $hasFeatured = isset($featuredProductsList) && count($featuredProductsList) > 0;
+        $hasBestSell = isset($bestSellProduct) && count($bestSellProduct) > 0;
+        $hasLatest = isset($latestProductsList) && count($latestProductsList) > 0;
+        $hasRecommendedCategories = isset($recommendedCategories) && count($recommendedCategories) > 0;
+        $activeTab = $hasRecommendedCategories ? 'rp-pane-' . $recommendedCategories[0]->id : ($hasFeatured ? 'rp-pane-featured' : ($hasBestSell ? 'rp-pane-best_selling' : 'rp-pane-latest'));
+    @endphp
+
+    @if($hasRecommendedCategories || $hasFeatured || $hasBestSell || $hasLatest)
+        <div class="container rp-tabs-wrapper d-flex justify-content-center justify-content-lg-start">
+            <ul class="rp-tabs-nav d-flex p-0 mb-0" id="recommendedTabsNav" role="tablist">
+                @forelse($recommendedCategories as $category)
+                    <li class="rp-tab-item" role="presentation">
+                        <button class="rp-tab-btn {{ $loop->first ? 'active' : '' }}" data-target="rp-pane-{{ $category->id }}" type="button">{{ $category->name }}</button>
+                    </li>
+                @empty
+                @endforelse
+                
+                @if($hasFeatured && (!$hasRecommendedCategories || count($recommendedCategories) === 0))
+                    <li class="rp-tab-item" role="presentation">
+                        <button class="rp-tab-btn {{ $activeTab === 'rp-pane-featured' ? 'active' : '' }}" data-target="rp-pane-featured" type="button">المنتجات المميزة</button>
+                    </li>
+                @endif
+                @if($hasBestSell && (!$hasRecommendedCategories || count($recommendedCategories) === 0))
+                    <li class="rp-tab-item" role="presentation">
+                        <button class="rp-tab-btn {{ $activeTab === 'rp-pane-best_selling' ? 'active' : '' }}" data-target="rp-pane-best_selling" type="button">الأكثر مبيعًا</button>
+                    </li>
+                @endif
+                @if($hasLatest && (!$hasRecommendedCategories || count($recommendedCategories) === 0))
+                    <li class="rp-tab-item" role="presentation">
+                        <button class="rp-tab-btn {{ $activeTab === 'rp-pane-latest' ? 'active' : '' }}" data-target="rp-pane-latest" type="button">أحدث المنتجات</button>
+                    </li>
+                @endif
+            </ul>
+        </div>
+
+        <div class="rp-tabs-content mt-4 container" id="recommendedTabsContent">
+
+        @forelse($recommendedCategories as $index => $category)
+            <div class="rp-tab-pane {{ $index === 0 ? 'active' : '' }}" id="rp-pane-{{ $category->id }}" role="tabpanel">
+                <div class="owl-carousel owl-theme premium-product-carousel" id="rp-swiper-{{ $category->id }}">
+                    @forelse($category->product as $product)
+                        <div class="premium-card-item h-100">
+                            <div class="premium-card">
+                                <div class="premium-product-media">
+                                    @php
+                                        $discountPercent = 0;
+                                        if($product->discount > 0) {
+                                            if($product->discount_type == 'percent') {
+                                                $discountPercent = $product->discount;
+                                            } else {
+                                                $discountPercent = round(($product->discount / $product->unit_price) * 100);
+                                            }
+                                        }
+                                    @endphp
+                                    @if($discountPercent > 0)
+                                        <span class="premium-promo-badge">خصم {{ $discountPercent }}%</span>
+                                    @endif
+                                    <div class="premium-card-actions">
+                                        <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                            <i class="fa fa-heart-o"></i>
+                                        </button>
+                                        <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-quickview-{{ $product->id }}" title="Quick View">
+                                            <i class="czi-eye align-middle"></i>
+                                        </button>
+                                    </div>
+                                    <div class="premium-card-image">
+                                        <a href="{{ route('product', $product->slug) }}" class="d-block">
+                                            <img loading="lazy" src="{{ getStorageImages(path: $product->thumbnail_full_url ?? $product->thumbnail, type: 'product') }}" alt="{{ $product->name }}">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="premium-card-details">
+                                    <span class="premium-category-tag">{{ $category->name }}</span>
+                                    <a href="{{ route('product', $product->slug) }}" class="premium-product-title">{{ Str::limit($product->name, 50) }}</a>
+                                    <div class="premium-product-prices">
+                                        @php
+                                            $finalPrice = $product->unit_price;
+                                            if($product->discount > 0) {
+                                                if($product->discount_type == 'percent') {
+                                                    $finalPrice = $product->unit_price - ($product->unit_price * $product->discount / 100);
+                                                } else {
+                                                    $finalPrice = $product->unit_price - $product->discount;
+                                                }
+                                            }
+                                        @endphp
+                                        @if($product->discount > 0)
+                                            <del class="premium-price-old">{{ number_format($product->unit_price, 2) }}</del>
+                                        @endif
+                                        <span class="premium-price-new">{{ number_format($finalPrice, 2) }}</span>
+                                    </div>
+                                    <button class="premium-add-to-cart" type="button" onclick="addToCart({{ $product->id }})">
+                                        <i class="fa fa-shopping-cart"></i>
+                                        <span class="ms-1">أضف للعربة</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-center">{{ translate('no_product_found') }}</p>
+                    @endforelse
+                </div>
+            </div>
+        @empty
+            <p class="text-center py-4">{{ translate('no_category_found') }}</p>
+        @endforelse
+        
+        <!-- Keep old static items as fallback for theme compatibility -->
+        <div class="rp-tab-pane" id="rp-pane-washers" role="tabpanel" style="display: none;">
+            <div class="owl-carousel owl-theme premium-product-carousel" id="rp-swiper-washers">
+                <div class="premium-card-item h-100">
+                    <div class="premium-card">
+                        <div class="premium-product-media">
+                            <span class="premium-promo-badge">خصم 20%</span>
+                            <div class="premium-card-actions">
+                                <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                    <i class="fa fa-heart-o"></i>
+>>>>>>> Stashed changes
                                 </button>
                             </div>
                         </div>
@@ -472,6 +596,7 @@
         </div>
 
     </div>
+    @endif
 
 
 </section>

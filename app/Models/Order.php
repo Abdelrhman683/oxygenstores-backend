@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @property int $id
@@ -217,6 +218,19 @@ class Order extends Model
     public function shippingAddress(): BelongsTo
     {
         return $this->belongsTo(ShippingAddress::class, 'shipping_address');
+    }
+
+    /**
+     * If DISABLE_ORDERS env var is true, add a global scope
+     * that makes all queries return empty results (safe testing).
+     */
+    protected static function booted(): void
+    {
+        if (env('DISABLE_ORDERS')) {
+            static::addGlobalScope('disable_orders', function (Builder $builder) {
+                $builder->whereRaw('0 = 1');
+            });
+        }
     }
 
     public function billingAddress(): BelongsTo

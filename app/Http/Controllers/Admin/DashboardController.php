@@ -60,8 +60,9 @@ class DashboardController extends BaseController
                 'is_active' => 1,
                 'sort_by' => 'order_amount',
                 'avoid_walking_customer' => 1,
+                'withCount' => ['orders'],
             ],
-            relations: ['orders'],
+            relations: [],
             dataLimit: DASHBOARD_DATA_LIMIT,
         );
         $topRatedDeliveryMan = $this->deliveryManRepo->getTopRatedList(filters: ['seller_id' => 0, 'sort_by' => 'rating'], relations: ['deliveredOrders', 'rating', 'review'], dataLimit: 'all')->take(DASHBOARD_DATA_LIMIT);
@@ -72,20 +73,35 @@ class DashboardController extends BaseController
             session()->put('statistics_type', 'this_year');
         }
 
-        $data = self::getOrderStatusData();
+        // Temporary disable dashboard statistics generation for performance testing.
+        $data = array_fill_keys([
+            'order', 'store', 'product', 'customer',
+            'delivered', 'canceled', 'returned', 'failed',
+            'pending', 'confirmed', 'processing', 'out_for_delivery'
+        ], 0);
         $admin_wallet = $this->adminWalletRepo->getFirstWhere(params: ['admin_id' => 1]);
 
         $from = now()->startOfYear()->format('Y-m-d');
         $to = now()->endOfYear()->format('Y-m-d');
         $range = range(1, 12);
         $label = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        $inHouseOrderEarningArray = $this->getOrderStatisticsData(from: $from, to: $to, range: $range, type: 'month', userType: 'admin');
-        $vendorOrderEarningArray = $this->getOrderStatisticsData(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
-        $inHouseEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'admin');
-        $vendorEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
-        $commissionEarn = $this->getAdminCommission(from: $from, to: $to, range: $range, type: 'month');
+        // $inHouseOrderEarningArray = $this->getOrderStatisticsData(from: $from, to: $to, range: $range, type: 'month', userType: 'admin');
+        // $vendorOrderEarningArray = $this->getOrderStatisticsData(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
+        // $inHouseEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'admin');
+        // $vendorEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
+        // $commissionEarn = $this->getAdminCommission(from: $from, to: $to, range: $range, type: 'month');
         $dateType = 'yearEarn';
+<<<<<<< Updated upstream
         $getTotalCustomerCount = $this->customerRepo->getListWhereBetween(filters: ['avoid_walking_customer' => 1], dataLimit: 'all')->count();
+=======
+        $getTotalCustomerCount = $this->customerRepo->getCountWhere(filters: ['avoid_walking_customer' => 1]);
+
+        $inHouseOrderEarningArray = array_fill(0, count($range), 0);
+        $vendorOrderEarningArray = array_fill(0, count($range), 0);
+        $inHouseEarning = array_fill(0, count($range), 0);
+        $vendorEarning = array_fill(0, count($range), 0);
+        $commissionEarn = array_fill(0, count($range), 0);
+>>>>>>> Stashed changes
         $data += [
             'order' => $this->orderRepo->getListWhere(dataLimit: 'all')->count(),
             'brand' => $this->brandRepo->getListWhere(dataLimit: 'all')->count(),
@@ -106,6 +122,11 @@ class DashboardController extends BaseController
             'getTotalVendorCount' => $this->vendorRepo->getListWhere(dataLimit: 'all')->count(),
             'getTotalDeliveryManCount' => $this->deliveryManRepo->getListWhere(filters: ['seller_id' => 0], dataLimit: 'all')->count(),
         ];
+
+        // Temporary disable statistics display to verify if dashboard performance issue comes from stats rendering
+        $dashboardStatsDisabled = true;
+        $orderStatisticsDisabled = true;
+        $earningStatisticsDisabled = true;
         return view('admin-views.system.dashboard', compact('data', 'inHouseEarning', 'vendorEarning', 'commissionEarn', 'inHouseOrderEarningArray', 'vendorOrderEarningArray', 'label', 'dateType'));
     }
 
@@ -118,6 +139,7 @@ class DashboardController extends BaseController
 
     public function getOrderStatusData(): array
     {
+<<<<<<< Updated upstream
         $orderQuery = $this->orderRepo->getListWhere(dataLimit: 'all');
         $storeQuery = $this->vendorRepo->getListWhere(dataLimit: 'all');
         $productQuery = $this->productRepo->getListWhere(dataLimit: 'all');
@@ -144,6 +166,43 @@ class DashboardController extends BaseController
             'delivered' => self::getCommonQueryOrderStatus($deliveredQuery),
             'processing' => self::getCommonQueryOrderStatus($processingQuery),
             'out_for_delivery' => self::getCommonQueryOrderStatus($outForDeliveryQuery),
+=======
+        $statisticsType = session('statistics_type', 'overall');
+        $dateFilters = [];
+        if ($statisticsType == 'today') {
+            $dateFilters = ['date_type' => 'today'];
+        } elseif ($statisticsType == 'this_week') {
+            $dateFilters = ['date_type' => 'this_week'];
+        } elseif ($statisticsType == 'this_month') {
+            $dateFilters = ['date_type' => 'this_month'];
+        } elseif ($statisticsType == 'this_year') {
+            $dateFilters = ['date_type' => 'this_year'];
+        }
+
+        $orderCount = $this->orderRepo->getCountWhere(filters: $dateFilters);
+        $storeCount = $this->vendorRepo->getCountWhere(filters: $dateFilters);
+        $productCount = $this->productRepo->getCountWhere(filters: $dateFilters);
+        $customerCount = $this->customerRepo->getCountWhere(filters: array_merge(['avoid_walking_customer' => 1], $dateFilters));
+
+        $orderStatusList = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'canceled', 'returned', 'failed'];
+
+        // Use a single grouped query to fetch all status counts and total.
+        $grouped = $this->orderRepo->getCountGroupedByStatus(array_merge(['seller_is' => 'admin'], $dateFilters));
+
+        return [
+            'order' => $orderCount,
+            'store' => $storeCount,
+            'product' => $productCount,
+            'customer' => $customerCount,
+            'delivered' => $grouped['delivered'] ?? 0,
+            'canceled' => $grouped['canceled'] ?? 0,
+            'returned' => $grouped['returned'] ?? 0,
+            'failed' => $grouped['failed'] ?? 0,
+            'pending' => $grouped['pending'] ?? 0,
+            'confirmed' => $grouped['confirmed'] ?? 0,
+            'processing' => $grouped['processing'] ?? 0,
+            'out_for_delivery' => $grouped['out_for_delivery'] ?? 0,
+>>>>>>> Stashed changes
         ];
     }
 
@@ -213,7 +272,8 @@ class DashboardController extends BaseController
         $orderEarnings = $this->orderRepo->getListWhereBetween(
             filters: [
                 'seller_is' => $userType,
-                'payment_status' => 'paid'
+                'payment_status' => 'paid',
+                'group_by' => $type,
             ],
             selectColumn: 'order_amount',
             whereBetween: 'created_at',

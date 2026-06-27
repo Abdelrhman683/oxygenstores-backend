@@ -1,9 +1,7 @@
 @php
-    $last5Orders = \App\Models\Order::where('order_status', 'pending')
-        ->with('details.productAllStatus')
-        ->orderBy('id', 'desc')
-        ->take(5)
-        ->get();
+    // `last5Orders` and `pendingOrderCount` are provided by a view composer (cached) in AppServiceProvider.
+    $last5Orders = $last5Orders ?? collect([]);
+    $pendingOrderCount = $pendingOrderCount ?? 0;
 @endphp
 
 @php($direction = session('direction'))
@@ -111,116 +109,31 @@
                 </li>
 
                 @if (\App\Utils\Helpers::module_permission_check('order_management'))
-                    <li class="dropdown nav-item">
-                        <a class="btn-icon" href="{{ route('admin.orders.list', ['status' => 'pending']) }}"
-                            data-bs-toggle="dropdown">
-                            @php($pendingOrderCount = \App\Models\Order::where('order_status', 'pending')->count())
+                    <li class="nav-item dropdown">
+                        <a class="btn-icon" href="javascript:" data-bs-toggle="dropdown" title="{{ translate('Orders') }}">
                             <div class="position-relative lh-1 mt-1">
-                                <i class="fi fi-sr-shopping-cart fs-18"></i>
+                                <i class="fi fi-sr-shopping-cart fs-18 text-muted"></i>
                                 @if ($pendingOrderCount > 0)
-                                    <span
-                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                         {{ $pendingOrderCount > 99 ? '99+' : $pendingOrderCount }}
-                                        <span class="visually-hidden">{{ translate('pending_Orders') }}</span>
                                     </span>
                                 @endif
                             </div>
                         </a>
-                        <div class="dropdown-menu dropdown-cart dropdown-menu-end">
-                            <div class="d-flex flex-column gap-2 px-3 pb-2">
-                                <button type="button"
-                                    class="d-flex d-sm-none btn-close border-0 btn-circle w-20 h-20 p-1 fs-10 bg-section2 shadow-none position-absolute top-0 inset-inline-end-0 m-2"
-                                    data-bs-dismiss="modal" aria-label="Close"></button>
-                                <div
-                                    class="d-flex flex-wrap flex-column flex-sm-row column-gap-1 row-gap-3 justify-content-between py-2">
-                                    <div class="d-flex gap-2 align-items-center">
-                                        <h4 class="text-capitalize mb-0">{{ translate('total_orders') }}</h4>
-                                        <span class="text-body-light">
-                                            ({{ \App\Models\Order::where('order_status', 'pending')->count() }})
-                                        </span>
-                                    </div>
-                                    <a href="{{ route('admin.orders.list', ['status' => 'pending']) }}"
-                                        class="text-primary d-flex gap-1 lh-1">{{ translate('view_all') }} <i
-                                            class="fi fi-rr-arrow-small-right"></i></a>
-                                </div>
-                                <div class="overflow-auto max-h-65vh bg-body rounded">
-                                    <div class="py-2 bg-body rounded">
-                                        <table class="table bg-transparent table-borderless align-middle">
-                                            <tbody>
-                                                @foreach ($last5Orders as $order)
-                                                    <tr>
-                                                        <td>
-                                                            <div>
-                                                                <div
-                                                                    class="d-flex align-items-center flex-shrink-0 w-100px">
-                                                                    @php($productImages = [])
-                                                                    @foreach ($order->details as $details)
-                                                                        @if (
-                                                                            $details?->productAllStatus?->thumbnail_full_url &&
-                                                                                $details?->productAllStatus?->thumbnail_full_url['status'] === 200)
-                                                                            @php($productImages[] = $details?->productAllStatus?->thumbnail_full_url)
-                                                                        @endif
-                                                                    @endforeach
-                                                                    @if (count($productImages))
-                                                                        @foreach ($productImages as $imageKey => $productImage)
-                                                                            <div
-                                                                                class="w-100 ms-n-6px dropdown-cart-image {{ $imageKey == 2 ? 'position-relative' : '' }} {{ $imageKey > 2 ? 'd-none' : '' }}">
-                                                                                <img class="border bg-white rounded object-fit-cover w-100 shadow-left"
-                                                                                    height="36" alt="product image"
-                                                                                    src="{{ getStorageImages(path: $productImage, type: 'backend-product') }}">
-                                                                                @if ($imageKey == 2 && count($productImages) > 3)
-                                                                                    <div class="extra-images rounded">
-                                                                                        <span class="extra-image-count">
-                                                                                            +
-                                                                                            {{ count($productImages) - 3 }}
-                                                                                        </span>
-                                                                                    </div>
-                                                                                @endif
-                                                                            </div>
-                                                                        @endforeach
-                                                                    @else
-                                                                        <img class="border bg-white rounded object-fit-cover w-100"
-                                                                            height="36"
-                                                                            src="{{ getStorageImages(path: '', type: 'backend-product') }}"
-                                                                            alt="placeholder">
-                                                                    @endif
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="d-flex flex-column gap-1 fs-12">
-                                                                <div class="d-flex gap-2 align-items-center">
-                                                                    <div class="min-w-80 text-start">
-                                                                        {{ translate('Order_id') }}</div>
-                                                                    :
-                                                                    <span class="text-dark">{{ $order->id }}</span>
-                                                                </div>
-                                                                <div class="d-flex gap-2 align-items-center">
-                                                                    <div class="min-w-80 text-start">
-                                                                        {{ translate('Order_Amount') }}</div>
-                                                                    :
-                                                                    <span class="text-dark">
-                                                                        {{ setCurrencySymbol(amount: usdToDefaultCurrency(amount: $order->order_amount), currencyCode: getCurrencyCode()) }}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="d-flex justify-content-end">
-                                                                <a href="{{ route('admin.orders.details', ['id' => $order['id']]) }}"
-                                                                    class="btn btn-outline-primary btn-square">
-                                                                    <i class="fi fi-sr-eye"></i>
-                                                                </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end p-2">
+                            @forelse($last5Orders as $order)
+                                <li class="dropdown-item py-1">
+                                    <a href="{{ route('admin.orders.details', ['id' => $order->id]) }}" class="d-flex gap-2 align-items-center text-decoration-none">
+                                        <div class="fw-bold">#{{ $order->id }}</div>
+                                        <div class="small text-muted">{{ optional($order->created_at)->diffForHumans() }}</div>
+                                    </a>
+                                </li>
+                            @empty
+                                <li class="dropdown-item text-muted">{{ translate('No recent orders') }}</li>
+                            @endforelse
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="px-2"><a href="{{ route('admin.orders.list', ['status' => 'pending']) }}" class="btn btn-sm btn-primary w-100">{{ translate('View all pending') }}</a></li>
+                        </ul>
                     </li>
                 @endif
 

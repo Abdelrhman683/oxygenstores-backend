@@ -58,6 +58,50 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getListWhere(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {
+<<<<<<< Updated upstream
+=======
+        $query = $this->prepareOrderQuery($searchValue, $filters, $relations, $orderBy);
+        $filters += ['searchValue' => $searchValue];
+        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
+    }
+
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int
+    {
+        return $this->prepareOrderQuery($searchValue, $filters)->count();
+    }
+
+    /**
+     * Get counts grouped by order_status in a single query to avoid multiple round-trips.
+     * Returns array with total and per-status counts.
+     *
+     * @param array $filters
+     * @return array
+     */
+    public function getCountGroupedByStatus(array $filters = []): array
+    {
+        // Fetch raw group by results to avoid double-counting
+        $rows = DB::table('orders')
+            ->select('order_status', DB::raw('count(*) as total'))
+            ->where(function ($q) use ($filters) {
+                if (isset($filters['seller_is']) && $filters['seller_is'] != 'all') {
+                    $q->where('seller_is', $filters['seller_is']);
+                }
+                if (isset($filters['order_status']) && $filters['order_status'] != 'all') {
+                    $q->where('order_status', $filters['order_status']);
+                }
+            })
+            ->groupBy('order_status')
+            ->get()
+            ->pluck('total', 'order_status')
+            ->toArray();
+
+        $total = array_sum($rows);
+        return array_merge(['total' => $total], $rows);
+    }
+
+    protected function prepareOrderQuery(?string $searchValue = null, array $filters = [], array $relations = [], array $orderBy = [])
+    {
+>>>>>>> Stashed changes
         $query = $this->order->with($relations)
             ->when(isset($filters['seller_is']) && $filters['seller_is'] != 'all', function ($query) use ($filters) {
                 return $query->where('seller_is', $filters['seller_is']);
@@ -751,16 +795,30 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getListWhereBetween(array $filters = [], ?string $selectColumn = null, ?string $whereBetween = null, array $whereBetweenFilters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {
-        return $this->order->with($relations)->where($filters)
-            ->when($selectColumn == 'order_amount', function ($query) {
-                $query->select(
-                    DB::raw('IFNULL(sum(order_amount),0) as sums'),
-                    DB::raw('YEAR(created_at) year, MONTH(created_at) month,DAY(created_at) day,DAYNAME(created_at) day_of_week')
-                );
-            })
-            ->whereBetween($whereBetween, $whereBetweenFilters)
-            ->groupby('year', 'month', 'day_of_week')
-            ->get();
+        $query = $this->order->with($relations)->where($filters)
+            ->whereBetween($whereBetween, $whereBetweenFilters);
+
+        if ($selectColumn == 'order_amount') {
+            $groupBy = $filters['group_by'] ?? 'month';
+            // prepare select and group columns based on requested grouping
+            switch ($groupBy) {
+                case 'day':
+                    $query->select(DB::raw('IFNULL(sum(order_amount),0) as sums'), DB::raw('YEAR(created_at) year'), DB::raw('MONTH(created_at) month'), DB::raw('DAY(created_at) day'));
+                    $query->groupBy('year', 'month', 'day');
+                    break;
+                case 'day_of_week':
+                    $query->select(DB::raw('IFNULL(sum(order_amount),0) as sums'), DB::raw('DAYNAME(created_at) day_of_week'));
+                    $query->groupBy('day_of_week');
+                    break;
+                case 'month':
+                default:
+                    $query->select(DB::raw('IFNULL(sum(order_amount),0) as sums'), DB::raw('YEAR(created_at) year'), DB::raw('MONTH(created_at) month'));
+                    $query->groupBy('year', 'month');
+                    break;
+            }
+        }
+
+        return $query->get();
     }
 
     public function getTopCustomerList(array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator

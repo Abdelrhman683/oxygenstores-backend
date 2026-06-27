@@ -8,8 +8,68 @@
 @endpush
 
 @section('content')
+    @php
+        $productCategory = $product->category;
+        $productSubCategory = $product->subCategory;
+        $productSubSubCategory = $product->subSubCategory;
+        $brandName = $product->brand?->name ?? '';
+        $brandImage = $product->brand?->image_full_url['path'] ?? null;
+        $productSummary = $brandName
+            ? 'المنتج من علامة ' . $brandName
+            : 'السعر يشمل الضريبة والتركيب';
+        $shippingMessage = $product->current_stock > 0
+            ? 'متوفر في المخزون ويمكن شحنه حالياً.'
+            : 'غير متوفر حالياً في المخزون.';
+        $installmentAmount = $product->unit_price > 0 ? round($product->unit_price / 4, 2) : null;
+
+        $dynamicAttributes = [];
+        $rawAttributes = $product->attributes;
+        if (is_string($rawAttributes)) {
+            $rawAttributes = json_decode($rawAttributes, true);
+        }
+        if (is_array($rawAttributes)) {
+            foreach ($rawAttributes as $attribute) {
+                if (is_array($attribute)) {
+                    $label = $attribute['name'] ?? $attribute['title'] ?? $attribute['key'] ?? null;
+                    $value = $attribute['value'] ?? $attribute['values'] ?? null;
+                    if ($label && $value) {
+                        $dynamicAttributes[] = [
+                            'label' => $label,
+                            'value' => is_array($value) ? implode(', ', $value) : $value,
+                        ];
+                    }
+                }
+            }
+        }
+    @endphp
     <div class="__inline-23">
+<<<<<<< Updated upstream
         <div class="container my-4 rtl text-align-direction">
+=======
+        <div class="container-fluid  rtl text-align-direction">
+                    <nav aria-label="breadcrumb">
+            <style>
+                .breadcrumb-item + .breadcrumb-item::before {
+                    display: none;
+                }
+            </style>
+            <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 3px 0;">
+                <li class="breadcrumb-item d-flex align-items-center ">
+                    <a href="{{route('home')}}" class="breadcrumb-title">
+                        {{translate('الرئيسية')}}
+                    </a>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                    {{ $productSubSubCategory?->name ?? $productSubCategory?->name ?? $productCategory?->name ?? translate('category') }}
+                  <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                    {{ $product->name }}
+                </li>
+            </ol>
+        </nav>
+>>>>>>> Stashed changes
             <div class="row g-3 {{Session::get('direction') === "rtl" ? '__dir-rtl' : ''}}">
                 <div class="col-lg-9">
                     <div class="h-100 d-flex flex-column gap-4 pb-2">
@@ -121,8 +181,28 @@
 
                                 <div class="col-lg-7 col-md-8 mt-md-0 mt-sm-3 web-direction">
                                     <div class="details __h-100 product-cart-option-container p-0">
+<<<<<<< Updated upstream
                                         <h2 class="mb-4 __inline-24">{{ $product->name }}</h2>
                                         <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
+=======
+                                        <div class="head_det">
+                                           <a href="#" class="sub_cat_title">
+                                            {{ $productSubCategory?->name ?? $productCategory?->name ?? translate('category') }}
+                                        </a >  
+                                      <a href="javascript:void(0)"
+                                            class="head_fav product-action-add-wishlist"
+                                            data-product-id="{{ $product['id'] }}">
+
+                                                <i class="fa {{ ($wishlistStatus == 1 ? 'fa-heart' : 'fa-heart-o') }} wishlist_icon_{{ $product['id'] }}"></i>
+
+                                            </a>
+                                           
+                                       
+                                        </div>
+                                      
+                                        <h2 class=" __inline-24 cat_title_det">{{ $product->name }}</h2>
+                                        <!-- <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
+>>>>>>> Stashed changes
                                             @if($overallRating[0] !=0)
                                             <div class="star-rating me-2">
                                                 @for($inc=1;$inc<=5;$inc++)
@@ -206,8 +286,53 @@
                                                         {{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'string') }}
                                                     </span>
                                                 </h3>
+<<<<<<< Updated upstream
                                             </div>
 
+=======
+                                                <div class="summary_det">
+                                                    <p>{{ $productSummary }}</p>
+                                                </div>
+                                                @if($brandImage)
+                                                    <div class="brand">
+                                                        <img loading="lazy" src="{{ $brandImage }}" alt="{{ $brandName }}">
+                                                    </div>
+                                                @endif
+                                                <!-- <div class="product-details__short-description">
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                    <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
+                                                </div> -->
+                                                <div class="product-details__short-description">
+                                                   @if ($product['details'])
+                                                    <div
+                                                        class="p-details-description text-body col-lg-12 col-md-12 fs-14 text-justify details-text-justify rich-editor-html-content" style="max-height: 525px">
+                                                        {!! $product['details'] !!}
+                                                    </div>
+                                                @endif
+                                                </div>
+                                                <div class="shipping-alert">
+                                                    {{ $shippingMessage }}
+                                                </div>
+                                            </div>
+
+                                            @if($installmentAmount)
+                                                <div>
+                                                    <div class="installment-box">
+                                                        <div class="installment-text">
+                                                            أو قسم فاتورتك بقيمة <strong>{{ webCurrencyConverter(amount: $product->unit_price) }}</strong> على 4 دفعات بدون رسوم تأخير، متوافقة مع الشريعة الإسلامية
+                                                            <a href="#" class="more-link">اعرف أكثر</a>
+                                                        </div>
+                                                        <img src="{{ theme_asset('public/assets/front-end/img/method_logo.svg') }}" loading="lazy" alt="method_logo" class="method_logo">
+                                                    </div>
+                                                </div>
+                                            @endif
+
+                                     
+>>>>>>> Stashed changes
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $product->id }}">
                                             <div
@@ -716,13 +841,334 @@
                                             </div>
                                         </div>
                                     </div>
+<<<<<<< Updated upstream
+=======
+                                    <div class="tab-pane fade" id="specifications" role="tabpanel">
+                                        <div class="specs-table">
+                                            @if(count($dynamicAttributes) > 0)
+                                                @foreach($dynamicAttributes as $attribute)
+                                                    <div class="spec-row">
+                                                        <div class="spec-label">{{ $attribute['label'] }}</div>
+                                                        <div class="spec-value">{{ $attribute['value'] }}</div>
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                                <div class="spec-row">
+                                                    <div class="spec-label">{{ translate('description') }}</div>
+                                                    <div class="spec-value">{{ $product->details }}</div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="other_products" role="tabpanel">
+                           
+<section class="premium-static-section container rtl px-0 px-md-3">
+ 
+
+    <div class="premium-carousel-wrapper">
+        <div class="owl-carousel owl-theme other-product-carousel">
+            
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة دولابي">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة دولابي جنرال سوبريم، (21.6 قدم، 612...)</a>
+                        <div class="premium-product-prices">
+                            <del class="premium-price-old">2999 ريال</del>
+                            <span class="premium-price-new">2549 ريال</span>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة يوجين">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة يوجين دولابي 637 لتر، 22.4 قدم، ستيل</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2499 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1849 ريال</span>
+                            <del class="premium-price-old">2949 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1999 ريال</span>
+                            <del class="premium-price-old">2985 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم دولابي (15.4 قدم، 436...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2049 ريال</span>
+                            <del class="premium-price-old">2599 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة بابين جنرال سوبريم (21 قدم، 594...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2399 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{{-- Redundant static mockup modal removed --}}
+
+
+
+                                    </div>
+>>>>>>> Stashed changes
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3">
+<<<<<<< Updated upstream
                     @php($companyReliability = getWebConfig('company_reliability'))
+=======
+                   
+                        <div class="product-details-shipping-details px-3 py-3">
+                           <p class="stock {{ $product->current_stock > 0 ? 'in-stock' : 'out-of-stock-danger' }}">
+                               {{ $product->current_stock > 0 ? 'متوفر في المخزون' : 'غير متوفر في المخزون' }}
+                           </p>
+                                    <div class="shipping-details-bottom-border">
+                                        <div class="">
+                                            <span class="store_name">البائع :</span>
+                                            <img
+                                                class="store_img"
+                                                  loading="lazy"
+                                                 src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}">
+                                           <a href="#" class="store_bold">   <span>متجر ذرة أكسجين اللإلكتروني</span></a>
+                                        </div>
+                                    </div>
+                                       <div class="d-flex align-items-center gap-4">
+                                                        <div class="product-description-label __color-9B9B9B fs-14">
+                                                            {{ translate('qty') }}
+                                                        </div>
+                                                        <div
+                                                            class="d-flex justify-content-between align-items-center quantity-box  overflow-hidden">
+                                                            <span class="input-group-btn h-100">
+                                                                <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 h-100 w-32px"
+                                                                        type="button"
+                                                                        data-type="minus" data-field="quantity"
+                                                                        disabled="disabled">
+                                                                    -
+                                                                </button>
+                                                            </span>
+                                                            <input type="text" name="quantity"
+                                                                   class="form-control input-number text-center product-details-cart-qty __inline-29 border-0 w-100 fs-12"
+                                                                   placeholder="{{ translate('1') }}"
+                                                                   value="{{ $initialProductConfig['quantity'] ?? 1 }}"
+                                                                   data-producttype="{{ $product->product_type }}"
+                                                                   min="{{ $product->minimum_order_qty ?? 1 }}"
+                                                                   max="{{ $product['product_type'] == 'physical' ? $product->current_stock : 100}}">
+                                                            <span class="input-group-btn h-100">
+                                                                <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 h-100 w-32px"
+                                                                        type="button"
+                                                                        data-producttype="{{ $product->product_type }}"
+                                                                        data-type="plus" data-field="quantity">
+                                                                        +
+                                                                </button>
+                                                            </span>
+                                                        </div>
+                                                        <input type="hidden" class="product-generated-variation-code"
+                                                               name="product_variation_code"
+                                                               data-product-id="{{ $product['id'] }}">
+                                                        <input type="hidden" value=""
+                                                               class="product-exist-in-cart-list form-control w-50" name="key">
+                                                    </div>
+                          
+                                                              <div class="add_cart my-2">
+          
+                                                        <button class="premium-add-to-cart " type="button"
+                                                            data-form=".add-to-cart-details-form"
+                                                            data-update="{{ translate('update_cart') }}"
+                                                            data-add="{{ translate('add_to_cart') }}">
+                                                                              <i class="fa fa-shopping-cart"></i>
+                                                                           <span class="ms-1"> {{ $initialProductConfig['first_variant_in_cart'] ? translate('update_cart') : translate('add_to_cart') }}</span>
+                                                                             </button>
+                                                                         </div>
+                                                                         <hr class="bar">
+                                                                <div class="shipping-info-card">
+                                                                    <div class="shipping-info-row">
+                                                                        <span class="shipping-label">منطقتك:</span>
+                                                                        <span class="shipping-value">الرياض</span>
+                                                                    </div>
+
+                                                                    <div class="shipping-info-row">
+                                                                        <span class="shipping-label">تكاليف الشحن:</span>
+                                                                        <span class="shipping-value">﷼ 0</span>
+                                                                    </div>
+
+                                                                    <div class="shipping-info-row">
+                                                                        <span class="shipping-label">الوقت المقدر للشحن:</span>
+                                                                        <span class="shipping-value">ثلاث إلى سبع أيام</span>
+                                                                    </div>
+                                                                </div>
+
+
+                                                </div>
+                    <!-- @php($companyReliability = getWebConfig('company_reliability'))
+>>>>>>> Stashed changes
                     @if($companyReliability != null)
                         <div class="product-details-shipping-details">
                             @foreach ($companyReliability as $key=>$value)
@@ -1006,6 +1452,15 @@
                 </div>
             </div>
         </div>
+<<<<<<< Updated upstream
+=======
+<div class="container">
+    <div class="row">
+        <section class="premium-static-section container rtl px-0 px-md-3">
+    <div class="premium-section-header">
+        <h2 class="premium-section-title">منتجات ذات صلة</h2>
+    </div>
+>>>>>>> Stashed changes
 
     </div>
 

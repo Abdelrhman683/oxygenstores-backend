@@ -149,7 +149,13 @@
                     @endif
                 </div>
             </div>
+<<<<<<< Updated upstream
         </section>
+=======
+    </section>
+
+@include('web-views.partials._air-conditioner-offers', ['airConditionerProducts' => $airConditionerProducts])
+>>>>>>> Stashed changes
 
 
         @if (count($bannerTypeFooterBanner) > 1)
@@ -176,6 +182,7 @@
             </div>
         @endif
         @include('web-views.partials._banner-grid')
+<<<<<<< Updated upstream
 
         @if($web_config['brand_setting'] && $brands->count() > 0)
             <section class="container rtl">
@@ -213,6 +220,44 @@
         @endif
 
 <section class="banner-grid-section">
+=======
+@include('web-views.partials._dynamic-category-section', [
+    'sectionTitle'    => 'الأكثر مبيعا',
+    'sectionProducts' => $bestSellerAllTimeProducts,
+])
+
+
+@include('web-views.partials._dynamic-category-section', [
+    'sectionTitle'    => 'الأكثر مبيعا هذا الشهر',
+    'sectionProducts' => $bestSellerThisMonthProducts,
+])
+
+<section class="custom-banner-section custom_pd">
+    <div class="promo-wide-banner">
+        <a href="{{ route('products') }}" class="d-block">
+            <img
+                loading="lazy"
+                src="{{ theme_asset('public/assets/front-end/img/promo_ban.webp') }}"
+                alt="Promotional Banner"
+                class="promo-wide-banner__img"
+            >
+        </a>
+    </div>
+</section>
+
+@include('web-views.partials._dynamic-category-section', [
+    'sectionTitle'    => 'ثلاجة بابين',
+    'sectionProducts' => $twoDoorFridgeProducts,
+])
+
+@include('web-views.partials._dynamic-category-section', [
+    'sectionTitle'    => 'غسالات',
+    'sectionProducts' => $washerProducts,
+])
+
+
+<section class="banner-grid-section custom_pd">
+>>>>>>> Stashed changes
     <div class="container rtl">
         <div class="banner-grid-wrapper">
 
@@ -266,11 +311,36 @@
             @endforeach
         @endif
 
+<<<<<<< Updated upstream
 
         @php($companyReliability = getWebConfig(name: 'company_reliability'))
         @if($companyReliability != null)
             @include('web-views.partials._company-reliability')
         @endif
+=======
+        <section class="cat-promo-section  rtl py-4">
+
+        <div class="container">
+     <div class="cat-promo-grid">
+
+                <a href="{{ route('products') }}?category=large-appliances" class="cat-promo-card">
+                    <img loading="lazy" src="{{ theme_asset('public/assets/front-end/img/cat_1.webp') }}"alt="" >
+                </a>
+
+                <a href="{{ route('products') }}?category=screens" class="cat-promo-card">
+                    <img loading="lazy" src="{{ theme_asset('public/assets/front-end/img/cat_2.webp') }}"alt="" >
+                </a>
+
+                <a href="{{ route('products') }}?category=air-conditioners" class="cat-promo-card">
+                    <img loading="lazy" src="{{ theme_asset('public/assets/front-end/img/cat_2.webp') }}"alt="" >
+                </a>
+
+            </div>
+        </div>
+       
+        </section>
+
+>>>>>>> Stashed changes
     </div>
 
     <span id="direction-from-session" data-value="{{ session()->get('direction') }}"></span>
