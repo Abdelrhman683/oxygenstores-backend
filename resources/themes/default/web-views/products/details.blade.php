@@ -508,7 +508,7 @@
                         </div>
                         <div class="rtl text-align-direction flex-grow-1">
                             <div class="  h-100">
-                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-start gap-2 p-0" role="tablist">
+                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-lg-start justify-content-center gap-2 p-0" role="tablist">
                                           <li class="nav-item">
                                         <a class="nav-link __inline-27 mb-0 tab_link"
                                         data-toggle="tab"
@@ -1399,9 +1399,9 @@
                 </div>
             </div>
         </div>
-<div class="container">
+<div class="container ">
     <div class="row">
-        <section class="premium-static-section container rtl custom_pd ">
+        <section class="premium-static-section container rtl  ">
     <div class="premium-section-header">
         <h2 class="premium-section-title">منتجات ذات صلة</h2>
     </div>

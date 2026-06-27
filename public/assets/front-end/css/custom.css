@@ -4812,7 +4812,17 @@ width: max-content;
     transition: all 0.2s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-
+@media(max-width:767px){
+    .premium-action-btn {
+    width: 33px;
+    height: 33px;
+    font-size: 14px;
+  
+}
+.rp-tab-btn {
+    font-size: 1.3rem;
+}
+}
 .premium-action-btn:hover {
     background: #ffe14d;
     border: 1px solid #ffe14d;
@@ -5679,9 +5689,10 @@ content: "";
     }
     .thumb-vertical-wrapper .swiper-wrapper {
         flex-direction: row !important;
+        gap: 10px;
     }
     .thumb-vertical-wrapper .swiper-slide {
-        width: 80px !important;
+        width: 60px !important;
     }
 }
 .premium-card-bottom-info {

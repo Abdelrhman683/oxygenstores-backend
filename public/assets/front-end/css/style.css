@@ -5809,7 +5809,7 @@ a {
     z-index: 999;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 15px;
     align-items: center;
     transition: all ease 0.3s;
 }
@@ -6849,7 +6849,7 @@ a {
     } */
 }
 .owl-dots {
-    position: absolute;
+    position: relative;
     /* bottom: 20px; */
     left: 0;
     width: 100%;
@@ -6857,7 +6857,7 @@ a {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin: 15px 0!important;
+    margin-top: 15px !important;
 }
 .owl-dots button {
     margin: 0;
@@ -6882,7 +6882,12 @@ a {
 .owl-dots button span {
     display: none !important;
 }
-
+@media(max-width:767px){
+    .owl-dots button {
+    height: 15px;
+    width: 15px;
+    }
+}
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     display: none;
