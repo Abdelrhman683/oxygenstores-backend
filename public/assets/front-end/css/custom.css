@@ -6064,3 +6064,15 @@ padding: 10px;
     margin-left: auto;
     }
 }
+
+.user_drop .dropdown-item {
+    color: #000 !important;
+}
+.user_drop .dropdown-item:hover {
+    color: var(--web-primary) !important;
+}
+.user_drop .dropdown-menu.dropdown-menu-left {
+   
+    min-width:fit-content !important;
+    text-align: center !important;
+}

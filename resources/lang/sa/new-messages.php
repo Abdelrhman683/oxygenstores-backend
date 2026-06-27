@@ -10232,4 +10232,7 @@ return [
 	"منتجات_اخرى" => "منتجات اخرى",
 	"Already_have_account_" => "Already have account ",
 	"حسابى" => "حسابى",
+	"sort_by_latest" => "Sort by latest",
+	"sort_by_oldest" => "Sort by oldest",
+	"Why_shop_with_us_?" => "Why shop with us  ",
 ];
