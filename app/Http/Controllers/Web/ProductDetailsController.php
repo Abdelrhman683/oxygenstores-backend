@@ -73,11 +73,11 @@ class ProductDetailsController extends Controller
             ->where('slug', $normalizedSlug);
 
         if ($forAster) {
-            $query->with(['seoInfo', 'digitalVariation', 'reviews' => 'reviews', 'seller.shop' => 'seller.shop', 'wishList' => 'wishList', 'compareList' => 'compareList', 'digitalProductAuthors.author', 'digitalProductPublishingHouse.publishingHouse', 'clearanceSale' => 'clearanceSale'])
+            $query->with(['seoInfo', 'digitalVariation', 'reviews', 'seller.shop', 'wishList', 'compareList', 'digitalProductAuthors.author', 'digitalProductPublishingHouse.publishingHouse', 'clearanceSale'])
                 ->withCount(['orderDetails' => 'orderDetails', 'wishList' => 'wishList']);
         } else {
-            $query->with(['seoInfo', 'digitalVariation' => 'digitalVariation', 'reviews', 'seller.shop', 'digitalProductAuthors.author',
-                'digitalProductPublishingHouse.publishingHouse', 'clearanceSale' => 'clearanceSale', 'brand', 'category']);
+            $query->with(['seoInfo', 'digitalVariation', 'reviews', 'seller.shop', 'digitalProductAuthors.author',
+                'digitalProductPublishingHouse.publishingHouse', 'clearanceSale', 'brand', 'category']);
         }
 
         $product = $query->first();
