@@ -1,7 +1,7 @@
 @if ($categories->count() > 0 )
-    <section class="home-categories-section container rtl px-0 px-md-3">
+    <section class="home-categories-section container rtl  custom_pd">
         <div class="section-header">
-            <h2 class="categories-title fw-bold">{{ translate('categories')}}</h2>
+            <h2 class="categories-title ">{{ translate('categories')}}</h2>
             <a class="view-all-btn-yellow" href="{{route('categories')}}">
                 {{ translate('view_all')}}
             </a>

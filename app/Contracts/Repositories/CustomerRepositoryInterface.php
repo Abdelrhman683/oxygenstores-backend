@@ -41,4 +41,11 @@ interface CustomerRepositoryInterface extends RepositoryInterface
     public function updateOrCreate(array $params, array $data): mixed;
 
     public function getByIdentity(array $filters = []): ?Model;
+
+    /**
+     * @param string|null $searchValue
+     * @param array $filters
+     * @return int
+     */
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int;
 }

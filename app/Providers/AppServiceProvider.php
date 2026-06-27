@@ -9,6 +9,8 @@ use App\Models\StockClearanceProduct;
 use App\Traits\CacheManagerTrait;
 use App\Traits\FileManagerTrait;
 use App\Traits\UpdateClass;
+use App\Utils\CategoryManager;
+use App\Utils\BrandManager;
 use App\Utils\Helpers;
 use App\Enums\GlobalConstant;
 use App\Models\Currency;
@@ -118,7 +120,7 @@ class AppServiceProvider extends ServiceProvider
                         'meta_description' => substr(strip_tags(str_replace('&nbsp;', ' ', (BusinessPage::where('slug', 'about-us')->first()?->description ?? ''))), 0, 160),
                     ];
 
-                    if ((!Request::is('admin') && !Request::is('admin/*') && !Request::is('seller/*') && !Request::is('vendor/*')) || Request::is('vendor/auth/registration/*')) {
+                    if ((!Request::is('admin', 'admin/*', 'seller/*', 'vendor/*', 'login', 'login/*')) || Request::is('vendor/auth/registration/*')) {
                         $userId = Auth::guard('customer')->user() ? Auth::guard('customer')->id() : 0;
                         $flashDeal = ProductManager::getPriorityWiseFlashDealsProductsQuery(userId: $userId);
 
@@ -222,7 +224,8 @@ class AppServiceProvider extends ServiceProvider
 
                     // Currency
                     Helpers::currency_load();
-                    View::share(['web_config' => $web_config, 'language' => $language]);
+                    $categories = CategoryManager::getCategoriesWithCountingAndPriorityWiseSorting();
+                    View::share(['web_config' => $web_config, 'language' => $language, 'categories' => $categories]);
                     Schema::defaultStringLength(191);
                 }
             } catch (Exception $exception) {

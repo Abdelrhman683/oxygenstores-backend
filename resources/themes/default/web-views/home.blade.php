@@ -18,7 +18,7 @@
 ?>
 @include("web-views.partials._order-success-modal",['orderSuccessIds' => $orderSuccessIds,'isNewCustomerInSession' => $isNewCustomerInSession])
 
-<div class="__inline-61 d-flex flex-column gap-20">
+<div class="__inline-61">
         @php($decimalPointSettings = !empty(getWebConfig(name: 'decimal_point_settings')) ? getWebConfig(name: 'decimal_point_settings') : 0)
 
         @include('web-views.partials._home-top-slider',['bannerTypeMainBanner'=>$bannerTypeMainBanner])
@@ -34,9 +34,9 @@
                             {{ translate('featured_products') }}
                         </h2>
                         <div class="text-end d-none d-md-block">
-                            <a class="text-capitalize view-all-text web-text-primary" href="{{ route('featured-products') }}">
+                            <a class="view-all-btn-yellow" href="{{ route('featured-products') }}">
                                 {{ translate('view_all')}}
-                                <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i>
+                                <!-- <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i> -->
                             </a>
                         </div>
                     </div>
@@ -51,9 +51,9 @@
                             </div>
                         </div>
                         <div class="text-center pt-2 d-md-none">
-                            <a class="text-capitalize view-all-text web-text-primary" href="{{ route('featured-products') }}">
+                            <a class="view-all-btn-yellow" href="{{ route('featured-products') }}">
                                 {{ translate('view_all') }}
-                                <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i>
+                                <!-- <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i> -->
                             </a>
                         </div>
                     </div>
@@ -62,104 +62,101 @@
         @endif
 
         @include('web-views.partials._category-section-home')
+    @include('web-views.partials._air-conditioner-offers', ['airConditionerProducts' => $airConditionerProducts])
 
-
-         @if(getFeaturedDealsProductList() && (count(getFeaturedDealsProductList()) > 0))
-            <section class="featured_deal pb-3">
-                <div class="container">
-                    <div class="__featured-deal-wrap bg--light px-0-mobile">
-                        <div class="d-flex flex-wrap justify-content-between align-items-sm-start gap-8 mb-xxl-4 mb-3">
-                            <div class="w-0 flex-grow-1">
-                                <span class="featured_deal_title font-bold text-dark">{{ translate('featured_deal')}}</span>
-                                <br>
-                                <span class="text-left">{{ translate('see_the_latest_deals_and_exciting_new_offers')}}!</span>
-                            </div>
-                            <div>
-                                <a class="text-capitalize view-all-text web-text-primary" href="{{ route('featured-deal-products') }}">
-                                    {{ translate('view_all')}}
-                                    <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="owl-carousel owl-theme new-arrivals-product" data-slide-items="{{ count(getFeaturedDealsProductList()) }}">
-                           @foreach(getFeaturedDealsProductList() as $key=>$product)
-                                @include('web-views.partials._product-card-1',['product'=>$product, 'decimal_point_settings'=>$decimalPointSettings])
-                            @endforeach
+            @if (count($bannerTypeFooterBanner) > 1)
+                            </a>
                         </div>
                     </div>
-                </div>
-            </section>
-         @endif
-
-        @include('web-views.partials._clearance-sale-products', ['clearanceSaleProducts' => $clearanceSaleProducts])
-
-        @if (isset($bannerTypeMainSectionBanner))
-            <div class="container rtl pt-0 px-0 px-md-3">
-                <a href="{{$bannerTypeMainSectionBanner->url}}" target="_blank"
-                    class="cursor-pointer d-block">
-                    <img loading="lazy" class="d-block footer_banner_img __inline-63" alt=""
-                         src="{{ getStorageImages(path:$bannerTypeMainSectionBanner->photo_full_url, type: 'wide-banner') }}">
-                </a>
-            </div>
-        @endif
-
-        @php($businessMode = getWebConfig(name: 'business_mode'))
-        @if ($businessMode == 'multi' && count($topVendorsList) > 0)
-            @include('web-views.partials._top-sellers')
-        @endif
-
-        @include('web-views.partials._deal-of-the-day', ['decimal_point_settings' => $decimalPointSettings])
-
-        <section class="new-arrival-section">
-
-            @if ($newArrivalProducts->count() >0 )
-                <div class="container rtl">
-                    <div class="section-header">
-                        <h2 class="arrival-title d-block mb-1">
-                            <div class="text-capitalize">
-                                {{ translate('new_arrivals')}}
-                            </div>
-                        </h2>
-                    </div>
-                </div>
-                <div class="container rtl mb-3 overflow-hidden">
-                    <div class="py-2">
-                        <div class="new_arrival_product">
-                            <div class="carousel-wrap">
-                                <div class="owl-carousel owl-theme new-arrivals-product" data-slide-items="{{ count($newArrivalProducts) }}">
-                                    @foreach($newArrivalProducts as $key=> $product)
-                                        @include('web-views.partials._product-card-2',['product'=>$product,'decimal_point_settings'=>$decimalPointSettings])
-                                    @endforeach
-                                </div>
-                            </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1999 ريال</span>
+                            <del class="premium-price-old">2985 ريال</del>
                         </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
                     </div>
-                </div>
-            @endif
-
-            <div class="container rtl px-0 px-md-3">
-                <div class="row g-3 mx-max-md-0">
-
-                    @if ($bestSellProduct->count() >0)
-                        @include('web-views.partials._best-selling')
-                    @endif
-
-                    @if ($topRatedProducts->count() >0)
-                        @include('web-views.partials._top-rated')
-                    @endif
                 </div>
             </div>
-<<<<<<< Updated upstream
-        </section>
-=======
-    </section>
 
-@include('web-views.partials._air-conditioner-offers', ['airConditionerProducts' => $airConditionerProducts])
->>>>>>> Stashed changes
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم دولابي (15.4 قدم، 436...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2049 ريال</span>
+                            <del class="premium-price-old">2599 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة بابين جنرال سوبريم (21 قدم، 594...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2399 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
 
 
-        @if (count($bannerTypeFooterBanner) > 1)
-            <div class="container rtl">
+    @endif
+    @if (count($bannerTypeFooterBanner) > 1)
+            <div class="container rtl ">
                 <div class="promotional-banner-slider owl-carousel owl-theme">
                     @foreach($bannerTypeFooterBanner as $banner)
                         <a href="{{ $banner['url'] }}" class="d-block" target="_blank">
@@ -182,45 +179,26 @@
             </div>
         @endif
         @include('web-views.partials._banner-grid')
-<<<<<<< Updated upstream
-
-        @if($web_config['brand_setting'] && $brands->count() > 0)
-            <section class="container rtl">
-
-                <div class="section-header align-items-center mb-1">
-                    <h2 class="text-black font-bold __text-22px mb-0">
-                        <span> {{translate('brands')}}</span>
-                    </h2>
-                    <div class="__mr-2px">
-                        <a class="text-capitalize view-all-text web-text-primary" href="{{route('brands')}}">
-                            {{ translate('view_all')}}
-                            <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1 float-left' : 'right ml-1 mr-n1'}}"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="mt-sm-3 mb-0 brand-slider">
-                    <div class="owl-carousel owl-theme p-2 brands-slider" data-slide-items="{{ count($brands) }}">
-                        @php($brandCount=0)
-                        @foreach($brands as $brand)
-                            @if($brandCount < 15 && !empty($brand['slug']))
-                                <div class="text-center">
-                                    <a href="{{ route('brand-products', ['slug' => $brand['slug']]) }}"
-                                       class="__brand-item">
-                                        <img loading="lazy" alt="{{ $brand->image_alt_text }}"
-                                             src="{{ getStorageImages(path: $brand->image_full_url, type: 'brand') }}">
-                                    </a>
-                                </div>
-                            @endif
-                            @php($brandCount++)
-                        @endforeach
-                    </div>
-                </div>
-            </section>
+<section class="custom-banner-section custom_pd">
+        <div class="promo-wide-banner">
+            <a href="{{ route('products') }}" class="d-block">
+                <img
+                    loading="lazy"
+                    src="{{ theme_asset('public/assets/front-end/img/promo_ban.webp') }}"
+                    alt="Promotional Banner"
+                    class="promo-wide-banner__img"
+                >
+            </a>
+    </div>
+</section>
+        @include('web-views.partials._custom-static-products')
+      @if ($homeCategories->count() > 0)
+            @foreach($homeCategories as $category)
+                @include('web-views.partials._category-wise-product', ['decimal_point_settings'=>$decimalPointSettings])
+            @endforeach
         @endif
 
 <section class="banner-grid-section">
-=======
 @include('web-views.partials._dynamic-category-section', [
     'sectionTitle'    => 'الأكثر مبيعا',
     'sectionProducts' => $bestSellerAllTimeProducts,
@@ -257,7 +235,12 @@
 
 
 <section class="banner-grid-section custom_pd">
->>>>>>> Stashed changes
+
+        @php($companyReliability = getWebConfig(name: 'company_reliability'))
+        @if($companyReliability != null)
+            @include('web-views.partials._company-reliability')
+        @endif
+    <section class="banner-grid-section custom_pd">
     <div class="container rtl">
         <div class="banner-grid-wrapper">
 
@@ -302,23 +285,48 @@
         </div>
     </div>
 </section>
-        @include('web-views.partials._recommended-products')
+        @if($web_config['brand_setting'] && $brands->count() > 0)
+            <section class="container rtl custom_pd">
 
-   
-        @if ($homeCategories->count() > 0)
-            @foreach($homeCategories as $category)
-                @include('web-views.partials._category-wise-product', ['decimal_point_settings'=>$decimalPointSettings])
-            @endforeach
+                <div class="section-header d-flex justify-content-between align-items-center mb-1">
+                    <h2 class="header_section_title mb-0">
+                        <span> {{translate('brands')}}</span>
+                    </h2>
+                    <div class="__mr-2px">
+                        <a class="view-all-btn-yellow" href="{{route('brands')}}">
+                            {{ translate('view_all')}}
+                            <!-- <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1 float-left' : 'right ml-1 mr-n1'}}"></i> -->
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-sm-3 mb-0 brand-slider">
+                    <div class="owl-carousel owl-theme p-2 brands-slider" data-slide-items="{{ count($brands) }}">
+                        @php($brandCount=0)
+                        @foreach($brands as $brand)
+                            @if($brandCount < 15 && !empty($brand['slug']))
+                                <div class="text-center">
+                                    <a href="{{ route('brand-products', ['slug' => $brand['slug']]) }}"
+                                       class="__brand-item">
+                                        <img loading="lazy" alt="{{ $brand->image_alt_text }}"
+                                             src="{{ getStorageImages(path: $brand->image_full_url, type: 'brand') }}">
+                                    </a>
+                                </div>
+                            @endif
+                            @php($brandCount++)
+                        @endforeach
+                    </div>
+                </div>
+            </section>
         @endif
 
-<<<<<<< Updated upstream
 
         @php($companyReliability = getWebConfig(name: 'company_reliability'))
         @if($companyReliability != null)
             @include('web-views.partials._company-reliability')
         @endif
-=======
-        <section class="cat-promo-section  rtl py-4">
+
+<section class="cat-promo-section  rtl py-4">
 
         <div class="container">
      <div class="cat-promo-grid">
@@ -340,58 +348,15 @@
        
         </section>
 
->>>>>>> Stashed changes
     </div>
 
     <span id="direction-from-session" data-value="{{ session()->get('direction') }}"></span>
 @endsection
 
 @push('script')
-    @if($orderSuccessIds)
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var modalEl = document.getElementById('order_successfully');
-                var orderModal = new bootstrap.Modal(modalEl, {
-                    backdrop: 'static',
-                    keyboard: false
-                });
-                orderModal.show();
 
-
-                document.querySelectorAll('.copy-order-id').forEach(function(copyBtn) {
-                    copyBtn.addEventListener('click', function() {
-                        let orderTextEl = null;
-                        orderTextEl = this.closest('tr')?.querySelector('.order-id-text');
-                        if (!orderTextEl) {
-                            orderTextEl = this.parentElement.querySelector('.order-id-text');
-                        }
-                        const orderText = orderTextEl?.textContent.trim();
-                        if (orderText) {
-                            navigator.clipboard.writeText(orderText).then(() => {
-                                toastr.success('Order ID copied successfully!');
-                            }).catch(err => {
-                                console.warn('Clipboard error:', err);
-                                toastr.warning('Unable to copy. Clipboard requires HTTPS or localhost.');
-                            });
-                        }
-                    });
-                });
-                document.getElementById('modal-close-btn').addEventListener('click', function() {
-                    setTimeout(() => { orderModal.hide(); }, 600);
-                });
-            });
-        </script>
-    @endif
-
-    @if(Request::is('/') && \Illuminate\Support\Facades\Cookie::has('popup_banner') == false && empty($orderSuccessIds))
-        <script>
-            $(document).ready(function () {
-                $('#popup-modal').modal('show');
-            });
-        </script>
-        @php(\Illuminate\Support\Facades\Cookie::queue('popup_banner', 'off', 1))
-    @endif
     <script src="{{theme_asset(path: 'public/assets/front-end/js/owl.carousel.min.js')}}"></script>
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/home.js') }}"></script>
 @endpush
+
 

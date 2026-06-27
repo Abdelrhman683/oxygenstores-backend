@@ -38,8 +38,7 @@ class DashboardController extends BaseController
         private readonly RestockProductRepositoryInterface   $restockProductRepo,
         private readonly DashboardService                    $dashboardService,
         private readonly ChattingRepositoryInterface          $chattingRepo,
-    )
-    {
+    ) {
     }
 
     /**
@@ -91,9 +90,8 @@ class DashboardController extends BaseController
         // $vendorEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
         // $commissionEarn = $this->getAdminCommission(from: $from, to: $to, range: $range, type: 'month');
         $dateType = 'yearEarn';
-<<<<<<< Updated upstream
-        $getTotalCustomerCount = $this->customerRepo->getListWhereBetween(filters: ['avoid_walking_customer' => 1], dataLimit: 'all')->count();
-=======
+
+        // Use count helper for customers and ensure statistic arrays are initialized
         $getTotalCustomerCount = $this->customerRepo->getCountWhere(filters: ['avoid_walking_customer' => 1]);
 
         $inHouseOrderEarningArray = array_fill(0, count($range), 0);
@@ -101,10 +99,9 @@ class DashboardController extends BaseController
         $inHouseEarning = array_fill(0, count($range), 0);
         $vendorEarning = array_fill(0, count($range), 0);
         $commissionEarn = array_fill(0, count($range), 0);
->>>>>>> Stashed changes
         $data += [
-            'order' => $this->orderRepo->getListWhere(dataLimit: 'all')->count(),
-            'brand' => $this->brandRepo->getListWhere(dataLimit: 'all')->count(),
+            'order' => $this->orderRepo->getCountWhere(),
+            'brand' => $this->brandRepo->getCountWhere(),
             'topSellProduct' => $topSellProduct,
             'mostRatedProducts' => $mostRatedProducts,
             'topVendorByEarning' => $topVendorByEarning,
@@ -119,8 +116,8 @@ class DashboardController extends BaseController
             'pending_amount' => $admin_wallet['pending_amount'] ?? 0,
             'total_tax_collected' => $admin_wallet['total_tax_collected'] ?? 0,
             'getTotalCustomerCount' => $getTotalCustomerCount,
-            'getTotalVendorCount' => $this->vendorRepo->getListWhere(dataLimit: 'all')->count(),
-            'getTotalDeliveryManCount' => $this->deliveryManRepo->getListWhere(filters: ['seller_id' => 0], dataLimit: 'all')->count(),
+            'getTotalVendorCount' => $this->vendorRepo->getCountWhere(),
+            'getTotalDeliveryManCount' => $this->deliveryManRepo->getCountWhere(filters: ['seller_id' => 0]),
         ];
 
         // Temporary disable statistics display to verify if dashboard performance issue comes from stats rendering
@@ -139,34 +136,6 @@ class DashboardController extends BaseController
 
     public function getOrderStatusData(): array
     {
-<<<<<<< Updated upstream
-        $orderQuery = $this->orderRepo->getListWhere(dataLimit: 'all');
-        $storeQuery = $this->vendorRepo->getListWhere(dataLimit: 'all');
-        $productQuery = $this->productRepo->getListWhere(dataLimit: 'all');
-        $customerQuery = $this->customerRepo->getListWhere(filters: ['avoid_walking_customer' => 1], dataLimit: 'all');
-        $failedQuery = $this->orderRepo->getListWhere(filters: ['order_status' => 'failed'], dataLimit: 'all');
-        $pendingQuery = $this->orderRepo->getListWhere(filters: ['order_status' => 'pending'], dataLimit: 'all');
-        $returnedQuery = $this->orderRepo->getListWhere(filters: ['order_status' => 'returned'], dataLimit: 'all');
-        $canceledQuery = $this->orderRepo->getListWhere(filters: ['order_status' => 'canceled'], dataLimit: 'all');
-        $confirmedQuery = $this->orderRepo->getListWhere(filters: ['order_status' => 'confirmed'], dataLimit: 'all');
-        $deliveredQuery = $this->orderRepo->getListWhere(filters: ['order_status' => 'delivered'], dataLimit: 'all');
-        $processingQuery = $this->orderRepo->getListWhere(filters: ['order_status' => 'processing'], dataLimit: 'all');
-        $outForDeliveryQuery = $this->orderRepo->getListWhere(filters: ['order_status' => 'out_for_delivery'], dataLimit: 'all');
-
-        return [
-            'order' => self::getCommonQueryOrderStatus($orderQuery),
-            'store' => self::getCommonQueryOrderStatus($storeQuery),
-            'failed' => self::getCommonQueryOrderStatus($failedQuery),
-            'pending' => self::getCommonQueryOrderStatus($pendingQuery),
-            'product' => self::getCommonQueryOrderStatus($productQuery),
-            'customer' => self::getCommonQueryOrderStatus($customerQuery),
-            'returned' => self::getCommonQueryOrderStatus($returnedQuery),
-            'canceled' => self::getCommonQueryOrderStatus($canceledQuery),
-            'confirmed' => self::getCommonQueryOrderStatus($confirmedQuery),
-            'delivered' => self::getCommonQueryOrderStatus($deliveredQuery),
-            'processing' => self::getCommonQueryOrderStatus($processingQuery),
-            'out_for_delivery' => self::getCommonQueryOrderStatus($outForDeliveryQuery),
-=======
         $statisticsType = session('statistics_type', 'overall');
         $dateFilters = [];
         if ($statisticsType == 'today') {
@@ -185,48 +154,25 @@ class DashboardController extends BaseController
         $customerCount = $this->customerRepo->getCountWhere(filters: array_merge(['avoid_walking_customer' => 1], $dateFilters));
 
         $orderStatusList = ['pending', 'confirmed', 'processing', 'out_for_delivery', 'delivered', 'canceled', 'returned', 'failed'];
-
-        // Use a single grouped query to fetch all status counts and total.
-        $grouped = $this->orderRepo->getCountGroupedByStatus(array_merge(['seller_is' => 'admin'], $dateFilters));
+        $orderStatusCounts = [];
+        foreach ($orderStatusList as $status) {
+            $orderStatusCounts[$status] = $this->orderRepo->getCountWhere(filters: array_merge(['seller_is' => 'admin', 'order_status' => $status], $dateFilters));
+        }
 
         return [
             'order' => $orderCount,
             'store' => $storeCount,
             'product' => $productCount,
             'customer' => $customerCount,
-            'delivered' => $grouped['delivered'] ?? 0,
-            'canceled' => $grouped['canceled'] ?? 0,
-            'returned' => $grouped['returned'] ?? 0,
-            'failed' => $grouped['failed'] ?? 0,
-            'pending' => $grouped['pending'] ?? 0,
-            'confirmed' => $grouped['confirmed'] ?? 0,
-            'processing' => $grouped['processing'] ?? 0,
-            'out_for_delivery' => $grouped['out_for_delivery'] ?? 0,
->>>>>>> Stashed changes
+            'delivered' => $orderStatusCounts['delivered'] ?? 0,
+            'canceled' => $orderStatusCounts['canceled'] ?? 0,
+            'returned' => $orderStatusCounts['returned'] ?? 0,
+            'failed' => $orderStatusCounts['failed'] ?? 0,
+            'pending' => $orderStatusCounts['pending'] ?? 0,
+            'confirmed' => $orderStatusCounts['confirmed'] ?? 0,
+            'processing' => $orderStatusCounts['processing'] ?? 0,
+            'out_for_delivery' => $orderStatusCounts['out_for_delivery'] ?? 0,
         ];
-    }
-
-    public function getCommonQueryOrderStatus($query)
-    {
-        $today = session()->has('statistics_type') && session('statistics_type') == 'today' ? 1 : 0;
-        $this_week = session()->has('statistics_type') && session('statistics_type') == 'this_week' ? 1 : 0;
-        $this_month = session()->has('statistics_type') && session('statistics_type') == 'this_month' ? 1 : 0;
-        $this_year = session()->has('statistics_type') && session('statistics_type') == 'this_year' ? 1 : 0;
-
-        return $query
-            ->when($today, function ($query) {
-                return $query->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()]);
-            })
-            ->when($this_week, function ($query) {
-                return $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
-            })
-            ->when($this_month, function ($query) {
-                return $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
-            })
-            ->when($this_year, function ($query) {
-                return $query->whereBetween('created_at', [now()->startOfYear(), now()->endOfYear()]);
-            })
-            ->count();
     }
 
     public function getOrderStatistics(Request $request): JsonResponse
@@ -330,7 +276,7 @@ class DashboardController extends BaseController
 
     public function getRealTimeActivities(): JsonResponse
     {
-        $newOrder = $this->orderRepo->getListWhere(filters: ['checked' => 0], dataLimit: 'all')->count();
+        $newOrder = $this->orderRepo->getCountWhere(filters: ['checked' => 0]);
         $restockProductList = $this->restockProductRepo->getListWhere(filters: ['added_by' => 'in_house'], dataLimit: 'all')->groupBy('product_id');
         $restockProduct = [];
         if (count($restockProductList) == 1) {

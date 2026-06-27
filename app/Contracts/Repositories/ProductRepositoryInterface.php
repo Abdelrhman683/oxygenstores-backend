@@ -135,4 +135,10 @@ interface ProductRepositoryInterface extends RepositoryInterface
 
     public function updateByParams(array $params, array $data): bool;
 
+    /**
+     * @param string|null $searchValue
+     * @param array $filters
+     * @return int
+     */
+    public function getCountWhere(?string $searchValue = null, array $filters = []): int;
 }

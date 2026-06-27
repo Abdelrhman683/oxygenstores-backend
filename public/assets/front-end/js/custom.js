@@ -2733,27 +2733,157 @@ $(document).ready(function () {
     });
 
     // ---- swipper slider and zoom
-    function initSliderWithZoom() {
+    window.initSliderWithZoom = function() {
         $(".easyzoom").each(function () {
             $(this).easyZoom();
         });
 
-        new Swiper(".quickviewSlider2", {
-            slidesPerView: 1,
-            spaceBetween: 10,
-            loop: false,
-            thumbs: {
-                swiper: new Swiper(".quickviewSliderThumb2", {
-                    spaceBetween: 10,
-                    slidesPerView: 'auto',
-                    watchSlidesProgress: true,
-                    navigation: {
-                        nextEl: ".swiper-quickview-button-next",
-                        prevEl: ".swiper-quickview-button-prev",
-                    },
-                }),
-            },
+        $(".quickviewSlider2").each(function () {
+            const $mainSlider = $(this);
+            const $parent = $mainSlider.closest(".pd-img-wrap");
+            const $thumbSlider = $parent.find(".quickviewSliderThumb2");
+            const isVertical = $parent.find(".thumb-vertical-wrapper").length > 0;
+
+            if ($mainSlider[0] && $mainSlider[0].swiper) return;
+
+            const thumbSwiper = new Swiper($thumbSlider[0], {
+                direction: isVertical ? "vertical" : "horizontal",
+                spaceBetween: 10,
+                slidesPerView: isVertical ? 5 : "auto",
+                watchSlidesProgress: true,
+                navigation: {
+                    nextEl: $parent.find(".swiper-quickview-button-next")[0],
+                    prevEl: $parent.find(".swiper-quickview-button-prev")[0],
+                },
+            });
+
+            new Swiper($mainSlider[0], {
+                slidesPerView: 1,
+                spaceBetween: 10,
+                loop: false,
+                thumbs: {
+                    swiper: thumbSwiper,
+                },
+            });
         });
     }
     initSliderWithZoom();
 });
+    $(".other-product-carousel").owlCarousel({
+        loop: false,
+        autoplay: true,
+        margin: 10,
+        nav: false,
+        dots: true,
+        autoplayHoverPause: true,
+        rtl: themeDirection === "rtl",
+        responsive: {
+            0: {
+                items: 1,
+                margin: 5,
+            },
+            375: {
+                items: 1,
+                margin: 5,
+            },
+            540: {
+                items: 1,
+                margin: 5,
+            },
+            768: {
+                items: 2,
+                margin: 10,
+            },
+            992: {
+                items: 4,
+                margin: 10,
+            },
+            1200: {
+                items: 4,
+                margin: 10,
+            },
+            1400: {
+                items: 4,
+                margin: 10,
+            },
+        },
+    });
+
+        $(".related-product-carousel").owlCarousel({
+        loop: false,
+        autoplay: true,
+        margin: 10,
+        nav: false,
+        dots: true,
+        autoplayHoverPause: true,
+        rtl: themeDirection === "rtl",
+        responsive: {
+            0: {
+                items: 1.2,
+                margin: 10,
+            },
+            375: {
+                items: 1.5,
+                margin: 15,
+            },
+            540: {
+                items: 2.2,
+                margin: 5,
+            },
+            768: {
+                items: 3.2,
+                margin: 10,
+            },
+            992: {
+                items: 4,
+                margin: 10,
+            },
+            1200: {
+                items: 6,
+                margin: 10,
+            },
+            1400: {
+                items: 6,
+                margin: 10,
+            },
+        },
+    });
+        $(".filter-product-carousel").owlCarousel({
+        loop: false,
+        autoplay: true,
+        margin: 10,
+        nav: false,
+        dots: true,
+        autoplayHoverPause: true,
+        rtl: themeDirection === "rtl",
+        responsive: {
+            0: {
+                items: 1.2,
+                margin: 10,
+            },
+            375: {
+                items: 1.5,
+                margin: 15,
+            },
+            540: {
+                items: 2.2,
+                margin: 5,
+            },
+            768: {
+                items: 3.2,
+                margin: 10,
+            },
+            992: {
+                items: 4,
+                margin: 10,
+            },
+            1200: {
+                items: 6,
+                margin: 10,
+            },
+            1400: {
+                items: 6,
+                margin: 10,
+            },
+        },
+    });

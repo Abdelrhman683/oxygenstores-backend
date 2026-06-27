@@ -728,9 +728,10 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    max-width: 85px;
-    border-radius: 50%;
-    aspect-ratio: 1;
+    /* max-width: 85px; */
+    max-width: 100%;
+    /* aspect-ratio: 1; */
+      aspect-ratio: 4 / 3;
     overflow: hidden;
     background-color: var(--white-clr);
     box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
@@ -744,7 +745,9 @@ a {
 
 .__brand-item img {
     width: 100%;
-    aspect-ratio: 1;
+    /* aspect-ratio: 1; */
+          aspect-ratio: 4 / 3;
+
     -o-object-fit: cover;
     object-fit: cover;
     transition: all 300ms ease-in-out;
@@ -2643,6 +2646,10 @@ a {
         border-radius: 3px;
     }
 }
+.__inline-10- {
+  height: 60px !important;
+  width: auto;
+}
 .__inline-11 {
     height: 40px !important;
     width: auto;
@@ -2655,6 +2662,11 @@ a {
 @media screen and (max-width: 575px) {
     .__inline-12 {
         max-width: 70px;
+        -o-object-fit: contain;
+        object-fit: contain;
+    }
+    .__inline-12_header {
+        max-width: 120px;
         -o-object-fit: contain;
         object-fit: contain;
     }
@@ -6838,30 +6850,33 @@ a {
 }
 .owl-dots {
     position: absolute;
-    bottom: 20px;
+    /* bottom: 20px; */
     left: 0;
     width: 100%;
-    margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     gap: 10px;
+    margin-top: 10px !important;
 }
 .owl-dots button {
     margin: 0;
     transition: all ease 0.3s;
-    height: 6px;
-    width: 6px;
+    height: 20px;
+    width: 20px;
     opacity: 0.4;
     background: transparent;
     border: none;
     outline: none;
     box-shadow: none;
-    background-color: var(--primary-clr);
-    border-radius: 3px;
+    background-color: var(--web-primary);
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
 }
 .owl-dots button.active {
-    width: 18px;
     opacity: 1;
 }
 .owl-dots button span {
@@ -7022,9 +7037,9 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .search-page-header {
-    border-radius: 5px;
+    /* border-radius: 5px;
     background: #fff;
-    box-shadow: 0px 0px 3px 0px rgba(27, 127, 237, 0.15);
+    box-shadow: 0px 0px 3px 0px rgba(27, 127, 237, 0.15); */
     padding: 15px;
     display: flex;
     /* flex-wrap: wrap; */

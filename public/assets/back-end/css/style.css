@@ -3229,12 +3229,20 @@ select {
     border-radius: 3px;
   }
 }
+.__inline-10- {
+  height: 60px !important;
+  width: auto;
+}
 .__inline-11 {
   height: 40px !important;
   width: auto;
 }
 
 .__inline-12 {
+  height: 38px !important;
+  width: auto;
+}
+.__inline-12_header {
   height: 38px !important;
   width: auto;
 }

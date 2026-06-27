@@ -2,56 +2,54 @@
     @php($overallRating = getOverallRating($product?->reviews))
     @php($wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $product->id)->count() : (session()->has('wish_list') && in_array($product->id, session('wish_list')) ? 1 : 0))
 
-    <div class="custom-product-card shadow-none">
-        <div class="product-card-top">
+    <div class="premium-card h-100">
+        <div class="premium-product-media">
             @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
-                <span class="product-badges">
+                <span class="premium-promo-badge">
                     {{ translate('discount') }} {{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
                 </span>
             @endif
 
-            <div class="card-actions">
+            <div class="premium-card-actions">
                 <button type="button" data-product-id="{{ $product['id'] }}"
-                        class="action-btn product-action-add-wishlist"
+                        class="premium-action-btn product-action-add-wishlist"
                         title="{{ translate('Add_to_wishlist') }}">
                     <i class="fa {{($wishlist_status == 1?'fa-heart text-danger':'fa-heart-o')}} wishlist_icon_{{$product['id']}}"></i>
                 </button>
-                <a class="action-btn stopPropagation action-product-quick-view"
+                <a class="premium-action-btn stopPropagation action-product-quick-view"
                    href="javascript:"
                    data-product-id="{{ $product->id }}"
                    title="{{ translate('Quick_View') }}">
                     <i class="czi-eye align-middle"></i>
                 </a>
             </div>
+
+            <div class="premium-card-image">
+                <a href="{{route('product',$product->slug)}}" class="d-block">
+                    <img src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}" alt="{{ $product['name'] }}">
+                </a>
+                @if($product->product_type == 'physical' && $product->current_stock <= 0)
+                    <span class="out_fo_stock">{{translate('out_of_stock')}}</span>
+                @endif
+            </div>
         </div>
 
-        <div class="product-image-container">
-            <a href="{{route('product',$product->slug)}}" class="d-block">
-                <img src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}" alt="{{ $product['name'] }}">
-            </a>
-            @if($product->product_type == 'physical' && $product->current_stock <= 0)
-                <span class="out_fo_stock">{{translate('out_of_stock')}}</span>
-            @endif
-        </div>
-
-        <hr>
-
-        <div class="product-details {{Session::get('direction') === "rtl" ? 'rtl' : ''}}">
+        <div class="premium-card-details">
             @if($product->category)
-                <span class="category-badge">{{ $product->category->name }}</span>
+                <span class="premium-category-tag">{{ $product->category->name }}</span>
             @endif
 
-            <a href="{{route('product',$product->slug)}}" class="product-title-text" title="{{ $product['name'] }}">
+            <a href="{{route('product',$product->slug)}}" class="premium-product-title" title="{{ $product['name'] }}">
                 {{ $product['name'] }}
             </a>
 
-            <div class="product-prices">
+            <div class="premium-product-prices">
                 @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
-                    <del class="price-old">
+                    <del class="premium-price-old">
                         {{ webCurrencyConverter(amount: $product->unit_price) }}
                     </del>
                 @endif
-                <span class="price-new font-bold">
+                <span class="premium-price-new">
                     {{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'string') }}
                 </span>
             </div>
@@ -62,7 +60,7 @@
                 <input type="hidden" name="quantity" value="{{ $product->minimum_order_qty ?? 1 }}">
             </form>
 
-            <button class="add-to-cart-btn product-add-to-cart-button"
+            <button class="premium-add-to-cart product-add-to-cart-button"
                     type="button"
                     data-form="#add-to-cart-form-{{ $product->id }}"
                     data-update="{{ translate('update_cart') }}"

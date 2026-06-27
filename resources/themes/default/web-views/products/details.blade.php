@@ -43,9 +43,6 @@
         }
     @endphp
     <div class="__inline-23">
-<<<<<<< Updated upstream
-        <div class="container my-4 rtl text-align-direction">
-=======
         <div class="container-fluid  rtl text-align-direction">
                     <nav aria-label="breadcrumb">
             <style>
@@ -69,15 +66,16 @@
                 </li>
             </ol>
         </nav>
->>>>>>> Stashed changes
             <div class="row g-3 {{Session::get('direction') === "rtl" ? '__dir-rtl' : ''}}">
                 <div class="col-lg-9">
                     <div class="h-100 d-flex flex-column gap-4 pb-2">
-                        <div class="card card-body flex-grow-0">
+                        <div class="card card-body flex-grow-0" style="border: none ; background: transparent;">
                             <div class="row g-3">
-                                <div class="col-lg-5 col-md-4">
-                                    <div class="pd-img-wrap position-relative">
-                                        <div class="swiper-container quickviewSlider2 border rounded aspect-1">
+                                <div class="col-lg-6 col-md-4">
+                              <div class="gallery_wrapper_deta">
+
+                                    <div class="pd-img-wrap position-relative d-flex gap-3 flex-row-reverse">
+                                        <div class="swiper-container quickviewSlider2 flex-grow-1  aspect-1">
                                             <div class="swiper-wrapper">
                                                 @php
                                                     $imageSources = ($product->product_type === 'physical' && !empty($product->color_image) && count($product->color_images_full_url) > 0)
@@ -105,69 +103,25 @@
                                         </div>
                                         @if (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                                         <div class="discount-badge-wrapper">
-                                            <span class="fs-13 text-white bg-primary text-nowrap fw-bold d-block discount-badge">
-                                                <span class="direction-ltr d-block">
+                                            <span class="">
+                                                <span class="direction-ltr d-block dic_">
                                                  -{{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
                                                 </span>
                                             </span>
                                         </div>
                                         @endif
-                                        <div class="cz-product-gallery-icons">
-                                            <div class="d-flex flex-column gap-12px pt-3">
-                                                @if($product->product_type == "physical")
-                                                <div class="bg-white btn-circle border" style="--size: 35px" data-toggle="tooltip" title="{{ translate('Physical_Product') }}" data-placement="left">
-                                                    <img class="h-16px aspect-1 svg" src="{{theme_asset(path: "public/assets/front-end/img/icons/physical-product.svg")}}" alt="">
-                                                </div>
-                                                @else
-                                                    <div class="bg-white btn-circle border" style="--size: 35px" data-toggle="tooltip" title="{{ translate('Digital_Product') }}" data-placement="left">
-                                                        <img class="h-16px aspect-1 svg" src="{{theme_asset(path: "public/assets/front-end/img/icons/digital-product.svg")}}" alt="">
-                                                    </div>
-                                                @endif
-                                                <button type="button" data-product-id="{{ $product['id'] }}"
-                                                    class="btn __text-18px border position-static rounded-circle wishList-pos-btn d-sm-none product-action-add-wishlist">
-                                                    <i class="fa {{($wishlistStatus == 1?'fa-heart':'fa-heart-o') }} wishlist_icon_{{ $product['id'] }} web-text-primary"
-                                                    aria-hidden="true"></i>
-                                                    <div class="wishlist-tooltip" x-placement="top">
-                                                        <div class="arrow"></div>
-                                                        <div class="inner">
-                                                            <span class="add">{{ translate('added_to_wishlist') }}</span>
-                                                            <span class="remove">{{ translate('removed_from_wishlist') }}</span>
-                                                        </div>
-                                                    </div>
-                                                </button>
-
-                                                <div class="share_dropdown_wrapper">
-                                                    <button type="button" class="btn btn-outline-primary btn-circle p-0 share_btn" style="--size: 35px" tabindex="0">
-                                                        <i class="fa fa-share-alt"></i>
-                                                    </button>
-                                                    <div class="share_dropdown bg-white d-flex gap-3 align-items-center flex-column">
-                                                        <a href="#"  class="flex-shrink-0 btn btn-circle p-0 bg-facebook text-white share-on-social-media share_btn facebook" style="--size: 20px"   data-action="{{route('product',$product->slug)}}"    data-social-media-name="facebook.com/sharer/sharer.php?u=">
-                                                            <i class="czi-facebook lh-1 fs-10"></i>
-                                                        </a>
-                                                        <a href="#" class="flex-shrink-0 btn btn-circle p-0 bg-twitter text-white share-on-social-media share_btn twitter" style="--size: 20px"    data-action="{{route('product',$product->slug)}}" data-social-media-name="twitter.com/intent/tweet?text=">
-                                                            <i class="czi-twitter lh-1 fs-10"></i>
-                                                        </a>
-                                                        <a href="#" class="flex-shrink-0 btn btn-circle p-0 bg-linkedin text-white share-on-social-media share_btn linkedin" style="--size: 20px"  data-action="{{route('product',$product->slug)}}" data-social-media-name="linkedin.com/shareArticle?mini=true&url=">
-                                                            <i class="czi-linkedin lh-1 fs-10"></i>
-                                                        </a>
-                                                        <a href="#" class="flex-shrink-0 btn btn-circle p-0 bg-whatsapp text-white share-on-social-media share_btn whatsapp" style="--size: 20px"  data-action="{{route('product',$product->slug)}}" data-social-media-name="api.whatsapp.com/send?text=">
-                                                            <i class="fa fa-whatsapp lh-1 fs-10"></i>
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3 user-select-none">
-                                            <div class="quickviewSliderThumb2 swiper-container position-relative active-border">
-                                                <div class="swiper-wrapper auto-item-width justify-content-start">
+                                        
+                                        <div class="user-select-none thumb-vertical-wrapper" style="width: 65px;">
+                                            <div class="quickviewSliderThumb2 swiper-container position-relative active-border h-100">
+                                                <div class="swiper-wrapper justify-content-start">
                                                     @foreach ($imageSources as $key => $photo)
                                                         @php
                                                             $imagePath = isset($photo['image_name'])
                                                                 ? getStorageImages(path: $photo['image_name'], type: 'backend-product')
                                                                 : getStorageImages(path: $photo, type: 'backend-product');
                                                         @endphp
-                                                        <div class="swiper-slide position-relative rounded border" role="group">
-                                                            <img class="aspect-1" alt="" src="{{ $imagePath }}">
+                                                        <div class="swiper-slide position-relative mb-2" role="group">
+                                                            <img class="aspect-1 rounded" alt="" src="{{ $imagePath }}">
                                                         </div>
                                                     @endforeach
                                                 </div>
@@ -177,14 +131,12 @@
                                             </div>
                                         </div>
                                     </div>
+
+                              </div>
                                 </div>
 
-                                <div class="col-lg-7 col-md-8 mt-md-0 mt-sm-3 web-direction">
+                                <div class="col-lg-6 col-md-8 mt-md-0 mt-sm-3 web-direction">
                                     <div class="details __h-100 product-cart-option-container p-0">
-<<<<<<< Updated upstream
-                                        <h2 class="mb-4 __inline-24">{{ $product->name }}</h2>
-                                        <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
-=======
                                         <div class="head_det">
                                            <a href="#" class="sub_cat_title">
                                             {{ $productSubCategory?->name ?? $productCategory?->name ?? translate('category') }}
@@ -202,7 +154,6 @@
                                       
                                         <h2 class=" __inline-24 cat_title_det">{{ $product->name }}</h2>
                                         <!-- <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
->>>>>>> Stashed changes
                                             @if($overallRating[0] !=0)
                                             <div class="star-rating me-2">
                                                 @for($inc=1;$inc<=5;$inc++)
@@ -238,7 +189,7 @@
                                                 class="font-weight-normal fs-14 font-for-tab d-inline-block font-size-sm text-body align-middle text-capitalize">
                                                 <span class="web-text-primary fw-semibold countWishlist-{{ $product->id }}"> {{ $countWishlist}}</span> {{ translate('wish_listed') }}
                                             </span>
-                                        </div>
+                                        </div> -->
 
                                         @if($product['product_type'] == 'digital')
                                             <div class="digital-product-authors mb-2">
@@ -275,21 +226,18 @@
                                         <form class="addToCartDynamicForm add-to-cart-details-form d-flex flex-column gap-4">
 
                                             <div class="">
-                                                <h3 class="font-weight-normal text-accent d-flex align-items-end gap-2 mb-0">
+                                                <h3 class="font-weight-normal  d-flex align-items-end gap-2 mb-0">
+                                                          <span class="discounted-unit-price fs-18 font-bold">
+                                                        {{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'string') }}
+                                                    </span>
                                                     @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                                                         <del
-                                                            class="product-total-unit-price align-middle text-muted fs-18 font-semibold">
+                                                            class="product-total-unit-price align-middle text-muted fs-15 font-semibold">
                                                             {{ webCurrencyConverter(amount: $product->unit_price) }}
                                                         </del>
                                                     @endif
-                                                    <span class="discounted-unit-price fs-24 font-bold">
-                                                        {{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'string') }}
-                                                    </span>
+                                              
                                                 </h3>
-<<<<<<< Updated upstream
-                                            </div>
-
-=======
                                                 <div class="summary_det">
                                                     <p>{{ $productSummary }}</p>
                                                 </div>
@@ -332,7 +280,6 @@
                                             @endif
 
                                      
->>>>>>> Stashed changes
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $product->id }}">
                                             <div
@@ -437,7 +384,7 @@
                                                 </div>
                                             @endforeach
 
-                                            <div class="">
+                                            <!-- <div class="">
                                                 <div class="product-quantity d-flex flex-column __gap-15">
                                                     <div class="d-flex align-items-center gap-4">
                                                         <div class="product-description-label __color-9B9B9B fs-14">
@@ -489,8 +436,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-
+                                            </div> -->
+{{--
                                             <div class="__btn-grp product-add-and-buy-section-parent">
 
                                                 <?php
@@ -557,7 +504,7 @@
                                                         </button>
                                                     </div>
                                                 @endif
-                                                <button type="button" data-product-id="{{ $product['id'] }}"
+                                                <!-- <button type="button" data-product-id="{{ $product['id'] }}"
                                                         class="btn __text-18px border product-action-add-wishlist">
                                                     <i class="fa {{($wishlistStatus == 1?'fa-heart':'fa-heart-o') }} wishlist_icon_{{ $product['id'] }} web-text-primary"
                                                        aria-hidden="true"></i>
@@ -570,7 +517,7 @@
                                                             <span class="remove">{{ translate('removed_from_wishlist') }}</span>
                                                         </div>
                                                     </div>
-                                                </button>
+                                                </button> -->
 
                                                 @if($product->added_by == 'admin')
                                                     @if(checkVendorAbility(type: 'inhouse', status: 'temporary_close') || checkVendorAbility(type: 'inhouse', status: 'vacation_status'))
@@ -586,15 +533,23 @@
                                                     @endif
                                                 @endif
                                             </div>
-
+--}}
                                         </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="rtl text-align-direction flex-grow-1">
-                            <div class="__review-overview card card-body h-100">
-                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-center gap-2" role="tablist">
+                            <div class="  h-100">
+                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-start gap-2 p-0" role="tablist">
+                                          <li class="nav-item">
+                                        <a class="nav-link __inline-27 mb-0 tab_link"
+                                        data-toggle="tab"
+                                        href="#specifications"
+                                        role="tab">
+                                            {{ translate('المواصفات') }}
+                                        </a>
+                                    </li>
                                     <li class="nav-item">
                                         <a class="nav-link __inline-27 mb-0 tab_link active"
                                         data-toggle="tab"
@@ -611,6 +566,15 @@
                                             {{ translate('reviews') }}
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link __inline-27 mb-0 tab_link"
+                                        data-toggle="tab"
+                                        href="#other_products"
+                                        role="tab">
+                                            {{ translate('منتجات اخرى') }}
+                                        </a>
+                                    </li>
+                          
                                 </ul>
 
 
@@ -841,8 +805,6 @@
                                             </div>
                                         </div>
                                     </div>
-<<<<<<< Updated upstream
-=======
                                     <div class="tab-pane fade" id="specifications" role="tabpanel">
                                         <div class="specs-table">
                                             @if(count($dynamicAttributes) > 0)
@@ -1075,16 +1037,12 @@
 
 
                                     </div>
->>>>>>> Stashed changes
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3">
-<<<<<<< Updated upstream
-                    @php($companyReliability = getWebConfig('company_reliability'))
-=======
                    
                         <div class="product-details-shipping-details px-3 py-3">
                            <p class="stock {{ $product->current_stock > 0 ? 'in-stock' : 'out-of-stock-danger' }}">
@@ -1168,7 +1126,6 @@
 
                                                 </div>
                     <!-- @php($companyReliability = getWebConfig('company_reliability'))
->>>>>>> Stashed changes
                     @if($companyReliability != null)
                         <div class="product-details-shipping-details">
                             @foreach ($companyReliability as $key=>$value)
@@ -1185,9 +1142,9 @@
                                 @endif
                             @endforeach
                         </div>
-                    @endif
+                    @endif -->
 
-                    @if(getWebConfig(name: 'business_mode')=='multi')
+                    <!-- @if(getWebConfig(name: 'business_mode')=='multi')
                         <div class="__inline-31">
 
                             @if($product->added_by=='seller')
@@ -1373,9 +1330,9 @@
                                 </div>
                             @endif
                         </div>
-                    @endif
+                    @endif -->
 
-                    <div class="pt-4 pb-3 d-flex justify-content-between align-items-center">
+                    <!-- <div class="pt-4 pb-3 d-flex justify-content-between align-items-center">
                         <h2 class="__text-16px font-bold text-capitalize mb-0">
                             @if(getWebConfig(name: 'business_mode') == 'multi')
                                 {{ translate('more_from_the_store') }}
@@ -1399,8 +1356,9 @@
                         @foreach($moreProductFromSeller as $item)
                             @include('web-views.partials._seller-products-product-details',['product' => $item, 'decimal_point_settings' => $decimalPointSettings])
                         @endforeach
-                    </div>
+                    </div> -->
                 </div>
+                <!-- <div class="col-lg-3"></div> -->
             </div>
         </div>
 
@@ -1415,10 +1373,10 @@
                             <div class="view_all d-flex justify-content-center align-items-center">
                                 <div>
                                     @if(!empty($product?->category?->slug))
-                                        <a class="text-capitalize view-all-text web-text-primary me-1"
+                                        <a class="view-all-btn-yellow me-1"
                                            href="{{ route('category-products', ['slug' => $product?->category?->slug]) }}">
                                             {{ translate('view_all') }}
-                                            <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1 ' : 'right ml-1 mr-n1'}}"></i>
+                                            <!-- <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1 ' : 'right ml-1 mr-n1'}}"></i> -->
                                         </a>
                                     @endif
                                 </div>
@@ -1452,16 +1410,223 @@
                 </div>
             </div>
         </div>
-<<<<<<< Updated upstream
-=======
 <div class="container">
     <div class="row">
         <section class="premium-static-section container rtl px-0 px-md-3">
     <div class="premium-section-header">
         <h2 class="premium-section-title">منتجات ذات صلة</h2>
     </div>
->>>>>>> Stashed changes
 
+    <div class="premium-carousel-wrapper">
+        <div class="owl-carousel owl-theme related-product-carousel">
+            
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة دولابي">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة دولابي جنرال سوبريم، (21.6 قدم، 612...)</a>
+                        <div class="premium-product-prices">
+                            <del class="premium-price-old">2999 ريال</del>
+                            <span class="premium-price-new">2549 ريال</span>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة يوجين">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة يوجين دولابي 637 لتر، 22.4 قدم، ستيل</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2499 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1849 ريال</span>
+                            <del class="premium-price-old">2949 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">1999 ريال</span>
+                            <del class="premium-price-old">2985 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم دولابي (15.4 قدم، 436...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2049 ريال</span>
+                            <del class="premium-price-old">2599 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="premium-card-item h-100">
+                <div class="premium-card">
+                    <div class="premium-product-media">
+                        <span class="premium-promo-badge">إستخدم كود OX26</span>
+                        <div class="premium-card-actions">
+                            <button type="button" class="premium-action-btn" title="Add to wishlist">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
+                                <i class="czi-eye align-middle"></i>
+                            </button>
+                        </div>
+                        <div class="premium-card-image">
+                            <a href="#" class="d-block">
+                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="premium-card-details">
+                        <span class="premium-category-tag">ثلاجات بابين</span>
+                        <a href="#" class="premium-product-title">ثلاجة بابين جنرال سوبريم (21 قدم، 594...)</a>
+                        <div class="premium-product-prices">
+                            <span class="premium-price-new">2399 ريال</span>
+                            <del class="premium-price-old">2899 ريال</del>
+                        </div>
+                        <button class="premium-add-to-cart" type="button">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">أضف للعربة</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{{-- Second redundant static mockup modal removed --}}
+
+
+    </div>
+</div>
     </div>
 
     @include("web-views.products._product-details-sticky", ['productDetails' => $product])

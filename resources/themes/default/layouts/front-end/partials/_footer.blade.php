@@ -138,7 +138,7 @@
                     </div>
 
                     <!-- Middle Column: General Info -->
-                    <div class="col-md-3 mb-4 mb-md-0 text-start">
+                    <div class="col-md-3 mb-4 mb-md-0 text-start middle_item_footer">
                         <h6 class="text-uppercase font-weight-bold text-white mb-3 fs-18" style="font-weight: 700 !important; letter-spacing: 0.5px;">معلومات عامة</h6>
                         <ul class="widget-list p-0 d-flex flex-column gap-3" style="list-style: none;">
                             <li>

@@ -1027,6 +1027,18 @@ class WebController extends Controller
             'page_no' => $request['page'],
             'min_price' => $request['min_price'],
             'max_price' => $request['max_price'],
+            'offer_type' => $request['offer_type'] ?? '',
+            'product_type' => $request['product_type'] ?? '',
+            'shop_id' => $request['shop_id'] ?? '',
+            'author_id' => $request['author_id'] ?? '',
+            'publishing_house_id' => $request['publishing_house_id'] ?? '',
+            'search_category_value' => $request['search_category_value'] ?? '',
+            'product_name' => $request['product_name'] ?? '',
+            'brand_id' => $request['brand_id'] ?? '',
+            'category_id' => $request['category_id'] ?? '',
+            'sub_category_id' => $request['sub_category_id'] ?? '',
+            'sub_sub_category_id' => $request['sub_sub_category_id'] ?? '',
+            'page' => $request['page'] ?? 1,
         ];
 
         $products = $fetched->paginate(5)->appends($data);
@@ -1043,7 +1055,16 @@ class WebController extends Controller
             $data['brand_name'] = Brand::active()->find((int)$request['id'])->name;
         }
 
-        return view(VIEW_FILE_NAMES['products_view_page'], compact('products', 'data'), $data);
+        $categories = CategoryManager::getCategoriesWithCountingAndPriorityWiseSorting();
+        $activeBrands = BrandManager::getActiveBrandWithCountingAndPriorityWiseSorting();
+
+        return view(VIEW_FILE_NAMES['products_view_page'], [
+            'pageTitleContent' => $data['brand_name'] ?? translate('products'),
+            'products' => $products,
+            'data' => $data,
+            'activeBrands' => $activeBrands,
+            'categories' => $categories,
+        ]);
 
     }
 

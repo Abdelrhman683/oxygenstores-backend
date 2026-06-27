@@ -1,8 +1,8 @@
 
 @if (count($clearanceSaleProducts) > 0)
 <section class="container rtl pb-0 px-max-sm-0">
-    <div class="__shadow-2">
-        <div class="__p-20px rounded bg-white overflow-hidden">
+    <div class="">
+        <div class="__p-20px overflow-hidden">
             <div class="d-flex __gap-6px flex-between align-items-center">
                 <div>
                     <div class="clearance-sale-title-bg" data-bg-img="{{ theme_asset(path: 'public/assets/front-end/img/media/clearance-sale-title-bg.svg') }}">
@@ -12,10 +12,10 @@
                     </div>
                 </div>
                 <div>
-                    <a class="text-capitalize view-all-text text-nowrap web-text-primary"
+                    <a class="view-all-btn-yellow"
                        href="{{ route('clearance-sale-products') }}">
                         {{ translate('view_all') }}
-                        <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1 float-left' : 'right ml-1 mr-n1'}}"></i>
+                        <!-- <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1 float-left' : 'right ml-1 mr-n1'}}"></i> -->
                     </a>
                 </div>
             </div>

@@ -27,6 +27,9 @@
     }
     ?>
 
+
+    {{-- Old Design  --}}
+    {{--
     <div class="container py-4 py-lg-5 my-4 text-align-direction">
         <div class="row justify-content-center">
             <div class="{{ $multiColumn ? 'col-md-9' : 'col-md-6' }} login-card">
@@ -206,6 +209,109 @@
             </div>
         </div>
     </div>
+    --}}
+
+    {{-- New Design --}}
+    <div class="container rtl">
+              <nav aria-label="breadcrumb">
+            <style>
+                .breadcrumb-item + .breadcrumb-item::before {
+                    display: none;
+                }
+            </style>
+            <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 3px 0;">
+                <li class="breadcrumb-item d-flex align-items-center ">
+                    <a href="{{route('home')}}" class="breadcrumb-title">
+                        {{translate('home')}}
+                    </a>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                                        <a class="breadcrumb-title" href="{{ route('customer.auth.login') }}"> {{translate('حسابى')}}</a>
+
+               
+                </li>
+            </ol>
+        </nav>
+    <div class="login-split-container container">
+
+        <div class="row w-100 m-0">
+                <div class="col-lg-6 login-form-side">
+        
+
+                <div class="login-form-container">
+                    <h1 class="login-title">تسجيل الدخول</h1>
+                    <p class="login-subtitle">مرحبا بعودتك! سجل الدخول إلى حسابك.</p>
+
+                    <form autocomplete="off" class="login-form mt-4" action="{{ route('customer.auth.login') }}" method="post" id="customer-login-form">
+                        @csrf
+                        <input type="hidden" name="keep_customer_login_redirect_url" value="{{ $keepCustomerLoginRedirectUrl ?? old('keep_customer_login_redirect_url', url()->previous()) }}">
+                        <input type="hidden" name="login_type" value="manual-login">
+
+                        <div class="form-group mb-3">
+                            <label class="form-label">إسم المستخدم او البريد الإلكتروني او رقم الهاتف *</label>
+                            <input class="form-control" type="text" name="user_identity" value="{{ old('user_identity') }}" placeholder="admin" required>
+                        </div>
+
+                        <!-- <div class="custom-control custom-checkbox mb-2">
+                            <input type="checkbox" class="custom-control-input" id="use-password" checked>
+                            <label class="custom-control-label" for="use-password">إستعمال كلمة المرور</label>
+                        </div> -->
+
+                        <div class="form-group mb-3 password-toggle" style="display: block;">
+                            <input class="form-control" name="password" type="password" id="si-password" placeholder="كلمة المرور" required>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="d-flex align-items-center" style="gap: 8px;">
+                                <input type="checkbox" name="remember" id="remember-me" {{ old('remember') ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--web-primary); cursor: pointer;">
+                                <label class="m-0" for="remember-me" style="cursor: pointer; color: var(--web-primary);">تذكرني</label>
+                            </div>
+                            <a class="forgot-password-link" href="{{ route('customer.auth.recover-password') }}">فقدت كلمة المرور الخاصة بك؟</a>
+                        </div>
+
+                        @include('web-views.customer-views.auth.partials._recaptcha')
+
+                        <button class="btn btn-primary btn-login" type="submit">تسجيل الدخول</button>
+
+                        <a href="{{ route('customer.auth.sign-up') }}" class="signup-link">ليس لديك حساب ؟ <span>انشاء حساب</span></a>
+
+                        @if ($customerSocialLogin || ($customerOTPLogin && $customerManualLogin))
+                            <div class="or-divider my-4">
+                                <span>{{ translate('Or_Sign_in_with') }}</span>
+                            </div>
+
+                            <div class="d-flex justify-content-center gap-3">
+                                @if ($customerSocialLogin)
+                                    @foreach ($web_config['customer_social_login_options'] as $socialLoginServiceKey => $socialLoginService)
+                                        @if ($socialLoginService && $socialLoginServiceKey != 'apple')
+                                            <a class="social-login-item" href="{{ route('customer.auth.service-login', $socialLoginServiceKey) }}">
+                                                <img width="24" src="{{ theme_asset(path: 'public/assets/front-end/img/icons/' . $socialLoginServiceKey . '.png') }}" alt="">
+                                            </a>
+                                        @endif
+                                    @endforeach
+                                @endif
+
+                                @if ($customerOTPLogin && $customerManualLogin)
+                                    <a class="social-login-item otp-login-btn" href="javascript:">
+                                        <img width="24" src="{{ theme_asset(path: 'public/assets/front-end/img/icons/otp-login-icon.svg') }}" alt="">
+                                    </a>
+                                @endif
+                            </div>
+                        @endif
+                    </form>
+                </div>
+            </div>
+            <div class="col-lg-6 login-illustration-side">
+                <img src="{{ theme_asset(path: 'public/assets/front-end/img/login-illustration.png') }}" alt="Login Illustration">
+            </div>
+
+        
+        </div>
+    </div>
+    </div>
+
+
 @endsection
 
 @push('script')

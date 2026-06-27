@@ -97,25 +97,25 @@ if (!function_exists('getPriceRangeWithDiscount')) {
             if (isset($product['clearanceSale']) && $product['clearanceSale']) {
                 $discountAmount = getProductPriceByType(product: $product, type: 'discounted_amount', result: 'value', price: $productUnitPrice, from: 'panel');
                 $productDiscountedPrice = setCurrencySymbol(amount: usdToDefaultCurrency(amount: $productUnitPrice - $discountAmount), currencyCode: getCurrencyCode());
-                return '<span class="discounted-unit-price text-primary fs-30 fw-bold lh-1">' . $productDiscountedPrice . '</span>' . '<del class="product-total-unit-price align-middle text-muted opacity-75 fs-20 fw-semibold lh-1">' . setCurrencySymbol(amount: usdToDefaultCurrency(amount: $productUnitPrice), currencyCode: getCurrencyCode()) . '</del>';
+                return '<span class="discounted-unit-price  fs-18 fw-bold lh-1">' . $productDiscountedPrice . '</span>' . '<del class="product-total-unit-price align-middle text-muted opacity-75 fs-15 fw-semibold lh-1">' . setCurrencySymbol(amount: usdToDefaultCurrency(amount: $productUnitPrice), currencyCode: getCurrencyCode()) . '</del>';
             } elseif ($product->discount > 0) {
                 $amount = $productUnitPrice - getProductDiscount(product: $product, price: $productUnitPrice);
                 $productDiscountedPrice = setCurrencySymbol(amount: usdToDefaultCurrency(amount: $amount), currencyCode: getCurrencyCode());
-                return '<span class="discounted-unit-price text-primary fs-30 fw-bold lh-1">' . $productDiscountedPrice . '</span>' . '<del class="product-total-unit-price align-middle text-muted opacity-75 fs-20 fw-semibold lh-1">' . setCurrencySymbol(amount: usdToDefaultCurrency(amount: $productUnitPrice), currencyCode: getCurrencyCode()) . '</del>';
+                return '<span class="discounted-unit-price  fs-18 fw-bold lh-1">' . $productDiscountedPrice . '</span>' . '<del class="product-total-unit-price align-middle text-muted opacity-75 fs-15 fw-semibold lh-1">' . setCurrencySymbol(amount: usdToDefaultCurrency(amount: $productUnitPrice), currencyCode: getCurrencyCode()) . '</del>';
             } else {
-                return '<span class="discounted-unit-price text-primary fs-30 fw-bold lh-1">' . setCurrencySymbol(amount: usdToDefaultCurrency(amount: $productUnitPrice), currencyCode: getCurrencyCode()) . '</span>';
+                return '<span class="discounted-unit-price  fs-30 fw-bold lh-1">' . setCurrencySymbol(amount: usdToDefaultCurrency(amount: $productUnitPrice), currencyCode: getCurrencyCode()) . '</span>';
             }
         } else {
             if (isset($product['clearanceSale']) && $product['clearanceSale']) {
                 $discountAmount = getProductPriceByType(product: $product, type: 'discounted_amount', result: 'value', price: $productUnitPrice);
                 $productDiscountedPrice = webCurrencyConverter(amount: $productUnitPrice - $discountAmount);
-                return '<del class="product-total-unit-price align-middle text-muted opacity-75 fs-20 fw-semibold lh-1">' . webCurrencyConverter(amount: $productUnitPrice) . '</del>' . '<span class="discounted-unit-price text-primary fs-30 fw-bold lh-1">' . $productDiscountedPrice . '</span>';
+                return '<del class="product-total-unit-price align-middle text-muted opacity-75 fs-15 fw-semibold lh-1">' . webCurrencyConverter(amount: $productUnitPrice) . '</del>' . '<span class="discounted-unit-price  fs-18 fw-bold lh-1">' . $productDiscountedPrice . '</span>';
 
             } elseif ($product->discount > 0) {
                 $productDiscountedPrice = webCurrencyConverter(amount: $productUnitPrice - getProductDiscount(product: $product, price: $productUnitPrice));
-                return '<del class="product-total-unit-price align-middle text-muted opacity-75 fs-20 fw-semibold lh-1">' . webCurrencyConverter(amount: $productUnitPrice) . '</del>' . '<span class="discounted-unit-price text-primary fs-30 fw-bold lh-1">' . $productDiscountedPrice . '</span>';
+                return '<del class="product-total-unit-price align-middle text-muted opacity-75 fs-15 fw-semibold lh-1">' . webCurrencyConverter(amount: $productUnitPrice) . '</del>' . '<span class="discounted-unit-price  fs-18 fw-bold lh-1">' . $productDiscountedPrice . '</span>';
             } else {
-                return '<span class="discounted-unit-price text-primary fs-30 fw-bold lh-1">' . webCurrencyConverter(amount: $productUnitPrice) . '</span>';
+                return '<span class="discounted-unit-price  fs-18 fw-bold lh-1">' . webCurrencyConverter(amount: $productUnitPrice) . '</span>';
             }
 
         }

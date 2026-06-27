@@ -58,8 +58,6 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getListWhere(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {
-<<<<<<< Updated upstream
-=======
         $query = $this->prepareOrderQuery($searchValue, $filters, $relations, $orderBy);
         $filters += ['searchValue' => $searchValue];
         return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
@@ -82,13 +80,11 @@ class OrderRepository implements OrderRepositoryInterface
         // Fetch raw group by results to avoid double-counting
         $rows = DB::table('orders')
             ->select('order_status', DB::raw('count(*) as total'))
-            ->where(function ($q) use ($filters) {
-                if (isset($filters['seller_is']) && $filters['seller_is'] != 'all') {
-                    $q->where('seller_is', $filters['seller_is']);
-                }
-                if (isset($filters['order_status']) && $filters['order_status'] != 'all') {
-                    $q->where('order_status', $filters['order_status']);
-                }
+            ->when(isset($filters['seller_is']) && $filters['seller_is'] != 'all', function ($q) use ($filters) {
+                $q->where('seller_is', $filters['seller_is']);
+            })
+            ->when(isset($filters['order_status']) && $filters['order_status'] != 'all', function ($q) use ($filters) {
+                $q->where('order_status', $filters['order_status']);
             })
             ->groupBy('order_status')
             ->get()
@@ -101,7 +97,6 @@ class OrderRepository implements OrderRepositoryInterface
 
     protected function prepareOrderQuery(?string $searchValue = null, array $filters = [], array $relations = [], array $orderBy = [])
     {
->>>>>>> Stashed changes
         $query = $this->order->with($relations)
             ->when(isset($filters['seller_is']) && $filters['seller_is'] != 'all', function ($query) use ($filters) {
                 return $query->where('seller_is', $filters['seller_is']);
@@ -197,12 +192,23 @@ class OrderRepository implements OrderRepositoryInterface
             ->when(!empty($orderBy), function ($query) use ($orderBy) {
                 $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
             });
+        return $query;
+    }
 
+
+    public function getListWhereIn(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $whereIn = [], array $relations = [], array $nullFields = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
+    {
+        $query = $this->prepareOrderWhereInQuery($searchValue, $filters, $whereIn, $relations, $nullFields, $orderBy);
         $filters += ['searchValue' => $searchValue];
         return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
     }
 
-    public function getListWhereIn(array $orderBy = [], ?string $searchValue = null, array $filters = [], array $whereIn = [], array $relations = [], array $nullFields = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
+    public function getCountWhereIn(?string $searchValue = null, array $filters = [], array $whereIn = [], array $nullFields = []): int
+    {
+        return $this->prepareOrderWhereInQuery($searchValue, $filters, $whereIn, [], $nullFields)->count();
+    }
+
+    protected function prepareOrderWhereInQuery(?string $searchValue = null, array $filters = [], array $whereIn = [], array $relations = [], array $nullFields = [], array $orderBy = [])
     {
         $query = $this->order->with($relations)
             ->when(isset($filters['seller_is']) && $filters['seller_is'] != 'all', function ($query) use ($filters) {
@@ -313,14 +319,10 @@ class OrderRepository implements OrderRepositoryInterface
             })
             ->when(!empty($nullFields), function ($query) use ($nullFields) {
                 return $query->whereNull($nullFields);
-            })
-            ->when(!empty($orderBy), function ($query) use ($orderBy) {
-                return $query->orderBy(array_key_first($orderBy), array_values($orderBy)[0]);
             });
-
-        $filters += ['searchValue' => $searchValue];
-        return $dataLimit == 'all' ? $query->get() : $query->paginate($dataLimit)->appends($filters);
+        return $query;
     }
+
 
     public function getListWhereDate(array $filters = [], ?string $dateType = null, array $filterDate = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {

@@ -14,7 +14,25 @@
 @endpush
 
 @section('content')
-    <div class="container py-3" dir="{{ session('direction') }}">
+    <div class="container" dir="{{ session('direction') }}">
+        <nav aria-label="breadcrumb">
+            <style>
+                .breadcrumb-item + .breadcrumb-item::before {
+                    display: none;
+                }
+            </style>
+            <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 3px 0;">
+                <li class="breadcrumb-item d-flex align-items-center ">
+                    <a href="{{route('home')}}" class="breadcrumb-title">
+                        {{translate('الرئيسية')}}
+                    </a>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                    {{$pageTitleContent}}
+                </li>
+            </ol>
+        </nav>
 
         <form method="POST" action="{{ url()->current() }}" class="product-list-filter">
             <input hidden name="offer_type" value="{{ $data['offer_type'] }}">
@@ -23,18 +41,12 @@
             <input hidden name="brand_id" value="{{ request('brand_id') }}">
 
             @csrf
-            @include('web-views.products.partials._product-list-header', [
-                    'pageTitleContent' => $pageTitleContent,
-                    'pageProductsCount' => $products->total(),
-                    'searchBarSection' => true,
-                    'sortBySection' => true,
-                    'showProductsFilter' => true,
-            ])
 
-            <div class="py-3 mb-2 mb-md-4 rtl __inline-35" dir="{{ session('direction') }}">
+
+            <div class=" mb-2 mb-md-4 rtl __inline-35" dir="{{ session('direction') }}">
                 <div class="row">
-                    <aside class="col-lg-3 hidden-xs col-md-3 col-sm-4 SearchParameters __search-sidebar" id="SearchParameters">
-                        <div class="cz-sidebar __inline-35 p-4 overflow-hidden" id="shop-sidebar">
+                    <aside class="col-lg-2 hidden-xs col-md-3 col-sm-4 SearchParameters __search-sidebar" id="SearchParameters">
+                        <div class="cz-sidebar __inline-35 py-4 overflow-hidden" id="shop-sidebar">
                             <div class="cz-sidebar-header p-0">
                                 <button class="close ms-auto fs-18-mobile" type="button" data-dismiss="sidebar" aria-label="Close">
                                     <i class="tio-clear"></i>
@@ -71,7 +83,16 @@
                         <div class="sidebar-overlay"></div>
                     </aside>
 
-                    <section class="col-lg-9">
+                    <section class="col-lg-10">
+                        <div>
+                            @include('web-views.products.partials._product-list-header', [
+                                    'pageTitleContent' => $pageTitleContent,
+                                    'pageProductsCount' => $products->total(),
+                                    'searchBarSection' => true,
+                                    'sortBySection' => true,
+                                    'showProductsFilter' => true,
+                            ])
+                        </div>
                         <div class="row" id="ajax-products-view">
                             @include('web-views.products._ajax-products', ['products' => $products])
                         </div>
@@ -105,3 +126,9 @@
 @push('script')
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/product-list-filter.js') }}"></script>
 @endpush
+<style>
+    .cz-sidebar {
+    border: none !important;
+    background: transparent !important;
+    }
+</style>

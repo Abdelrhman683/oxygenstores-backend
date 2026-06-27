@@ -5,7 +5,6 @@ setInterval(updateFlashDealProgressBar, 10000);
 
 $(document).ready(function () {
     var directionFromSession = $("#direction-from-session").data("value");
-    directionFromSession = directionFromSession === 'rtl' ? true : false;
 
     $(".flash-deal-slider").owlCarousel({
         loop: false,
@@ -383,18 +382,8 @@ $(document).ready(function () {
         $(this).owlCarousel({
             autoplay: true,
             margin: 20,
-            nav: true,
-            navText:
-                directionFromSession === "rtl"
-                    ? [
-                          "<i class='czi-arrow-right'></i>",
-                          "<i class='czi-arrow-left'></i>",
-                      ]
-                    : [
-                          "<i class='czi-arrow-left'></i>",
-                          "<i class='czi-arrow-right'></i>",
-                      ],
-            dots: false,
+            nav: false,
+            dots: true,
             autoplayHoverPause: true,
             rtl: directionFromSession === "rtl",
             responsive: {
@@ -427,14 +416,20 @@ $(document).ready(function () {
                     loop: maxItems > 6
                 },
             },
-            onInitialized: checkNavigationButtons,
+            // onInitialized: checkNavigationButtons,
         });
     })
 
     function checkNavigationButtons(event) {
         var itemCount = event.item.count;
-        let owlNav = $(".owl-nav");
-        itemCount > 1 ? owlNav.show() : owlNav.hide();
+        let owlNav = $(event.target).find(".owl-nav");
+        let settings = $(event.target).data('owl.carousel').settings;
+        
+        if (itemCount > 1 && settings.nav) {
+            owlNav.show();
+        } else {
+            owlNav.hide();
+        }
     }
 
     let isLoopHeroSlider = $(".hero-slider").data('loop')?.toString() === '1';
@@ -532,32 +527,32 @@ $(document).ready(function () {
             
             responsive: {
                 0: {
+                    items: 2,
+                    loop: maxItems > 2
+                },
+                360: {
+                    items: 2,
+                    loop: maxItems > 2
+                },
+                576: {
+                    items: 3,
+                    loop: maxItems > 3
+                },
+                768: {
+                    items: 3,
+                    loop: maxItems > 3
+                },
+                992: {
                     items: 4,
                     loop: maxItems > 4
                 },
-                360: {
+                1200: {
                     items: 5,
                     loop: maxItems > 5
                 },
-                576: {
-                    items: 6,
-                    loop: maxItems > 6
-                },
-                768: {
-                    items: 7,
-                    loop: maxItems > 7
-                },
-                992: {
-                    items: 9,
-                    loop: maxItems > 9
-                },
-                1200: {
-                    items: 11,
-                    loop: maxItems > 11
-                },
                 1400: {
-                    items: 12,
-                    loop: maxItems > 12
+                    items: 5,
+                    loop: maxItems > 5
                 },
             },            
         });
@@ -693,4 +688,111 @@ $(document).ready(function () {
     $(".store-prev").on("click", function () {
         othersStore.trigger("prev.owl.carousel", [600]);
     });
+
+    $(".premium-product-carousel").owlCarousel({
+        loop: false,
+        autoplay: true,
+        margin: 10,
+        nav: false,
+        dots: true,
+        autoplayHoverPause: true,
+        rtl: directionFromSession === "rtl",
+        ltr: directionFromSession === "ltr",
+        responsive: {
+            0: {
+                items: 1.2,
+                margin:5,
+            },
+            375: {
+                items: 2,
+                margin: 5,
+            },
+            540: {
+                items: 2.2,
+                margin: 5,
+            },
+            768: {
+                items: 3.2,
+                margin: 10,
+            },
+            992: {
+                items: 4,
+                margin: 10,
+            },
+            1200: {
+                items: 6,
+                margin: 10,
+            },
+            1400: {
+                items: 6,
+                margin: 10,
+            },
+        },
+    });
+
+    /* =========================================================
+       Recommended Products (Category Tabs) - Owl Carousel & Tabs Logic
+       ========================================================= */
+    const tabBtns = document.querySelectorAll('#recommendedTabsNav .rp-tab-btn');
+    const tabPanes = document.querySelectorAll('#recommendedTabsContent .rp-tab-pane');
+
+    tabBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabPanes.forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            var targetId = btn.getAttribute('data-target');
+            var target = document.getElementById(targetId);
+            if (target) {
+                target.classList.add('active');
+                // Refresh the owl carousel inside the active tab to ensure correct layout
+                $(target).find('.owl-carousel').trigger('refresh.owl.carousel');
+            }
+        });
+    });
+
+    /* =========================================================
+       Order Success Modal & Copy ID Logic
+       ========================================================= */
+    const orderModalEl = document.getElementById('order_successfully');
+    if (orderModalEl) {
+        const orderModal = new bootstrap.Modal(orderModalEl, {
+            backdrop: 'static',
+            keyboard: false
+        });
+        orderModal.show();
+
+        document.querySelectorAll('.copy-order-id').forEach(function(copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                let orderTextEl = this.closest('tr')?.querySelector('.order-id-text');
+                if (!orderTextEl) {
+                    orderTextEl = this.parentElement.querySelector('.order-id-text');
+                }
+                const orderText = orderTextEl?.textContent.trim();
+                if (orderText) {
+                    navigator.clipboard.writeText(orderText).then(() => {
+                        if (typeof toastr !== 'undefined') toastr.success('Order ID copied successfully!');
+                    }).catch(err => {
+                        console.warn('Clipboard error:', err);
+                        if (typeof toastr !== 'undefined') toastr.warning('Unable to copy. Clipboard requires HTTPS or localhost.');
+                    });
+                }
+            });
+        });
+
+        const closeBtn = document.getElementById('modal-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                setTimeout(() => { orderModal.hide(); }, 600);
+            });
+        }
+    }
+
+    /* =========================================================
+       Popup Modal Logic
+       ========================================================= */
+    const popupModal = $('#popup-modal');
+    if (popupModal.length > 0) {
+        popupModal.modal('show');
+    }
 });
