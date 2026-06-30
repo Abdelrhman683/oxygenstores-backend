@@ -155,7 +155,41 @@ class CustomerRepository implements CustomerRepositoryInterface
                 return $query->orderBy('created_at', $filters['sort_by']);
             })
             ->when(isset($filters['sort_by']) && $filters['sort_by'] == 'order_amount', function ($query) use ($filters) {
-                return $query->withSum('orders', 'order_amount')->orderBy('orders_sum_order_amount', 'desc');
+                $startDate = now()->subMonth();
+                $endDate = now();
+                if (isset($filters['order_date']) && !empty($filters['order_date'])) {
+                    $dates = explode(' - ', $filters['order_date']);
+                    if (count($dates) === 2) {
+                        try {
+                            $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', $dates[0])->startOfDay();
+                            $endDate = \Carbon\Carbon::createFromFormat('m/d/Y', $dates[1])->endOfDay();
+                        } catch (\Exception $e) {
+                            // Use default if date format is invalid
+                        }
+                    }
+                }
+
+                $topCustomerIds = \Illuminate\Support\Facades\DB::table('orders')
+                    ->select('customer_id', \Illuminate\Support\Facades\DB::raw('SUM(order_amount) as total_amount'))
+                    ->whereNotNull('customer_id')
+                    ->where('customer_id', '!=', 0)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->groupBy('customer_id')
+                    ->orderBy('total_amount', 'desc')
+                    ->limit(100)
+                    ->pluck('customer_id')
+                    ->toArray();
+
+                if (empty($topCustomerIds)) {
+                    return $query->whereNull('id');
+                }
+
+                $idsString = implode(',', $topCustomerIds);
+                return $query->whereIn('id', $topCustomerIds)
+                    ->withSum(['orders' => function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate]);
+                    }], 'order_amount')
+                    ->orderByRaw("FIELD(id, {$idsString})");
             })
             ->when(isset($filters['avoid_walking_customer']) && $filters['avoid_walking_customer'] == 1, function ($query) use ($filters) {
                 return $query->whereNot('email', 'walking@customer.com');

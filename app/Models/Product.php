@@ -353,6 +353,11 @@ class Product extends Model
         return $this->belongsToMany(Tag::class);
     }
 
+    public function branches(): BelongsToMany
+    {
+        return $this->belongsToMany(Branch::class, 'branch_product', 'product_id', 'branch_id');
+    }
+
     public function taxVats(): MorphMany
     {
         return $this->morphMany(Taxable::class, 'taxable');

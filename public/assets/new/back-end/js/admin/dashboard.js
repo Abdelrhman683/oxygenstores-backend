@@ -249,7 +249,8 @@ $("#statistics_type").on("change", function () {
             "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
         },
     });
-    $.post({
+    $.ajax({
+        type: 'POST',
         url: url,
         data: {
             statistics_type: type,

@@ -62,100 +62,100 @@
         @endif
 
         @include('web-views.partials._category-section-home')
-    @include('web-views.partials._air-conditioner-offers', ['airConditionerProducts' => $airConditionerProducts])
+    @include('web-views.partials._recommended-products')
 
-            @if (count($bannerTypeFooterBanner) > 1)
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">1999 ريال</span>
-                            <del class="premium-price-old">2985 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
 
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
+        @if(getFeaturedDealsProductList() && (count(getFeaturedDealsProductList()) > 0))
+            <section class="featured_deal pb-3">
+                <div class="container">
+                    <div class="__featured-deal-wrap bg--light px-0-mobile">
+                        <div class="d-flex flex-wrap justify-content-between align-items-sm-start gap-8 mb-xxl-4 mb-3">
+                            <div class="w-0 flex-grow-1">
+                                <span class="featured_deal_title font-bold text-dark">{{ translate('featured_deal')}}</span>
+                                <br>
+                                <span class="text-left">{{ translate('see_the_latest_deals_and_exciting_new_offers')}}!</span>
+                            </div>
+                            <div>
+                                <a class="view-all-btn-yellow" href="{{ route('featured-deal-products') }}">
+                                    {{ translate('view_all')}}
+                                    <i class="czi-arrow-{{Session::get('direction') === 'rtl' ? 'left mr-1 ml-n1 mt-1' : 'right ml-1'}}"></i>
+                                </a>
+                            </div>
                         </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة سوبريم">
-                            </a>
+                        <div class="owl-carousel owl-theme new-arrivals-product" data-slide-items="{{ count(getFeaturedDealsProductList()) }}">
+                           @foreach(getFeaturedDealsProductList() as $key=>$product)
+                                @include('web-views.partials._product-card-1',['product'=>$product, 'decimal_point_settings'=>$decimalPointSettings])
+                            @endforeach
                         </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم دولابي (15.4 قدم، 436...)</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">2049 ريال</span>
-                            <del class="premium-price-old">2599 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
                     </div>
                 </div>
-            </div>
+            </section>
+         @endif
 
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة بابين جنرال سوبريم (21 قدم، 594...)</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">2399 ريال</span>
-                            <del class="premium-price-old">2899 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
+        @include('web-views.partials._clearance-sale-products', ['clearanceSaleProducts' => $clearanceSaleProducts])
+
+        @if (isset($bannerTypeMainSectionBanner))
+            <div class="container rtl ">
+                <a href="{{$bannerTypeMainSectionBanner->url}}" target="_blank"
+                    class="cursor-pointer d-block">
+                    <img loading="lazy" class="d-block footer_banner_img __inline-63" alt=""
+                         src="{{ getStorageImages(path:$bannerTypeMainSectionBanner->photo_full_url, type: 'wide-banner') }}">
+                </a>
+            </div>
+        @endif
+
+        @php($businessMode = getWebConfig(name: 'business_mode'))
+        @if ($businessMode == 'multi' && count($topVendorsList) > 0)
+            @include('web-views.partials._top-sellers')
+        @endif
+
+        @include('web-views.partials._deal-of-the-day', ['decimal_point_settings' => $decimalPointSettings])
+
+        <section class="new-arrival-section">
+<!-- 
+            @if ($newArrivalProducts->count() >0 )
+                <div class="container rtl">
+                    <div class="section-header">
+                        <h2 class="arrival-title d-block mb-1">
+                            <div class="text-capitalize">
+                                {{ translate('new_arrivals')}}
+                            </div>
+                        </h2>
                     </div>
                 </div>
+                <div class="container rtl mb-3 overflow-hidden">
+                    <div class="py-2">
+                        <div class="new_arrival_product">
+                            <div class="carousel-wrap">
+                                <div class="owl-carousel owl-theme new-arrivals-product" data-slide-items="{{ count($newArrivalProducts) }}">
+                                    @foreach($newArrivalProducts as $key=> $product)
+                                        @include('web-views.partials._product-card-2',['product'=>$product,'decimal_point_settings'=>$decimalPointSettings])
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif -->
+
+            <div class="container rtl custom_pd ">
+                <div class="row g-3 mx-max-md-0">
+
+                    @if ($bestSellProduct->count() >0)
+                        @include('web-views.partials._best-selling')
+                    @endif
+
+                    @if ($topRatedProducts->count() >0)
+                        @include('web-views.partials._top-rated')
+                    @endif
+                </div>
             </div>
+    </section>
 
-        </div>
-    </div>
-</section>
+@include('web-views.partials._air-conditioner-offers', ['airConditionerProducts' => $airConditionerProducts])
 
 
-    @endif
-    @if (count($bannerTypeFooterBanner) > 1)
+        @if (count($bannerTypeFooterBanner) > 1)
             <div class="container rtl ">
                 <div class="promotional-banner-slider owl-carousel owl-theme">
                     @foreach($bannerTypeFooterBanner as $banner)
@@ -179,26 +179,6 @@
             </div>
         @endif
         @include('web-views.partials._banner-grid')
-<section class="custom-banner-section custom_pd">
-        <div class="promo-wide-banner">
-            <a href="{{ route('products') }}" class="d-block">
-                <img
-                    loading="lazy"
-                    src="{{ theme_asset('public/assets/front-end/img/promo_ban.webp') }}"
-                    alt="Promotional Banner"
-                    class="promo-wide-banner__img"
-                >
-            </a>
-    </div>
-</section>
-        @include('web-views.partials._custom-static-products')
-      @if ($homeCategories->count() > 0)
-            @foreach($homeCategories as $category)
-                @include('web-views.partials._category-wise-product', ['decimal_point_settings'=>$decimalPointSettings])
-            @endforeach
-        @endif
-
-<section class="banner-grid-section">
 @include('web-views.partials._dynamic-category-section', [
     'sectionTitle'    => 'الأكثر مبيعا',
     'sectionProducts' => $bestSellerAllTimeProducts,
@@ -235,12 +215,6 @@
 
 
 <section class="banner-grid-section custom_pd">
-
-        @php($companyReliability = getWebConfig(name: 'company_reliability'))
-        @if($companyReliability != null)
-            @include('web-views.partials._company-reliability')
-        @endif
-    <section class="banner-grid-section custom_pd">
     <div class="container rtl">
         <div class="banner-grid-wrapper">
 
@@ -320,13 +294,7 @@
             </section>
         @endif
 
-
-        @php($companyReliability = getWebConfig(name: 'company_reliability'))
-        @if($companyReliability != null)
-            @include('web-views.partials._company-reliability')
-        @endif
-
-<section class="cat-promo-section  rtl py-4">
+        <section class="cat-promo-section  rtl py-4">
 
         <div class="container">
      <div class="cat-promo-grid">
@@ -358,5 +326,4 @@
     <script src="{{theme_asset(path: 'public/assets/front-end/js/owl.carousel.min.js')}}"></script>
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/home.js') }}"></script>
 @endpush
-
 

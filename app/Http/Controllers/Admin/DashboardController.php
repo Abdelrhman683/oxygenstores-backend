@@ -49,10 +49,10 @@ class DashboardController extends BaseController
      */
     public function index(Request|null $request, ?string $type = null): View|Collection|LengthAwarePaginator|null|callable|RedirectResponse
     {
-        $mostRatedProducts = $this->productRepo->getTopRatedList(filters: ['added_by' => 'admin'])->take(DASHBOARD_DATA_LIMIT);
-        $topSellProduct = $this->productRepo->getTopSellList(filters: ['added_by' => 'in_house'], relations: ['orderDetails', 'refundRequest'])->take(DASHBOARD_TOP_SELL_DATA_LIMIT);
-        $vendorMostRatedProducts = $this->productRepo->getTopRatedList(filters: ['added_by' => 'seller', 'request_status' => 1])->take(DASHBOARD_DATA_LIMIT);
-        $vendorTopSellProduct = $this->productRepo->getTopSellList(filters: ['added_by' => 'seller', 'request_status' => 1], relations: ['orderDetails', 'refundRequest'])->take(DASHBOARD_TOP_SELL_DATA_LIMIT);
+        $mostRatedProducts = $this->productRepo->getTopRatedList(filters: ['added_by' => 'admin'], dataLimit: DASHBOARD_DATA_LIMIT);
+        $topSellProduct = $this->productRepo->getTopSellList(filters: ['added_by' => 'in_house'], relations: ['orderDetails', 'refundRequest'], dataLimit: DASHBOARD_TOP_SELL_DATA_LIMIT);
+        $vendorMostRatedProducts = $this->productRepo->getTopRatedList(filters: ['added_by' => 'seller', 'request_status' => 1], dataLimit: DASHBOARD_DATA_LIMIT);
+        $vendorTopSellProduct = $this->productRepo->getTopSellList(filters: ['added_by' => 'seller', 'request_status' => 1], relations: ['orderDetails', 'refundRequest'], dataLimit: DASHBOARD_TOP_SELL_DATA_LIMIT);
 
         $topCustomer = $this->customerRepo->getListWhereBetween(
             filters: [
@@ -64,41 +64,31 @@ class DashboardController extends BaseController
             relations: [],
             dataLimit: DASHBOARD_DATA_LIMIT,
         );
-        $topRatedDeliveryMan = $this->deliveryManRepo->getTopRatedList(filters: ['seller_id' => 0, 'sort_by' => 'rating'], relations: ['deliveredOrders', 'rating', 'review'], dataLimit: 'all')->take(DASHBOARD_DATA_LIMIT);
+        $topRatedDeliveryMan = $this->deliveryManRepo->getTopRatedList(filters: ['seller_id' => 0, 'sort_by' => 'rating'], relations: ['deliveredOrders', 'rating', 'review'], dataLimit: DASHBOARD_DATA_LIMIT);
         $topVendorByEarning = $this->vendorWalletRepo->getListWhere(orderBy: ['total_earning' => 'desc'], filters: [['column' => 'total_earning', 'operator' => '>', 'value' => 0]], relations: ['seller.shop'])->take(DASHBOARD_DATA_LIMIT);
-        $topVendorListByWishlist = $this->vendorRepo->getTopVendorListByWishlist(relations: ['shop'], dataLimit: 'all')->take(DASHBOARD_DATA_LIMIT);
+        $topVendorListByWishlist = $this->vendorRepo->getTopVendorListByWishlist(relations: ['shop'], dataLimit: DASHBOARD_DATA_LIMIT);
 
         if (empty(session('statistics_type'))) {
             session()->put('statistics_type', 'this_year');
         }
 
-        // Temporary disable dashboard statistics generation for performance testing.
-        $data = array_fill_keys([
-            'order', 'store', 'product', 'customer',
-            'delivered', 'canceled', 'returned', 'failed',
-            'pending', 'confirmed', 'processing', 'out_for_delivery'
-        ], 0);
+        $data = $this->getOrderStatusData();
         $admin_wallet = $this->adminWalletRepo->getFirstWhere(params: ['admin_id' => 1]);
 
         $from = now()->startOfYear()->format('Y-m-d');
         $to = now()->endOfYear()->format('Y-m-d');
         $range = range(1, 12);
         $label = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        // $inHouseOrderEarningArray = $this->getOrderStatisticsData(from: $from, to: $to, range: $range, type: 'month', userType: 'admin');
-        // $vendorOrderEarningArray = $this->getOrderStatisticsData(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
-        // $inHouseEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'admin');
-        // $vendorEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
-        // $commissionEarn = $this->getAdminCommission(from: $from, to: $to, range: $range, type: 'month');
+        $inHouseOrderEarningArray = $this->getOrderStatisticsData(from: $from, to: $to, range: $range, type: 'month', userType: 'admin');
+        $vendorOrderEarningArray = $this->getOrderStatisticsData(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
+        $inHouseEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'admin');
+        $vendorEarning = $this->getEarning(from: $from, to: $to, range: $range, type: 'month', userType: 'seller');
+        $commissionEarn = $this->getAdminCommission(from: $from, to: $to, range: $range, type: 'month');
         $dateType = 'yearEarn';
 
         // Use count helper for customers and ensure statistic arrays are initialized
         $getTotalCustomerCount = $this->customerRepo->getCountWhere(filters: ['avoid_walking_customer' => 1]);
 
-        $inHouseOrderEarningArray = array_fill(0, count($range), 0);
-        $vendorOrderEarningArray = array_fill(0, count($range), 0);
-        $inHouseEarning = array_fill(0, count($range), 0);
-        $vendorEarning = array_fill(0, count($range), 0);
-        $commissionEarn = array_fill(0, count($range), 0);
         $data += [
             'order' => $this->orderRepo->getCountWhere(),
             'brand' => $this->brandRepo->getCountWhere(),
@@ -120,10 +110,6 @@ class DashboardController extends BaseController
             'getTotalDeliveryManCount' => $this->deliveryManRepo->getCountWhere(filters: ['seller_id' => 0]),
         ];
 
-        // Temporary disable statistics display to verify if dashboard performance issue comes from stats rendering
-        $dashboardStatsDisabled = true;
-        $orderStatisticsDisabled = true;
-        $earningStatisticsDisabled = true;
         return view('admin-views.system.dashboard', compact('data', 'inHouseEarning', 'vendorEarning', 'commissionEarn', 'inHouseOrderEarningArray', 'vendorOrderEarningArray', 'label', 'dateType'));
     }
 
@@ -136,7 +122,7 @@ class DashboardController extends BaseController
 
     public function getOrderStatusData(): array
     {
-        $statisticsType = session('statistics_type', 'overall');
+        $statisticsType = session('statistics_type', 'this_year');
         $dateFilters = [];
         if ($statisticsType == 'today') {
             $dateFilters = ['date_type' => 'today'];

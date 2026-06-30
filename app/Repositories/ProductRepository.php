@@ -493,18 +493,18 @@ class ProductRepository implements ProductRepositoryInterface
             ->having('reviews_count', '>', 0)
             ->orderByDesc('reviews_count');
 
-        $result = $query->get();
-
         if ($dataLimit === 'all') {
-            return $result;
+            return $query->get();
         } else {
             $page = $offset ?? 1;
-            $perPage = $dataLimit;
-            $paged = $result->slice(($page - 1) * $perPage, $perPage)->values();
+            $perPage = (int) $dataLimit;
+            // Count via a subquery so we don't load all rows into memory
+            $total = $query->toBase()->getCountForPagination();
+            $items = $query->forPage($page, $perPage)->get();
 
             return new LengthAwarePaginator(
-                $paged,
-                $result->count(),
+                $items,
+                $total,
                 $perPage,
                 $page,
                 ['path' => request()->url(), 'query' => request()->query()]
@@ -541,19 +541,21 @@ class ProductRepository implements ProductRepositoryInterface
                 },
             ])->when(in_array('reviews', $withCount), function ($query) use ($withCount) {
                 return $query->withCount($withCount['reviews']);
-            });
-        $result = $query->get()->sortByDesc('total_qty_sold')->values();
+            })
+            ->orderByDesc('total_qty_sold');
 
         if ($dataLimit === 'all') {
-            return $result;
+            return $query->get();
         } else {
             $page = $offset ?? 1;
-            $perPage = $dataLimit;
-            $paged = $result->slice(($page - 1) * $perPage, $perPage)->values();
+            $perPage = (int) $dataLimit;
+            // Count via a subquery so we don't load all rows into memory
+            $total = $query->toBase()->getCountForPagination();
+            $items = $query->forPage($page, $perPage)->get();
 
             return new LengthAwarePaginator(
-                $paged,
-                $result->count(),
+                $items,
+                $total,
                 $perPage,
                 $page,
                 ['path' => request()->url(), 'query' => request()->query()]

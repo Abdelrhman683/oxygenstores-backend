@@ -26,23 +26,23 @@
                             <div class="min-w-200">
                                 <select class="custom-select w-auto" name="statistics_type" id="statistics_type">
                                     <option value="overall"
-                                        {{ session()->has('statistics_type') && session('statistics_type') == 'overall' ? 'selected' : '' }}>
+                                        {{ session('statistics_type', 'this_year') == 'overall' ? 'selected' : '' }}>
                                         {{ translate('Overall_Statistics') }}
                                     </option>
                                     <option value="today"
-                                        {{ session()->has('statistics_type') && session('statistics_type') == 'today' ? 'selected' : '' }}>
+                                        {{ session('statistics_type', 'this_year') == 'today' ? 'selected' : '' }}>
                                         {{ translate('Today_Statistics') }}
                                     </option>
                                     <option value="this_week"
-                                        {{ session()->has('statistics_type') && session('statistics_type') == 'this_week' ? 'selected' : '' }}>
+                                        {{ session('statistics_type', 'this_year') == 'this_week' ? 'selected' : '' }}>
                                         {{ translate('This_Week_Statistics') }}
                                     </option>
                                     <option value="this_month"
-                                        {{ session()->has('statistics_type') && session('statistics_type') == 'this_month' ? 'selected' : '' }}>
+                                        {{ session('statistics_type', 'this_year') == 'this_month' ? 'selected' : '' }}>
                                         {{ translate('This_Month_Statistics') }}
                                     </option>
                                     <option value="this_year"
-                                        {{ session()->has('statistics_type') && session('statistics_type') == 'this_year' ? 'selected' : '' }}>
+                                        {{ session('statistics_type', 'this_year') == 'this_year' ? 'selected' : '' }}>
                                         {{ translate('This_Year_Statistics') }}
                                     </option>
                                 </select>

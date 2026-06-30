@@ -797,7 +797,11 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getListWhereBetween(array $filters = [], ?string $selectColumn = null, ?string $whereBetween = null, array $whereBetweenFilters = [], array $relations = [], int|string $dataLimit = DEFAULT_DATA_LIMIT, ?int $offset = null): Collection|LengthAwarePaginator
     {
-        $query = $this->order->with($relations)->where($filters)
+        $dbFilters = array_filter($filters, function ($key) {
+            return $key !== 'group_by';
+        }, ARRAY_FILTER_USE_KEY);
+
+        $query = $this->order->with($relations)->where($dbFilters)
             ->whereBetween($whereBetween, $whereBetweenFilters);
 
         if ($selectColumn == 'order_amount') {

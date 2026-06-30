@@ -114,6 +114,9 @@ class DeliveryManRepository implements DeliveryManRepositoryInterface
             ->when(!empty($orderBy), function ($query) use ($orderBy) {
                 return $query->orderBy(key($orderBy), current($orderBy));
             })
+            ->when($dataLimit !== 'all', function ($query) use ($dataLimit) {
+                return $query->limit((int) $dataLimit);
+            })
             ->get();
     }
 
