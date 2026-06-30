@@ -5184,24 +5184,8 @@ justify-content: center;
 }
 */
 
-/* =========================================================
-   Full-Width Promo Banner
-   ========================================================= */
-.promo-wide-banner {
-    overflow: hidden;
-    line-height: 0;
-}
 
-.promo-wide-banner__img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform 0.4s ease;
-}
 
-.promo-wide-banner:hover .promo-wide-banner__img {
-    transform: scale(1.02);
-}
 
 
 
@@ -5244,36 +5228,8 @@ justify-content: center;
         -o-border-radius: 0px;
 }
 }
-.custom-banner-section{
-   height: 80vh;
-}
-@media (max-width: 768px) {
-    .custom-banner-section {
-        height: 35vh;
-    }
-}
 
-@media (max-width: 480px) {
-    .custom-banner-section {
-        height: 25vh;
-    }
-}
-.promo-wide-banner{
-    width: 100%;
-    overflow: hidden;
-  
-}
 
-.promo-wide-banner__img{
-    max-width: 100%;
-    object-fit: cover;
-    display: block;
-
-}
-
-.promo-wide-banner:hover .promo-wide-banner__img{
-    transform: scale(1.02);
-}
 
 .breadcrumb-title ,
 .breadcrumb-item.active{

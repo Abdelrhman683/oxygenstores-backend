@@ -94,15 +94,6 @@
 
         @include('web-views.partials._clearance-sale-products', ['clearanceSaleProducts' => $clearanceSaleProducts])
 
-        @if (isset($bannerTypeMainSectionBanner))
-            <div class="container rtl ">
-                <a href="{{$bannerTypeMainSectionBanner->url}}" target="_blank"
-                    class="cursor-pointer d-block">
-                    <img loading="lazy" class="d-block footer_banner_img __inline-63" alt=""
-                         src="{{ getStorageImages(path:$bannerTypeMainSectionBanner->photo_full_url, type: 'wide-banner') }}">
-                </a>
-            </div>
-        @endif
 
         @php($businessMode = getWebConfig(name: 'business_mode'))
         @if ($businessMode == 'multi' && count($topVendorsList) > 0)
@@ -814,17 +805,17 @@
     </div>
 </div>
 </section>
-<section class="custom-banner-section custom_pd">
-        <div class="promo-wide-banner">
-            <a href="{{ route('products') }}" class="d-block">
-                <img
-                    loading="lazy"
-                    src="{{ theme_asset('public/assets/front-end/img/promo_ban.webp') }}"
-                    alt="Promotional Banner"
-                    class="promo-wide-banner__img"
-                >
-            </a>
-    </div>
+<section class="custom_pd">
+
+        @if (isset($bannerTypeMainSectionBanner))
+            <div class=" ">
+                <a href="{{$bannerTypeMainSectionBanner->url}}" target="_blank"
+                    class="cursor-pointer d-block">
+                    <img loading="lazy" class="d-block footer_banner_img " alt=""
+                         src="{{ getStorageImages(path:$bannerTypeMainSectionBanner->photo_full_url, type: 'wide-banner') }}">
+                </a>
+            </div>
+        @endif
 </section>
         @include('web-views.partials._custom-static-products')
       @if ($homeCategories->count() > 0)
