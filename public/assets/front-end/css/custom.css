@@ -3039,7 +3039,7 @@ body {
 
 /* Bottom Navbar Categories Style */
 .bottom_navbar {
-    background-color: #FCD535 !important;
+        background-color: #ffe14d !important;
     border: none !important;
     padding: 0 !important;
 }
@@ -3240,9 +3240,14 @@ body {
         gap: 8px;
     }
 }
+@media (max-width: 991px) {
+.top-navbar-row1 {
+    padding: 0px 15px;
+}
+}
 
 .top-navbar-row1 {
-    padding: 8px 15px;
+    padding: 17px 15px;
     width: 100%;
     box-sizing: border-box;
 }
