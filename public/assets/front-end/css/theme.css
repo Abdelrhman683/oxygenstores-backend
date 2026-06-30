@@ -16211,7 +16211,7 @@ a.badge-shadow:hover {
 }
 
 .modal-quick-view .modal-dialog {
-    max-width: 1140px !important;
+    max-width: 880px !important;
 }
 
 @media (min-width: 576px) {

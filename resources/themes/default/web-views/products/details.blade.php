@@ -456,7 +456,7 @@
                                                         </button>
                                                     @endif
                                                 </div>
-
+<!-- 
                                                 @if(($product['product_type'] == 'physical'))
                                                     <div
                                                         class="product-restock-request-section collapse" {!! $firstVariationQuantity <= 0 ? 'style="display: block;"' : '' !!}>
@@ -470,7 +470,7 @@
                                                             {{ translate('Request_Restock') }}
                                                         </button>
                                                     </div>
-                                                @endif
+                                                @endif -->
                                                 <!-- <button type="button" data-product-id="{{ $product['id'] }}"
                                                         class="btn __text-18px border product-action-add-wishlist">
                                                     <i class="fa {{($wishlistStatus == 1?'fa-heart':'fa-heart-o') }} wishlist_icon_{{ $product['id'] }} web-text-primary"

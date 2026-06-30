@@ -865,9 +865,7 @@ span.badge-accent:hover {
     font-size: 14px !important;
 }
 
-.modal-quick-view .modal-dialog {
-    max-width: 850px !important;
-}
+
 
 .modal-quick-view .product-title2 {
     font-family: "Roboto", sans-serif !important;
@@ -5349,9 +5347,7 @@ width: max-content;
     border-bottom: 1px solid #EEEEEE;
     padding-bottom: 20px;
 }
-.summary_det {
-    margin: .5rem 0;
-}
+
 .summary_det p {
         display: block;
     font-size: 12px;
@@ -5560,6 +5556,10 @@ content: "";
         color:#1c344a;
         line-height:2;
         font-size:12px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
     }
 
 
@@ -5567,6 +5567,9 @@ content: "";
     .label{
         font-weight:700;
     }
+.specs-list li { display: inline; }
+.specs-list li + li::before { content: "•"; margin: 0 0px; color: #999; }
+
 
     @media (max-width:768px){
         .specs-box{
@@ -5581,10 +5584,10 @@ content: "";
    
     }
 .payment-methods-modal{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-
-    width: 100%;
+     display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap
 }
 
 .payment-methods-modal .payment-item{
@@ -5594,34 +5597,21 @@ content: "";
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 60px;
     padding: 8px;
 }
 
 .payment-methods-modal .payment-item img{
     width: 100%;
-    max-height: 50px;
+    max-height: 40px;
     object-fit: contain;
 }
 
-@media (max-width: 768px){
-    .payment-methods-modal .payment-methods{
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-    }
-
-   .payment-methods-modal  .payment-item{
-        min-height: 50px;
-    }
-}
 
 @media (max-width: 480px){
-   .payment-methods-modal  .payment-methods{
-        grid-template-columns: 1fr;
-    }
+
 
     .payment-methods-modal .payment-item img{
-        max-height: 45px;
+        max-height: 30px;
     }
 }
 
