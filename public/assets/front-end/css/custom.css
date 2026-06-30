@@ -4908,23 +4908,22 @@ justify-content: center;
 }
 
 .premium-add-to-cart {
-    width: 100%;
     background: var(--web-primary);
-    color: #fff;
-    border: none;
+    text-transform: uppercase;
     border-radius: 8px;
+    text-align: center;
     padding: 10px;
-    font-weight: 700;
+    font-weight: 400;
+    font-size: 15px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 10px;
-    cursor: pointer;
-    transition: all 0.3s;
-    -webkit-transition: all 0.3s;
-    -moz-transition: all 0.3s;
-    -ms-transition: all 0.3s;
-    -o-transition: all 0.3s;
+    align-items: center;
+    height: auto;
+    line-height: unset;
+    width: 100%;
+    color: #fff;
+    border: 1px solid var(--web-primary);
+    position: relative;
 }
 
 .premium-add-to-cart:hover {

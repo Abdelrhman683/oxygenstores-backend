@@ -1036,7 +1036,6 @@
                 <div class="col-lg-3">
                    
                         <div class="product-details-shipping-details px-3 py-3">
-                           <p class="stock out-of-stock-danger">غير متوفر في المخزون</p>
                                     <div class="shipping-details-bottom-border">
                                         <div class="">
                                             <span class="store_name">البائع :</span>
@@ -1046,7 +1045,13 @@
                                                  src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}">
                                            <a href="#" class="store_bold">   <span>متجر ذرة أكسجين اللإلكتروني</span></a>
                                         </div>
+                                   
+
                                     </div>
+                                         <div>
+                                           <p class="stock out-of-stock-danger">غير متوفر في المخزون</p>
+
+                                        </div>
                                        <div class="d-flex align-items-center gap-4">
                                                         <div class="product-description-label __color-9B9B9B fs-14">
                                                             {{ translate('qty') }}
