@@ -5454,6 +5454,7 @@ content: "";
     font-weight:600;
     text-align:right;
 }
+
 #specifications .specs-table{
     width:100%;
 
@@ -5570,11 +5571,23 @@ content: "";
 .specs-list li + li::before { content: "•"; margin: 0 0px; color: #999; }
 
 
-    @media (max-width:768px){
+    @media (max-width:767px){
         .specs-box{
             padding:15px;
         }
-
+.shipping-details-bottom-border {
+justify-content: start;
+}
+.product-details-shipping-details .quantity-box
+ {
+    width: 50%;
+}
+.shipping-info-card {
+    background-color: rgb(252, 246, 215);
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
         .specs-list{
             font-size:15px;
             line-height:1.9;
