@@ -9,7 +9,26 @@
 
 @section('content')
     @php($billingInputByCustomer=getWebConfig(name: 'billing_input_by_customer'))
-    <div class="container py-4 pt-3 rtl __inline-56 px-0 px-md-3 text-align-direction">
+    <div class="container text-align-direction">
+                      <nav aria-label="breadcrumb">
+            <style>
+                .breadcrumb-item + .breadcrumb-item::before {
+                    display: none;
+                }
+            </style>
+            <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 3px 0;">
+                <li class="breadcrumb-item d-flex align-items-center ">
+                    <a href="{{route('home')}}" class="breadcrumb-title">
+                        {{translate('الرئيسية')}}
+                    </a>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                   {{translate('إتمام الطلب')}}
+
+                </li>
+            </ol>
+        </nav>
         <div class="row mx-max-md-0">
             <section class="col-lg-8 px-max-md-0">
                 <div class="checkout_details">

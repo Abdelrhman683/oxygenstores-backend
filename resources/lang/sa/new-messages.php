@@ -10236,4 +10236,5 @@ return [
 	"sort_by_oldest" => "Sort by oldest",
 	"Why_shop_with_us_?" => "Why shop with us  ",
 	"Please_update_address_information" => "Please update address information",
+	"إتمام_الطلب" => "إتمام الطلب",
 ];

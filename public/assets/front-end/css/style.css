@@ -1490,16 +1490,16 @@ a {
     object-fit: cover;
 }
 
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
     .checkout_details {
         padding-right: 20px;
     }
-}
-@media (min-width: 1200px) {
+} */
+/* @media (min-width: 1200px) {
     .checkout_details {
         padding-right: 40px;
     }
-}
+} */
 .checkout_details .steps-light .step-item:hover {
     color: #000;
 }
