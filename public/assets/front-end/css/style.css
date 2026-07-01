@@ -11277,3 +11277,64 @@ input[type="checkbox"] {
         opacity: 0.6;
     }
 }
+.kr-checkout-options {
+    max-width: 100%;
+}
+
+.kr-option-box {
+    background: #5b7993;
+    border-radius: 6px;
+    border-right: 5px solid #111;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
+}
+
+.kr-option-content {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    text-align: start;
+}
+
+.kr-option-title {
+    color: #fff;
+    font-size: 1rem;
+
+}
+
+.kr-option-link {
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+        text-decoration: underline;
+    text-decoration-thickness: 0;
+    text-underline-offset: 3px;
+    text-decoration-style: dashed;
+}
+
+.kr-option-link:hover {
+    color: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+    .kr-option-box {
+        padding: 10px 15px;
+    }
+
+    .kr-option-title,
+    .kr-option-link {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kr-option-title,
+    .kr-option-link {
+        font-size: 14px;
+    }
+}

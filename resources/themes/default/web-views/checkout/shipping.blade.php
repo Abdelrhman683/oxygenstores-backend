@@ -29,6 +29,33 @@
                 </li>
             </ol>
         </nav>
+        <div class="kr-checkout-options container py-3">
+
+    <div class="kr-option-box mb-3">
+        <div class="kr-option-content">
+            <span class="kr-option-title">
+                عميل سابق؟
+            </span>
+
+            <a href="#" class="kr-option-link">
+                انقر هنا لتسجيل الدخول
+            </a>
+        </div>
+    </div>
+
+    <div class="kr-option-box">
+        <div class="kr-option-content">
+            <span class="kr-option-title">
+                هل لديك قسيمة؟
+            </span>
+
+            <a href="#" class="kr-option-link">
+                انقر هنا لإدخال رمز القسيمة
+            </a>
+        </div>
+    </div>
+
+</div>
         <div class="row mx-max-md-0">
             <section class="col-lg-8 px-max-md-0">
                 <div class="checkout_details">
