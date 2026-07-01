@@ -15579,7 +15579,7 @@ a.nav-link:hover .media-tab-media {
 }
 
 .breadcrumb-item > a:hover {
-    color: #fe696a;
+    color: var(--web-primary);
     text-decoration: none;
 }
 

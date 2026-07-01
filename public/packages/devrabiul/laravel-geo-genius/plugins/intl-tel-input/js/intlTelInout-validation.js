@@ -286,9 +286,9 @@ function initializeIntlTelInput() {
     const onlyCountries = parseCountries(configDataset.onlyCountriesArray);
     const onlyCountriesMode = toBool(configDataset.onlyCountriesMode);
 
-    // choose detected_country first, fallback to initial_country, then "us"
+    // choose detected_country first, fallback to initial_country, then "sa"
     const defaultCountry =
-        (configDataset.detectedCountry || configDataset.initialCountry || "us").toLowerCase();
+        (configDataset.detectedCountry || configDataset.initialCountry || "sa").toLowerCase();
 
     inputs.forEach(input => {
         const iti = window.intlTelInput(input, {
@@ -509,7 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     // Read from data-* attributes
                     const dataValue = input.getAttribute('data-value') || "";
-                    const dataCountry = input.getAttribute('data-country') || "bd";
+                    const dataCountry = input.getAttribute('data-country') || "sa";
 
                     if (dataValue) {
                         iti.setCountry(dataCountry);       // set country first

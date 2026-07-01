@@ -509,6 +509,8 @@
 
 @push('script')
     <script>
+
+        
         "use strict";
         const deliveryRestrictedCountries = @json($countriesName);
         function deliveryRestrictedCountriesCheck(countryOrCode, elementSelector, inputElement) {
