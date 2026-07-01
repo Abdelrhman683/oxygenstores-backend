@@ -268,7 +268,7 @@
                         @endif
                     @endif
 
-                    @if($billingInputByCustomer)
+                    <!-- @if($billingInputByCustomer)
                         <div>
                             <div class="billing-methods_label d-flex flex-wrap justify-content-between gap-2 mt-4 pb-3 px-3 px-md-0">
                                 <h4 class="mb-0 fs-18 text-capitalize">{{ translate('billing_address')}}</h4>
@@ -492,7 +492,7 @@
                                 </div>
                             </div>
                         @endif
-                    @endif
+                    @endif -->
                 </div>
             </section>
             @include('web-views.partials._order-summary')
