@@ -1,4 +1,22 @@
-<h3 class="mt-4 mb-3 text-center text-lg-left mobile-fs-20 fs-18 font-bold">{{ translate('shopping_cart')}}</h3>
+                    <nav aria-label="breadcrumb">
+            <style>
+                .breadcrumb-item + .breadcrumb-item::before {
+                    display: none;
+                }
+            </style>
+            <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 3px 0;">
+                <li class="breadcrumb-item d-flex align-items-center ">
+                    <a href="{{route('home')}}" class="breadcrumb-title">
+                        {{translate('الرئيسية')}}
+                    </a>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                    {{ translate('shopping_cart')}}
+                </li>
+            </ol>
+        </nav>
+<h3 class=" mb-3 text-center mobile-fs-20 fs-30 font-bold">{{ translate('shopping_cart')}}</h3>
 
 @php($shippingMethod=getWebConfig(name: 'shipping_method'))
 @php($cart=\App\Utils\CartManager::getCartListGroupQuery())
