@@ -148,7 +148,7 @@
 <script src="{{ theme_asset(path: 'public/assets/front-end/js/slick.js') }}"></script>
 <script src="{{ theme_asset(path: 'public/assets/front-end/js/sweet_alert.js') }}"></script>
 <script src="{{ theme_asset(path: "public/assets/back-end/js/toastr.js") }}"></script>
-<script src="{{ theme_asset(path: 'public/assets/front-end/js/custom.js') }}"></script>
+<script src="{{ theme_asset(path: 'public/assets/front-end/js/custom.js') }}?v=1.3"></script>
 
 {!! Toastr::message() !!}
 

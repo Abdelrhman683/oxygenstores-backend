@@ -9,7 +9,9 @@
 define('LARAVEL_START', microtime(true));
 
 /*identify the domain pointer*/
-const DOMAIN_POINTED_DIRECTORY = 'root';
+if (!defined('DOMAIN_POINTED_DIRECTORY')) {
+    define('DOMAIN_POINTED_DIRECTORY', 'root');
+}
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader

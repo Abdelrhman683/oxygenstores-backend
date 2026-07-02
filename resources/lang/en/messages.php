@@ -1,6 +1,7 @@
 <?php
 
 return [
+    "exclusive_offers" => "Exclusive Offers",
     "i_Accept" => "i Accept",
     "no_thanks" => "no thanks",
     "Your_Privacy_Matter" => "Your Privacy Matter",

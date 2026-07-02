@@ -41,6 +41,24 @@
                 }
             }
         }
+
+        $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
+        $filteredChoiceOptions = [];
+        $rawChoiceOptions = json_decode($product->choice_options);
+        if (is_array($rawChoiceOptions)) {
+            foreach ($rawChoiceOptions as $choice) {
+                $title = trim($choice->title);
+                $optionsCount = count($choice->options);
+                if (in_array($title, $specTitles) || $optionsCount <= 1) {
+                    $dynamicAttributes[] = [
+                        'label' => $title,
+                        'value' => implode(', ', $choice->options)
+                    ];
+                } else {
+                    $filteredChoiceOptions[] = $choice;
+                }
+            }
+        }
     @endphp
     <div class="__inline-23">
         <div class="container-fluid  rtl text-align-direction">
@@ -239,11 +257,26 @@
                                               
                                                 </h3>
                                                 <div class="summary_det">
-                                                    <p>{{ $productSummary }}</p>
+                                                    <p>
+                                                        @if($product->brand && $product->brand->slug)
+                                                            المنتج من علامة 
+                                                            <a href="{{ route('brand-products', ['slug' => $product->brand->slug]) }}" class="web-text-primary font-semibold hover:underline">
+                                                                {{ $brandName }}
+                                                            </a>
+                                                        @else
+                                                            {{ $productSummary }}
+                                                        @endif
+                                                    </p>
                                                 </div>
                                                 @if($brandImage)
                                                     <div class="brand">
-                                                        <img loading="lazy" src="{{ $brandImage }}" alt="{{ $brandName }}">
+                                                        @if($product->brand && $product->brand->slug)
+                                                            <a href="{{ route('brand-products', ['slug' => $product->brand->slug]) }}">
+                                                                <img loading="lazy" src="{{ $brandImage }}" alt="{{ $brandName }}">
+                                                            </a>
+                                                        @else
+                                                            <img loading="lazy" src="{{ $brandImage }}" alt="{{ $brandName }}">
+                                                        @endif
                                                     </div>
                                                 @endif
                                                 <!-- <div class="product-details__short-description">
@@ -262,9 +295,11 @@
                                                     </div>
                                                 @endif
                                                 </div>
-                                                <div class="shipping-alert">
-                                                    {{ $shippingMessage }}
-                                                </div>
+                                                @if($product->current_stock <= 0)
+                                                    <div class="shipping-alert">
+                                                        {{ $shippingMessage }}
+                                                    </div>
+                                                @endif
                                             </div>
 
                                             @if($installmentAmount)
@@ -357,7 +392,7 @@
                                                 @endforeach
                                             @endif
 
-                                            @foreach (json_decode($product->choice_options) as $key => $choice)
+                                             @foreach ($filteredChoiceOptions as $key => $choice)
                                                 <div class="row flex-start mx-0  gap-3 flex-nowrap">
                                                     <div
                                                         class="product-description-label fs-14 __color-9B9B9B text-capitalize flex-shrink-0">{{ $choice->title }}
@@ -1045,17 +1080,30 @@
                 <div class="col-lg-3">
                    
                         <div class="product-details-shipping-details px-3 py-3">
-                           <p class="stock {{ $product->current_stock > 0 ? 'in-stock' : 'out-of-stock-danger' }}">
-                               {{ $product->current_stock > 0 ? 'متوفر في المخزون' : 'غير متوفر في المخزون' }}
-                           </p>
+                           @if($product->current_stock <= 0)
+                               <p class="stock out-of-stock-danger">
+                                   غير متوفر في المخزون
+                               </p>
+                           @endif
                                     <div class="shipping-details-bottom-border">
                                         <div class="">
+                                            <?php
+                                                 $shopName = '';
+                                                 $shopRoute = '#';
+                                                 
+                                                 if ($product->added_by == 'seller' && isset($product->seller->shop)) {
+                                                     $shopName = $product->seller->shop->name;
+                                                     $shopRoute = route('vendor-shop', ['slug' => $product->seller->shop->slug]);
+                                                 } else {
+                                                     $shopName = getInHouseShopConfig(key: 'name') ?: 'متجر ذرة أكسجين الإلكتروني';
+                                                     $shopRoute = route('vendor-shop', ['slug' => getInHouseShopConfig(key: 'slug')]);
+                                                 }
+                                             ?>
                                             <span class="store_name">البائع :</span>
-                                            <img
-                                                class="store_img"
-                                                  loading="lazy"
-                                                 src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}">
-                                           <a href="#" class="store_bold">   <span>متجر ذرة أكسجين اللإلكتروني</span></a>
+                                             <a href="{{ $shopRoute }}" class="store_bold d-inline-flex align-items-center gap-1">
+                                                 <img class="store_img" loading="lazy" src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}">
+                                                 <span>{{ $shopName }}</span>
+                                             </a>
                                         </div>
                                     </div>
                                        <div class="d-flex align-items-center gap-4">

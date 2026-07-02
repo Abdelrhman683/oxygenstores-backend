@@ -283,14 +283,20 @@
                 <label class="form-label" for="customer">{{ translate('Customer') }}</label>
                 <input type="hidden" id='customer_id' name="customer_id"
                     value="{{ request('customer_id') ? request('customer_id') : 'all' }}">
-                <select id="customer_id_value" class="custom-select">
-                    <option value="">{{translate('All_Customer')}}</option>
-                    @foreach($customers as $customer)
-                        <option value="{{ $customer['id'] }}"
-                            {{ request('customer_id') == $customer['id'] ? 'selected' : '' }}>
-                            {{ $customer['text'] }}
+                <select id="customer_id_value"
+                        data-placeholder="
+                        @if($customer == 'all')
+                            {{translate('All_Customer')}}
+                        @else
+                            {{$customer['name'] ?? $customer['f_name'].' '.$customer['l_name'].' '.'('.$customer['phone'].')'}}
+                        @endif"
+                        class="js-data-example-ajax form-control form-ellipsis">
+                    <option value="all">{{translate('All_Customer')}}</option>
+                    @if($customer != 'all')
+                        <option value="{{ $customer['id'] }}" selected>
+                            {{$customer['name'] ?? $customer['f_name'].' '.$customer['l_name'].' '.'('.$customer['phone'].')'}}
                         </option>
-                    @endforeach
+                    @endif
                 </select>
             </div>
         </div>

@@ -265,7 +265,7 @@ if (!function_exists('getCurrencyCode')) {
     function getCurrencyCode(string $type = 'default'): string
     {
         if ($type == 'web') {
-            $currencyCode = session('currency_code');
+            $currencyCode = session('currency_code') ?: getCurrencyCode(type: 'default');
         } else {
             if (session()->has('system_default_currency_info')) {
                 $currencyCode = session('system_default_currency_info')->code ?? 'USD';

@@ -214,6 +214,60 @@
 ])
 
 
+@if(isset($bannerTypeExclusiveOffers) && $bannerTypeExclusiveOffers->count() > 0)
+<section class="banner-grid-section custom_pd">
+    <div class="container rtl">
+        <div class="banner-grid-wrapper">
+            @php($exclusiveOffers = $bannerTypeExclusiveOffers->values())
+
+            <div class="banner-grid-row top-row">
+                @if(isset($exclusiveOffers[0]))
+                    @php($banner = $exclusiveOffers[0])
+                    <a href="{{ $banner->url }}" class="banner-grid-card d-block"
+                         style="background-image:url('{{ getStorageImages(path:$banner->photo_full_url, type: 'banner') }}'); background-size:cover; background-position:center;">
+                        <div class="banner-card-overlay"></div>
+                        <div class="banner-wave-pattern"></div>
+                        <div class="banner-card-content">
+                            <h3 class="banner-card-title">{{ $banner->title }}</h3>
+                            <p class="banner-card-desc">{{ $banner->sub_title }}</p>
+                        </div>
+                    </a>
+                @endif
+
+                @if(isset($exclusiveOffers[1]))
+                    @php($banner = $exclusiveOffers[1])
+                    <a href="{{ $banner->url }}" class="banner-grid-card d-block"
+                         style="background-image:url('{{ getStorageImages(path:$banner->photo_full_url, type: 'banner') }}'); background-size:cover; background-position:center;">
+                        <div class="banner-card-overlay"></div>
+                        <div class="banner-wave-pattern"></div>
+                        <div class="banner-card-content">
+                            <h3 class="banner-card-title">{{ $banner->title }}</h3>
+                            <p class="banner-card-desc">{{ $banner->sub_title }}</p>
+                        </div>
+                    </a>
+                @endif
+
+            </div>
+
+            @if(isset($exclusiveOffers[2]))
+                @php($banner = $exclusiveOffers[2])
+                <div class="banner-grid-row bottom-row">
+                    <a href="{{ $banner->url }}" class="banner-grid-wide d-block"
+                         style="background-image:url('{{ getStorageImages(path:$banner->photo_full_url, type: 'banner') }}'); background-size:cover; background-position:center;">
+                        <div class="banner-card-overlay"></div>
+                        <div class="banner-wave-pattern"></div>
+                        <div class="banner-card-content">
+                            <h3 class="banner-card-title">{{ $banner->title }}</h3>
+                            <p class="banner-card-desc">{{ $banner->sub_title }}</p>
+                        </div>
+                    </a>
+                </div>
+            @endif
+
+        </div>
+    </div>
+</section>
+@else
 <section class="banner-grid-section custom_pd">
     <div class="container rtl">
         <div class="banner-grid-wrapper">
@@ -221,7 +275,7 @@
             <div class="banner-grid-row top-row">
 
                 <div class="banner-grid-card "
-                     style="background-image:url('assets/front-end/img/Group-2-1.webp'); background-size:cover; background-position:center;">
+                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-2-1.webp') }}'); background-size:cover; background-position:center;">
                     <div class="banner-card-overlay"></div>
                     <div class="banner-wave-pattern"></div>
                     <div class="banner-card-content">
@@ -231,7 +285,7 @@
                 </div>
 
                 <div class="banner-grid-card "
-                     style="background-image:url('assets/front-end/img/Group-1-1.webp'); background-size:cover; background-position:center;">
+                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-1-1.webp') }}'); background-size:cover; background-position:center;">
                     <div class="banner-card-overlay"></div>
                     <div class="banner-wave-pattern"></div>
                     <div class="banner-card-content">
@@ -245,7 +299,7 @@
             <div class="banner-grid-row bottom-row">
 
                 <div class="banner-grid-wide "
-                     style="background-image:url('assets/front-end/img/Group-3.webp'); background-size:cover; background-position:center;">
+                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-3.webp') }}'); background-size:cover; background-position:center;">
                     <div class="banner-card-overlay"></div>
                     <div class="banner-wave-pattern"></div>
                     <div class="banner-card-content">
@@ -259,6 +313,7 @@
         </div>
     </div>
 </section>
+@endif
         @if($web_config['brand_setting'] && $brands->count() > 0)
             <section class="container rtl custom_pd">
 

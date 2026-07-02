@@ -508,7 +508,7 @@ class CartManager
                 ];
             }
 
-            if ($product['product_type'] == 'physical' && $shippingType == 'order_wise') {
+            if ($product['product_type'] == 'physical' && $shippingType == 'order_wise' && $request['buy_now'] == 1) {
                 if ($request['shipping_method_exist'] && $request['shipping_method_id'] && count($sellerShippingList) > 0) {
                     $cart->update(['is_checked' => 1]);
                     $cartGroupIds = Cart::where(['customer_id' => ($user == 'offline' ? $guestId : $user['id']), 'is_guest' => ($user == 'offline' ? 1 : 0)])

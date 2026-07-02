@@ -197,6 +197,11 @@ class CartController extends Controller
             Toastr::warning($cart['message']);
             return back();
         }
+
+        $cart['cart_count'] = CartManager::getCartListQuery()->count();
+        $cart['cart_html'] = view(VIEW_FILE_NAMES['products_cart_partials'])->render();
+        $cart['mobile_nav'] = view(VIEW_FILE_NAMES['products_mobile_nav_partials'])->render();
+
         return response()->json($cart);
 
     }
@@ -242,6 +247,7 @@ class CartController extends Controller
         $user = Helpers::getCustomerInformation();
 
         Cart::where(['id' => $request->key, 'customer_id' => ($user == 'offline' ? session('guest_id') : auth('customer')->id())])->delete();
+        cacheRemoveByType(type: 'carts');
 
         session()->forget('coupon_code');
         session()->forget('coupon_type');
@@ -257,6 +263,9 @@ class CartController extends Controller
             'data' => view(VIEW_FILE_NAMES['products_cart_details_partials'], compact('request'))->render(),
             'message' => translate('Item_has_been_removed_from_cart'),
             'cartList' => $cart,
+            'cart_count' => CartManager::getCartListQuery()->count(),
+            'cart_html' => view(VIEW_FILE_NAMES['products_cart_partials'])->render(),
+            'mobile_nav' => view(VIEW_FILE_NAMES['products_mobile_nav_partials'])->render(),
         ]);
     }
 

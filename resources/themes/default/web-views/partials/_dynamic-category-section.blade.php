@@ -51,12 +51,51 @@
                                         }
                                     }
                                 @endphp
-                                @if($product->discount > 0)
-                                    <del class="premium-price-old">{{ number_format($product->unit_price, 2) }}</del>
-                                @endif
-                                <span class="premium-price-new">{{ number_format($finalPrice, 2) }}</span>
-                            </div>
-                        </div>
+                                 @if($product->discount > 0)
+                                     <del class="premium-price-old">{{ webCurrencyConverter(amount: $product->unit_price) }}</del>
+                                 @endif
+                                 <span class="premium-price-new">{{ webCurrencyConverter(amount: $finalPrice) }}</span>
+                             </div>
+                             @php
+                                 $hasVariations = false;
+                                 if (isset($product->choice_options)) {
+                                     $choices = json_decode($product->choice_options, true);
+                                     $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
+                                     if (is_array($choices)) {
+                                         foreach ($choices as $choice) {
+                                             $title = trim($choice['title'] ?? '');
+                                             $optionsCount = count($choice['options'] ?? []);
+                                             if (!in_array($title, $specTitles) && $optionsCount > 1) {
+                                                 $hasVariations = true;
+                                                 break;
+                                             }
+                                         }
+                                     }
+                                 }
+                                 if (isset($product->colors)) {
+                                     $colors = json_decode($product->colors, true);
+                                     if (is_array($colors) && count($colors) > 0) {
+                                         $hasVariations = true;
+                                     }
+                                 }
+                             @endphp
+                             @if($hasVariations)
+                                 <button class="premium-add-to-cart action-product-quick-view" type="button" data-product-id="{{ $product->id }}">
+                                     <i class="fa fa-shopping-cart"></i>
+                                     <span class="ms-1">أضف للعربة</span>
+                                 </button>
+                             @else
+                                 <form class="addToCartDynamicForm d-none" id="add-to-cart-form-dynamic-{{ $product->id }}">
+                                     @csrf
+                                     <input type="hidden" name="id" value="{{ $product->id }}">
+                                     <input type="hidden" name="quantity" value="{{ $product->minimum_order_qty ?? 1 }}">
+                                 </form>
+                                 <button class="premium-add-to-cart product-add-to-cart-button" type="button" data-form="#add-to-cart-form-dynamic-{{ $product->id }}">
+                                     <i class="fa fa-shopping-cart"></i>
+                                     <span class="ms-1">أضف للعربة</span>
+                                 </button>
+                             @endif
+                         </div>
                     </div>
                 </div>
             @endforeach

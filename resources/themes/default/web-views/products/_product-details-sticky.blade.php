@@ -1,3 +1,17 @@
+@php
+    $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
+    $filteredChoiceOptionsSticky = [];
+    $rawChoiceOptionsSticky = json_decode($productDetails->choice_options);
+    if (is_array($rawChoiceOptionsSticky)) {
+        foreach ($rawChoiceOptionsSticky as $choice) {
+            $title = trim($choice->title);
+            $optionsCount = count($choice->options);
+            if (!in_array($title, $specTitles) && $optionsCount > 1) {
+                $filteredChoiceOptionsSticky[] = $choice;
+            }
+        }
+    }
+@endphp
 <div class="bg-white product-details-sticky product-details-sticky-section pt-4 pt-md-3 pb-3 {{ $productDetails->variation && count(json_decode($productDetails->variation)) > 0 ? 'multi-variation-product' : '' }}">
     <div class="btn-circle product-details-sticky-collapse-btn d-md-none transition cursor-pointer shadow-sm position-absolute translate-middle top-0 left-50 justify-content-center align-items-center {{ $productDetails->variation && count(json_decode($productDetails->variation)) > 0 ? 'd-flex' : 'd-none' }}" style="--size: 34px">
         <i class="czi-arrow-up"></i>
@@ -70,7 +84,7 @@
                         @endforeach
                     @endif
 
-                    @foreach (json_decode($productDetails->choice_options) as $key => $choice)
+                    @foreach ($filteredChoiceOptionsSticky as $key => $choice)
                     <div>
                         <h6 class="fs-14 mb-2 text-capitalize">
                             {{ $choice->title }}

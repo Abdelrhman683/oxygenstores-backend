@@ -169,23 +169,68 @@ class OrderController extends BaseController
             $filterWhereIn['order_type'] = $orderTypes;
         }
 
-        $allOrders = $this->orderRepo->getListWhereIn(
-            orderBy: ['id' => 'desc'],
-            searchValue: $request['searchValue'],
-            filters: $filters,
-            whereIn: $filterWhereIn,
-            relations: ['customer', 'seller.shop'],
-            dataLimit: 'all'
-        );
+        $countFilters = [
+            'filter' => $request['filter'] ?? 'all',
+            'date_type' => $request['date_type'],
+            'from' => $request['from'],
+            'to' => $request['to'],
+            'delivery_man_id' => $request['delivery_man_id'],
+            'customer_id' => $request['customer_id'],
+            'seller_id' => $vendorId,
+            'seller_is' => $vendorIs,
+        ];
+        if (!empty($orderAmountSettlement)) {
+            $countFilters['has_order_edit_settlement'] = $orderAmountSettlement;
+        }
+
+        $countWhereIn = [
+            'payment_status' => $paymentPaidStatus,
+        ];
+        if (!empty($orderTypes)) {
+            $countWhereIn['order_type'] = $orderTypes;
+        }
+
         $allOrdersInfo = [
-            'pending_order' => $allOrders->where('order_status', 'pending')->count(),
-            'confirmed_order' => $allOrders->where('order_status', 'confirmed')->count(),
-            'processing_order' => $allOrders->where('order_status', 'processing')->count(),
-            'out_for_delivery_order' => $allOrders->where('order_status', 'out_for_delivery')->count(),
-            'delivered_order' => $allOrders->where('order_status', 'delivered')->count(),
-            'canceled_order' => $allOrders->where('order_status', 'canceled')->count(),
-            'returned_order' => $allOrders->where('order_status', 'returned')->count(),
-            'failed_order' => $allOrders->where('order_status', 'failed')->count(),
+            'pending_order' => $this->orderRepo->getCountWhereIn(
+                searchValue: $request['searchValue'],
+                filters: array_merge($countFilters, ['order_status' => 'pending']),
+                whereIn: $countWhereIn
+            ),
+            'confirmed_order' => $this->orderRepo->getCountWhereIn(
+                searchValue: $request['searchValue'],
+                filters: array_merge($countFilters, ['order_status' => 'confirmed']),
+                whereIn: $countWhereIn
+            ),
+            'processing_order' => $this->orderRepo->getCountWhereIn(
+                searchValue: $request['searchValue'],
+                filters: array_merge($countFilters, ['order_status' => 'processing']),
+                whereIn: $countWhereIn
+            ),
+            'out_for_delivery_order' => $this->orderRepo->getCountWhereIn(
+                searchValue: $request['searchValue'],
+                filters: array_merge($countFilters, ['order_status' => 'out_for_delivery']),
+                whereIn: $countWhereIn
+            ),
+            'delivered_order' => $this->orderRepo->getCountWhereIn(
+                searchValue: $request['searchValue'],
+                filters: array_merge($countFilters, ['order_status' => 'delivered']),
+                whereIn: $countWhereIn
+            ),
+            'canceled_order' => $this->orderRepo->getCountWhereIn(
+                searchValue: $request['searchValue'],
+                filters: array_merge($countFilters, ['order_status' => 'canceled']),
+                whereIn: $countWhereIn
+            ),
+            'returned_order' => $this->orderRepo->getCountWhereIn(
+                searchValue: $request['searchValue'],
+                filters: array_merge($countFilters, ['order_status' => 'returned']),
+                whereIn: $countWhereIn
+            ),
+            'failed_order' => $this->orderRepo->getCountWhereIn(
+                searchValue: $request['searchValue'],
+                filters: array_merge($countFilters, ['order_status' => 'failed']),
+                whereIn: $countWhereIn
+            ),
         ];
 
         $orders = $this->orderRepo->getListWhereIn(orderBy: ['id' => 'desc'], searchValue: $request['searchValue'], filters: $filters, whereIn: $filterWhereIn, relations: ['customer', 'seller.shop', 'orderEditHistory'], dataLimit: getWebConfig(name: WebConfigKey::PAGINATION_LIMIT));
@@ -195,7 +240,6 @@ class OrderController extends BaseController
         if (isset($request['customer_id']) && $request['customer_id'] != 'all' && !is_null($request->customer_id) && $request->has('customer_id')) {
             $customer = $this->customerRepo->getFirstWhere(params: ['id' => $request['customer_id']]);
         }
-        $customers = $this->customerRepo->getCustomerNameList(request: $request, dataLimit: 'all')->toArray();
         $vendorId = $request['seller_id'];
         $customerId = $request['customer_id'];
 
@@ -220,7 +264,6 @@ class OrderController extends BaseController
             'allOrdersInfo',
             'paymentPaidStatus',
             'orderStatus',
-            'customers',
             'orderTypes',
         ));
     }

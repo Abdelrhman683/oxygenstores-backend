@@ -2,6 +2,19 @@
     $overallRating = getOverallRating($product?->reviews);
     $rating = getRating($product->reviews);
     $productReviews = \App\Utils\ProductManager::get_product_review($product->id);
+
+    $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
+    $filteredChoiceOptionsQuick = [];
+    $rawChoiceOptionsQuick = json_decode($product->choice_options);
+    if (is_array($rawChoiceOptionsQuick)) {
+        foreach ($rawChoiceOptionsQuick as $choice) {
+            $title = trim($choice->title);
+            $optionsCount = count($choice->options);
+            if (!in_array($title, $specTitles) && $optionsCount > 1) {
+                $filteredChoiceOptionsQuick[] = $choice;
+            }
+        }
+    }
 @endphp
 
 
@@ -272,7 +285,7 @@
 
                     </div>
 
-                    @foreach (json_decode($product->choice_options) as $key => $choice)
+                    @foreach ($filteredChoiceOptionsQuick as $key => $choice)
                         <div class="flex-start gap-3">
                             <div class="product-description-label __color-9B9B9B fs-14 mt-1 text-capitalize text-nowrap">
                                 {{ $choice->title }}:

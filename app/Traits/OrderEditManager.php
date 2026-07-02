@@ -293,10 +293,10 @@ trait OrderEditManager
         foreach ($editedOrder as $details) {
             $product = json_decode($details['product_details'] ?? '', true);
             $activeProduct = $productList?->firstWhere('id', $details['product_id']) ?? $product;
-            $currentStock = max(0, $activeProduct['current_stock']);
-            $variations = is_array($activeProduct['variation']) ? $activeProduct['variation'] : json_decode($activeProduct['variation'], true);
+            $currentStock = max(0, $activeProduct['current_stock'] ?? 0);
+            $variations = isset($activeProduct['variation']) ? (is_array($activeProduct['variation']) ? $activeProduct['variation'] : json_decode($activeProduct['variation'], true)) : [];
             $firstVariation = collect($variations)->first(function ($variation) use ($details) {
-                return $variation['type'] == $details['variant'];
+                return ($variation['type'] ?? '') == $details['variant'];
             });
 
             if ($details['variant'] && $firstVariation) {

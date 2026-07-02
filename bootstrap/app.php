@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('DOMAIN_POINTED_DIRECTORY')) {
+    define('DOMAIN_POINTED_DIRECTORY', env('DOMAIN_POINTED_DIRECTORY', 'public'));
+}
+
 use App\Http\Middleware\ActivationCheckMiddleware;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\APIGuestMiddleware;

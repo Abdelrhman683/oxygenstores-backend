@@ -777,6 +777,7 @@ class MigrateFromWordPress extends Command
                 'post_author',
                 'post_date',
                 'post_content',
+                'post_excerpt',
                 'post_title',
                 'post_name',
                 'post_status',
@@ -897,12 +898,17 @@ class MigrateFromWordPress extends Command
             $meta = ($allPostMeta[$product->ID] ?? collect())->pluck('meta_value', 'meta_key')->toArray();
 
             // Determine seller and shop
-            $laravelSellerId = $sellerMap[$product->post_author] ?? ($defaultSeller?->id);
-            $laravelShopId = $laravelSellerId
-                ? (DB::table('shops')->where('seller_id', $laravelSellerId)->value('id') ?? $defaultShop?->id)
-                : $defaultShop?->id;
+            $adminShopId = DB::table('shops')->where('seller_id', 0)->value('id') ?? DB::table('shops')->where('author_type', 'admin')->value('id') ?? 9;
 
-            $addedBy = $laravelSellerId ? 'seller' : 'admin';
+            if (isset($sellerMap[$product->post_author]) && $sellerMap[$product->post_author] != 1) {
+                $laravelSellerId = $sellerMap[$product->post_author];
+                $laravelShopId = DB::table('shops')->where('seller_id', $laravelSellerId)->value('id') ?? $defaultShop?->id;
+                $addedBy = 'seller';
+            } else {
+                $laravelSellerId = 1; // admin user ID
+                $laravelShopId = $adminShopId;
+                $addedBy = 'admin';
+            }
 
             // Category mapping
             $productCategories = $productCategoryMap[$product->ID] ?? collect();
@@ -921,6 +927,15 @@ class MigrateFromWordPress extends Command
                 $mainCategoryId = $categoryIds[0] ?? null;
                 $subCategoryId = $categoryIds[1] ?? null;
                 $subSubCategoryId = $categoryIds[2] ?? null;
+            }
+
+            $formattedCategoryIds = [];
+            $position = 1;
+            foreach (array_values(array_filter($categoryIds)) as $catId) {
+                $formattedCategoryIds[] = [
+                    'id' => (string)$catId,
+                    'position' => $position++
+                ];
             }
 
             // Brand mapping
@@ -1019,7 +1034,10 @@ class MigrateFromWordPress extends Command
                 $slug = $originalSlug . '-' . $counter++;
             }
 
-            $details = $product->post_content ?? '';
+            $details = trim($product->post_content ?? '');
+            if (empty($details)) {
+                $details = trim($product->post_excerpt ?? '');
+            }
             $fixedName = $this->fixMojibake($product->post_title);
             $fixedDetails = $this->fixMojibake($details);
 
@@ -1030,7 +1048,7 @@ class MigrateFromWordPress extends Command
                 'name' => $fixedName,
                 'slug' => $slug,
                 'code' => $meta['_sku'] ?? 'WP-' . $product->ID,
-                'category_ids' => json_encode(array_values(array_filter($categoryIds))),
+                'category_ids' => json_encode($formattedCategoryIds),
                 'category_id' => $mainCategoryId,
                 'sub_category_id' => $subCategoryId,
                 'sub_sub_category_id' => $subSubCategoryId,

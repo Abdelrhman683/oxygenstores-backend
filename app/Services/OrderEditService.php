@@ -129,10 +129,10 @@ class OrderEditService
             $product = json_decode($details->product_details, true);
             $activeProduct = $productList?->firstWhere('id', $details['product_id']) ?? $product;
 
-            $currentStock = $activeProduct ? max(0, $activeProduct['current_stock']) : $product['current_stock'];
-            $variations = is_array($activeProduct['variation']) ? $activeProduct['variation'] : json_decode($activeProduct['variation'], true);
+            $currentStock = $activeProduct ? max(0, $activeProduct['current_stock'] ?? 0) : ($product['current_stock'] ?? 0);
+            $variations = isset($activeProduct['variation']) ? (is_array($activeProduct['variation']) ? $activeProduct['variation'] : json_decode($activeProduct['variation'], true)) : [];
             $firstVariation = collect($variations)->first(function ($variation) use ($details) {
-                return $variation['type'] == $details['variant'];
+                return ($variation['type'] ?? '') == $details['variant'];
             });
 
             $unitPrice = $activeProduct ? $activeProduct['unit_price'] : $details['price'];
@@ -154,8 +154,8 @@ class OrderEditService
             $isQuantityEditable = (bool)($checkActiveProduct);
 
             if ($checkActiveProduct) {
-                $detailsProductVariation = json_decode($product['variation'], true);
-                $activeProductVariation = json_decode($checkActiveProduct['variation'] ?? '', true);
+                $detailsProductVariation = json_decode($product['variation'] ?? '', true) ?? [];
+                $activeProductVariation = json_decode($checkActiveProduct['variation'] ?? '', true) ?? [];
                 if (count($activeProductVariation) > 0) {
                     $isQuantityEditable = collect($activeProductVariation)->filter(function ($item) use ($details) {
                         return $item['type'] == $details['variant'];
