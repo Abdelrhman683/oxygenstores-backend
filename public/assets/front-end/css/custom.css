@@ -6039,3 +6039,7 @@ padding: 10px;
     min-width:fit-content !important;
     text-align: center !important;
 }
+.btn_cust_cart {
+    background-color: var(--bg-yellow) !important;
+    color: #000 !important;
+}

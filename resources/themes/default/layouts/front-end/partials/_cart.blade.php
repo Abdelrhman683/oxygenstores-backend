@@ -46,7 +46,7 @@
                     {{ translate('shopping_cart') }}
                 </span>
             </h6>
-            <a href="#" class="text-body d-flex gap-2 align-items-center lh-1" id="cart_dropdown_close">
+            <a href="#" class="text-body d-flex gap-2 align-items-center lh-1" id="cart_dropdown_close" style="color: #000!important;">
                 <i class="czi-close fs-10"></i>
                 <span class="fs-14">{{ translate('close') }}</span>
             </a>
@@ -112,8 +112,8 @@
                                 <div
                                     class="media-body min-height-0 d-flex align-items-center {{ $product ? ($product->status == 0?'blur-section':'') : 'blur-section' }}">
                                     <div class="w-0 flex-grow-1 d-flex flex-column gap-1">
-                                        <h6 class="widget-product-title mb-0 mr-2 fw-semibold">
-                                            <a href="{{route('product',$cartItem['slug'])}}" class="text-title line--limit-1">
+                                        <h6 class="widget-product-title mb-0 mr-2 fw-semibold " style="color: #000!important;">
+                                            <a href="{{route('product',$cartItem['slug'])}}" class="text-title line--limit-1 " style="color: #000!important;">
                                                 {{$cartItem['name']}}
                                             </a>
                                         </h6>
@@ -199,26 +199,28 @@
                         </div>
                     </div>
                 @endif
-                <div class="d-flex flex-wrap justify-content-between align-items-center pb-2">
+                <div class="d-flex flex-wrap justify-content-center align-items-center pb-2">
                     <div
                         class="font-size-sm {{Session::get('direction') === "rtl" ? 'ml-2 float-left' : 'mr-2 float-right'}} py-2 ">
-                        <span>{{ translate('subtotal') }} :</span>
+                        <span style="color: #000!important; font-weight: bold;">{{ translate('subtotal') }} :</span>
                         <span
-                            class="text-accent font-size-base cart_total_amount {{Session::get('direction') === "rtl" ? 'mr-1' : 'ml-1'}}">
+                            class=" font-size-base cart_total_amount {{Session::get('direction') === "rtl" ? 'mr-1' : 'ml-1'}}" style="color: #000!important; font-weight: bold;">
                                 {{ webCurrencyConverter(amount: $sub_total) }}
                         </span>
                     </div>
 
-                    <a class="btn btn-outline-secondary btn-sm" href="{{route('shop-cart') }}">
-                        {{ translate('expand_cart') }}<i
-                            class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1' : 'right ml-1 mr-n1'}}"></i>
-                    </a>
+                 
                 </div>
-
-                <a class="btn btn--primary btn-block font-weight-normal rounded-10 py-3 text-capitalize"
+<div class="d-flex align-items-center justify-content-center gap-2">
+       <a class="btn  font-weight-normal rounded-10 py-2 text-capitalize btn_cust_cart" href="{{route('shop-cart') }}" style="color: #000!important; font-weight: bold !important;">
+                        {{ translate('expand_cart') }}
+                    </a>
+                        <a class="btn  font-weight-normal rounded-10 py-2 text-capitalize btn_cust_cart" style="color: #000!important; font-weight: bold!important;"
                    href="{{route('checkout-details') }}">
                     {{ translate('proceed_to_checkout') }}
                 </a>
+</div>
+            
 
             @else
                 <div class="widget-cart-item">
