@@ -6678,6 +6678,7 @@ a {
     overflow: hidden;
     text-overflow: ellipsis;
     -webkit-line-clamp: 2;
+    white-space: normal;
 }
 
 .line--limit-3 {

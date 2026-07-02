@@ -113,7 +113,7 @@
                                     class="media-body min-height-0 d-flex align-items-center {{ $product ? ($product->status == 0?'blur-section':'') : 'blur-section' }}">
                                     <div class="w-0 flex-grow-1 d-flex flex-column gap-1">
                                         <h6 class="widget-product-title mb-0 mr-2 fw-semibold " style="color: #000!important;">
-                                            <a href="{{route('product',$cartItem['slug'])}}" class="text-title line--limit-1 " style="color: #000!important;">
+                                            <a href="{{route('product',$cartItem['slug'])}}" class="text-title line--limit-2 " style="color: #000!important;">
                                                 {{$cartItem['name']}}
                                             </a>
                                         </h6>
@@ -199,6 +199,7 @@
                         </div>
                     </div>
                 @endif
+                <div class="dotted-line"></div>
                 <div class="d-flex flex-wrap justify-content-center align-items-center pb-2">
                     <div
                         class="font-size-sm {{Session::get('direction') === "rtl" ? 'ml-2 float-left' : 'mr-2 float-right'}} py-2 ">

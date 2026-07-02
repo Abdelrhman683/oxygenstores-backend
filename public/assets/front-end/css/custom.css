@@ -6043,3 +6043,8 @@ padding: 10px;
     background-color: var(--bg-yellow) !important;
     color: #000 !important;
 }
+.dotted-line {
+    border: none;
+    border-top: 2px dashed #ddd;
+       margin: 5px 20px;
+}
