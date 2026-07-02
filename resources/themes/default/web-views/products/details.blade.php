@@ -524,7 +524,7 @@
                                                         </button>
                                                     @endif
                                                 </div>
-
+<!-- 
                                                 @if(($product['product_type'] == 'physical'))
                                                     <div
                                                         class="product-restock-request-section collapse" {!! $firstVariationQuantity <= 0 ? 'style="display: block;"' : '' !!}>
@@ -538,7 +538,7 @@
                                                             {{ translate('Request_Restock') }}
                                                         </button>
                                                     </div>
-                                                @endif
+                                                @endif -->
                                                 <!-- <button type="button" data-product-id="{{ $product['id'] }}"
                                                         class="btn __text-18px border product-action-add-wishlist">
                                                     <i class="fa {{($wishlistStatus == 1?'fa-heart':'fa-heart-o') }} wishlist_icon_{{ $product['id'] }} web-text-primary"
@@ -576,7 +576,7 @@
                         </div>
                         <div class="rtl text-align-direction flex-grow-1">
                             <div class="  h-100">
-                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-start gap-2 p-0" role="tablist">
+                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-lg-start justify-content-center gap-2 p-0" role="tablist">
                                           <li class="nav-item">
                                         <a class="nav-link __inline-27 mb-0 tab_link"
                                         data-toggle="tab"
@@ -1105,7 +1105,11 @@
                                                  <span>{{ $shopName }}</span>
                                              </a>
                                         </div>
+                                   
+
                                     </div>
+
+                                        </div>
                                        <div class="d-flex align-items-center gap-4">
                                                         <div class="product-description-label __color-9B9B9B fs-14">
                                                             {{ translate('qty') }}
@@ -1458,7 +1462,7 @@
                 </div>
             </div>
         </div>
-<div class="container">
+<div class="container ">
     <div class="row">
         <section class="premium-static-section container rtl px-0 px-md-3">
     <div class="premium-section-header">

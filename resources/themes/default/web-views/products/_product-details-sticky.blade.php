@@ -195,7 +195,7 @@
                             </button>
                         </div>
 
-                        @if(($productDetails['product_type'] == 'physical'))
+                        <!-- @if(($productDetails['product_type'] == 'physical'))
                             <div class="product-restock-request-section collapse" {!! $firstVariationQuantity <= 0 ? 'style="display: block;"' : '' !!}>
                                 <button type="button"
                                         class="btn request-restock-btn btn-outline-primary fw-semibold product-restock-request-button"
@@ -207,7 +207,7 @@
                                     {{ translate('Request_Restock')}}
                                 </button>
                             </div>
-                        @endif
+                        @endif -->
                     @endif
                 </div>
             </div>

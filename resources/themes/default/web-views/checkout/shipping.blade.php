@@ -9,7 +9,53 @@
 
 @section('content')
     @php($billingInputByCustomer=getWebConfig(name: 'billing_input_by_customer'))
-    <div class="container py-4 pt-3 rtl __inline-56 px-0 px-md-3 text-align-direction">
+    <div class="container text-align-direction">
+                      <nav aria-label="breadcrumb">
+            <style>
+                .breadcrumb-item + .breadcrumb-item::before {
+                    display: none;
+                }
+            </style>
+            <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 3px 0;">
+                <li class="breadcrumb-item d-flex align-items-center ">
+                    <a href="{{route('home')}}" class="breadcrumb-title">
+                        {{translate('الرئيسية')}}
+                    </a>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                </li>
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                   {{translate('إتمام الطلب')}}
+
+                </li>
+            </ol>
+        </nav>
+        <div class="kr-checkout-options container py-3">
+
+    <div class="kr-option-box mb-3">
+        <div class="kr-option-content">
+            <span class="kr-option-title">
+                عميل سابق؟
+            </span>
+
+            <a href="#" class="kr-option-link">
+                انقر هنا لتسجيل الدخول
+            </a>
+        </div>
+    </div>
+
+    <div class="kr-option-box">
+        <div class="kr-option-content">
+            <span class="kr-option-title">
+                هل لديك قسيمة؟
+            </span>
+
+            <a href="#" class="kr-option-link">
+                انقر هنا لإدخال رمز القسيمة
+            </a>
+        </div>
+    </div>
+
+</div>
         <div class="row mx-max-md-0">
             <section class="col-lg-8 px-max-md-0">
                 <div class="checkout_details">
@@ -222,7 +268,7 @@
                         @endif
                     @endif
 
-                    @if($billingInputByCustomer)
+                    <!-- @if($billingInputByCustomer)
                         <div>
                             <div class="billing-methods_label d-flex flex-wrap justify-content-between gap-2 mt-4 pb-3 px-3 px-md-0">
                                 <h4 class="mb-0 fs-18 text-capitalize">{{ translate('billing_address')}}</h4>
@@ -446,7 +492,7 @@
                                 </div>
                             </div>
                         @endif
-                    @endif
+                    @endif -->
                 </div>
             </section>
             @include('web-views.partials._order-summary')
@@ -463,6 +509,8 @@
 
 @push('script')
     <script>
+
+        
         "use strict";
         const deliveryRestrictedCountries = @json($countriesName);
         function deliveryRestrictedCountriesCheck(countryOrCode, elementSelector, inputElement) {

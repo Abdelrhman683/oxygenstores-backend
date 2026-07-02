@@ -147,7 +147,7 @@
                     </a>
                     <span class="separator-line d-none d-md-inline-block">|</span>
                     @if(auth('customer')->check())
-                        <div class="dropdown d-none d-md-inline-block">
+                        <div class="dropdown d-none d-md-inline-block user_drop">
                             <a class="action-item dropdown-toggle cursor-pointer" data-toggle="dropdown">
                                 <i class="fa fa-user-circle"></i>
                                 <span>{{ Str::limit(auth('customer')->user()->f_name, 10) }}</span>

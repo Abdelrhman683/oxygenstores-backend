@@ -245,7 +245,7 @@ function initializeIntlTelInput() {
     );
 
     const defaultCountryCodeElement = document.querySelector(".system-default-country-code");
-    const defaultCountry = defaultCountryCodeElement?.dataset?.value?.toLowerCase() || "bd";
+    const defaultCountry = defaultCountryCodeElement?.dataset?.value?.toLowerCase() || "sa";
 
     inputs.forEach(input => {
         const iti = window.intlTelInput(input, {
@@ -462,7 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     // Read from data-* attributes
                     const dataValue = input.getAttribute('data-value') || "";
-                    const dataCountry = input.getAttribute('data-country') || "bd";
+                    const dataCountry = input.getAttribute('data-country') || "sa";
 
                     if (dataValue) {
                         iti.setCountry(dataCountry);       // set country first

@@ -15,7 +15,7 @@
 @endpush
 
 @section('content')
-    <div class="container mt-3 rtl px-0 px-md-3 text-align-direction" id="cart-summary">
+    <div class="container  text-align-direction" id="cart-summary">
         @include(VIEW_FILE_NAMES['products_cart_details_partials'])
     </div>
 

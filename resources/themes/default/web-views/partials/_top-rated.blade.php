@@ -1,5 +1,5 @@
-<div class="col-12 top-rated-section custom_pd">
-    <div class="">
+<div class="col-12 top-rated-section ">
+    <div class=" custom_pd">
         <!-- card card __shadow h-100 -->
         <div class="card-body p-0">
             <div class="row d-flex justify-content-between align-items-center mx-1 mb-3">

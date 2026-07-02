@@ -25,7 +25,7 @@
         </button>
     </div>
     <div class="row g-3">
-        <div class="col-lg-5 col-md-4 col-12" style="align-self: flex-start;">
+        <div class="col-lg-4 col-md-4 col-12" style="align-self: flex-start;">
 
             <div class="pd-img-wrap position-relative">
                 <div class="swiper-container quickviewSlider2 border rounded aspect-1">
@@ -133,7 +133,7 @@
             </div>
         </div>
 
-        <div class="col-lg-7 col-md-8 col-12 mt-md-0 mt-sm-3 web-direction">
+        <div class="col-lg-8 col-md-8 col-12 mt-md-0 mt-sm-3 web-direction">
             <div class="details __h-100 product-cart-option-container border-0 py-0">
                 @if (getWebConfig(name: 'business_mode') == 'multi')
                     @if($product->added_by =="admin")
@@ -221,7 +221,7 @@
                     @csrf
 
                     <div>
-                        <span class="font-weight-normal d-flex align-items-center gap-2">
+                        <span class="font-weight-normal d-flex align-items-center gap-2 my-3">
                             {!! getPriceRangeWithDiscount(product: $product) !!}
                         </span>
                     </div>
@@ -230,22 +230,23 @@
                                 </div>
 <div class="preview-stock"><p class="stock in-stock">متوفر في المخزون</p>
 </div>
-                                <div class="specs-box">
-                                <ul class="specs-list p-0">
-                                    <li>
-                                        <span class="label">الشركة:</span> جري
-                                         <span class="label">نوع الكمبريسور:</span> روتاري
-                                         <span class="label">سعة التبريد:</span> 23.200 وحدة
-                                    </li>
+                                    <div class="specs-box">
+    <ul class="specs-list p-0">
+        @foreach (json_decode($product->choice_options) as $choice)
+            <li>
+                
+            <span class="label">{{ $choice->title }}:</span>
 
-                                    <li>
-                                        <span class="label">الموديل:</span> GWC24AVEXF-D3NTA1F/I
-                                        • <span class="label">الضمان:</span> سنتين شامل و خمس سنوات على الكمبريسور
-                                        • <span class="label">حار و بارد / بارد:</span> بارد
-                                        • <span class="label">نوع التبريد:</span> غاز فريون R32
-                                    </li>
-                                </ul>
-                                    </div>
+            <a href="#">
+    @foreach ($choice->options as $index => $option)
+                    {{ $option }}@if(!$loop->last)  @endif
+                @endforeach
+            </a>
+            
+            </li>
+        @endforeach
+    </ul>
+</div>
                     <input type="hidden" name="id" value="{{ $product->id }}">
                     <div class="position-relative {{count(json_decode($product->colors)) > 0 ? '' : 'd-none'}}">
                         @if (count(json_decode($product->colors)) > 0)
@@ -285,7 +286,7 @@
 
                     </div>
 
-                    @foreach ($filteredChoiceOptionsQuick as $key => $choice)
+                    <!-- @foreach (json_decode($product->choice_options) as $key => $choice)
                         <div class="flex-start gap-3">
                             <div class="product-description-label __color-9B9B9B fs-14 mt-1 text-capitalize text-nowrap">
                                 {{ $choice->title }}:
@@ -306,7 +307,7 @@
                                 </ul>
                             </div>
                         </div>
-                    @endforeach
+                    @endforeach -->
 
                     @php($extensionIndex=0)
                     @if($product['product_type'] == 'digital' && $product['digital_product_file_types'] && count($product['digital_product_file_types']) > 0 && $product['digital_product_extensions'])
@@ -467,7 +468,7 @@
                         </button>
                     </div> -->
 
-                    @if(($product['product_type'] == 'physical'))
+                    <!-- @if(($product['product_type'] == 'physical'))
                         <div
                             class="product-restock-request-section collapse" {!! $firstVariationQuantity <= 0 ? 'style="display: block;"' : '' !!}>
                             <button type="button"
@@ -495,7 +496,7 @@
                                 </div>
                             </button>
                         </div>
-                    @endif
+                    @endif -->
 
                    <div>
                        @if($product->added_by == 'admin')

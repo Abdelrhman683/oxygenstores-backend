@@ -13485,8 +13485,8 @@ label:not(.form-check-label):not(.custom-control-label):not(
 .btn-scroll-top {
     display: block;
     position: fixed;
-    width: 32px;
-    height: 32px;
+    width: 55px;
+    height: 55px;
     transition: right 400ms cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s,
         background-color 0.25s ease-in-out;
     border-radius: 50%;
@@ -13499,9 +13499,9 @@ label:not(.form-check-label):not(.custom-control-label):not(
 }
 
 .btn-scroll-top > .btn-scroll-top-icon {
-    font-size: 0.875rem;
+    font-size: 1.3rem;
     font-weight: bold;
-    line-height: 32px;
+    line-height: 55px;
 }
 
 .btn-scroll-top .btn-scroll-top-tooltip {
@@ -13537,9 +13537,14 @@ label:not(.form-check-label):not(.custom-control-label):not(
 
 @media (max-width: 767.98px) {
     .btn-scroll-top {
-        width: 32px;
-        height: 32px;
+        width: 55px !important;
+        height: 55px !important;
     }
+    .btn-scroll-top > .btn-scroll-top-icon {
+    font-size: 1.3rem;
+    font-weight: bold;
+    line-height: 55px;
+}
 }
 
 .dropdown .dropdown-toggle::after,
@@ -15574,7 +15579,7 @@ a.nav-link:hover .media-tab-media {
 }
 
 .breadcrumb-item > a:hover {
-    color: #fe696a;
+    color: var(--web-primary);
     text-decoration: none;
 }
 
@@ -16206,7 +16211,7 @@ a.badge-shadow:hover {
 }
 
 .modal-quick-view .modal-dialog {
-    max-width: 1140px !important;
+    max-width: 880px !important;
 }
 
 @media (min-width: 576px) {

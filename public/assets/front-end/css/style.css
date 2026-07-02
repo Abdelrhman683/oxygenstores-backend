@@ -1490,16 +1490,16 @@ a {
     object-fit: cover;
 }
 
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
     .checkout_details {
         padding-right: 20px;
     }
-}
-@media (min-width: 1200px) {
+} */
+/* @media (min-width: 1200px) {
     .checkout_details {
         padding-right: 40px;
     }
-}
+} */
 .checkout_details .steps-light .step-item:hover {
     color: #000;
 }
@@ -5809,7 +5809,7 @@ a {
     z-index: 999;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 15px;
     align-items: center;
     transition: all ease 0.3s;
 }
@@ -6849,7 +6849,7 @@ a {
     } */
 }
 .owl-dots {
-    position: absolute;
+    position: relative;
     /* bottom: 20px; */
     left: 0;
     width: 100%;
@@ -6857,7 +6857,7 @@ a {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-top: 10px !important;
+    margin-top: 15px !important;
 }
 .owl-dots button {
     margin: 0;
@@ -6882,7 +6882,12 @@ a {
 .owl-dots button span {
     display: none !important;
 }
-
+@media(max-width:767px){
+    .owl-dots button {
+    height: 15px;
+    width: 15px;
+    }
+}
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     display: none;
@@ -11270,5 +11275,66 @@ input[type="checkbox"] {
     100% {
         transform: scale(0.9);
         opacity: 0.6;
+    }
+}
+.kr-checkout-options {
+    max-width: 100%;
+}
+
+.kr-option-box {
+    background: #5b7993;
+    border-radius: 6px;
+    border-right: 5px solid #111;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
+}
+
+.kr-option-content {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    text-align: start;
+}
+
+.kr-option-title {
+    color: #fff;
+    font-size: 1rem;
+
+}
+
+.kr-option-link {
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+        text-decoration: underline;
+    text-decoration-thickness: 0;
+    text-underline-offset: 3px;
+    text-decoration-style: dashed;
+}
+
+.kr-option-link:hover {
+    color: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+    .kr-option-box {
+        padding: 10px 15px;
+    }
+
+    .kr-option-title,
+    .kr-option-link {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .kr-option-title,
+    .kr-option-link {
+        font-size: 14px;
     }
 }
