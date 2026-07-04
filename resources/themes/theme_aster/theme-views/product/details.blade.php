@@ -294,6 +294,32 @@
                                                     </div>
                                                 </div>
 
+                                                <!-- Installments Mockup (Tabby & Tamara) -->
+                                                @if($product->unit_price > 0)
+                                                    <div class="installments-mockup mb-4">
+                                                        <!-- Tamara Mockup -->
+                                                        <div class="d-flex align-items-center justify-content-between p-2 mb-2 rounded border" style="background: #fff; cursor: pointer;">
+                                                            <div class="d-flex align-items-center" style="width: 15%;">
+                                                                <img src="{{ theme_asset('public/assets/front-end/img/tamara.png') }}" onerror="this.src='https://cdn.tamara.co/assets/svg/tamara-logo-badge-ar.svg'" alt="Tamara" style="max-width: 100%; height: auto;">
+                                                            </div>
+                                                            <div class="text-right px-2" style="width: 85%; font-size: 13px; color: #333;">
+                                                                أو قسم فاتورتك بقيمة <strong>{{ webCurrencyConverter(amount: $product->unit_price / 4) }}</strong> على 4 دفعات بدون رسوم تأخير، متوافقة مع الشريعة الإسلامية. <strong style="text-decoration: underline;">اعرف أكثر</strong>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Tabby Mockup -->
+                                                        <div class="d-flex align-items-center justify-content-between p-2 rounded border" style="background: #fff; cursor: pointer;">
+                                                            <div class="d-flex align-items-center" style="width: 15%;">
+                                                                <img src="{{ theme_asset('public/assets/front-end/img/tabby.png') }}" onerror="this.src='https://tabby.ai/assets/logo/tabby-badge.svg'" alt="Tabby" style="max-width: 100%; height: auto; border-radius: 4px;">
+                                                            </div>
+                                                            <div class="text-right px-2" style="width: 85%; font-size: 13px; color: #333;">
+                                                                قسّمها على 4 دفعات بقيمة <strong>{{ webCurrencyConverter(amount: $product->unit_price / 4) }}</strong> بدون فوائد. متوافق مع أحكام الشريعة. <strong style="color: #4b22db;">لمعرفة المزيد</strong>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                <!-- End Installments Mockup -->
+
 
                                                 <div class="">
                                                     <input type="hidden" name="id" value="{{ $product->id }}">

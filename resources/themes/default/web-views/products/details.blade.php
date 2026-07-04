@@ -302,17 +302,19 @@
                                                 @endif
                                             </div>
 
-                                            @if($installmentAmount)
-                                                <div>
-                                                    <div class="installment-box">
-                                                        <div class="installment-text">
-                                                            أو قسم فاتورتك بقيمة <strong>{{ webCurrencyConverter(amount: $product->unit_price) }}</strong> على 4 دفعات بدون رسوم تأخير، متوافقة مع الشريعة الإسلامية
-                                                            <a href="#" class="more-link">اعرف أكثر</a>
-                                                        </div>
-                                                        <img src="{{ theme_asset('public/assets/front-end/img/method_logo.svg') }}" loading="lazy" alt="method_logo" class="method_logo">
-                                                    </div>
-                                                </div>
-                                            @endif
+                                  @if($installmentAmount)
+    <div class="installment-text">
+
+     <tamara-widget
+    type="tamara-summary"
+    amount="{{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'value') }}"
+    inline-type="2">
+</tamara-widget>
+
+<div id="TabbyPromo" class="mt-2"></div>
+    </div>
+
+@endif
 
                                      
                                             @csrf
@@ -1086,7 +1088,7 @@
                                </p>
                            @endif
                                     <div class="shipping-details-bottom-border">
-                                        <div class="">
+                                        <div class=" d-flex align-items-center justify-content-center">
                                             <?php
                                                  $shopName = '';
                                                  $shopRoute = '#';
@@ -1108,9 +1110,7 @@
                                    
 
                                     </div>
-
-                                        </div>
-                                       <div class="d-flex align-items-center gap-4">
+            <div class="d-flex align-items-center gap-4">
                                                         <div class="product-description-label __color-9B9B9B fs-14">
                                                             {{ translate('qty') }}
                                                         </div>
@@ -1146,8 +1146,9 @@
                                                         <input type="hidden" value=""
                                                                class="product-exist-in-cart-list form-control w-50" name="key">
                                                     </div>
-                          
-                                                              <div class="add_cart my-2">
+
+
+         <div class="add_cart my-2">
           
                                                         <button class="premium-add-to-cart " type="button"
                                                             data-form=".add-to-cart-details-form"
@@ -1159,7 +1160,7 @@
                                                                          </div>
                                                                          <hr class="bar">
                                                                 <div class="shipping-info-card">
-                                                                    <div class="shipping-info-row">
+                                                                    <div class="shipping-info-row ">
                                                                         <span class="shipping-label">منطقتك:</span>
                                                                         <span class="shipping-value">الرياض</span>
                                                                     </div>
@@ -1174,6 +1175,12 @@
                                                                         <span class="shipping-value">ثلاث إلى سبع أيام</span>
                                                                     </div>
                                                                 </div>
+
+
+                                        </div>
+                           
+                          
+                                                     
 
 
                                                 </div>
@@ -1757,4 +1764,26 @@
 
         });
     </script>
+    <script>
+window.tamaraWidgetConfig = {
+    lang: 'ar',
+    country: 'SA',
+    publicKey: 'd5eee77d-f5d5-4177-b6f6-8a0f913e61c0'
+};
+</script>
+
+<script defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
+<script src="https://checkout.tabby.ai/tabby-promo.js"></script>
+
+<script>
+new TabbyPromo({
+    selector: '#TabbyPromo',
+    currency: 'SAR',
+    price: '{{ getProductPriceByType(product: $product, type: "discounted_unit_price", result: "value") }}',
+    lang: 'ar',
+    source: 'product',
+    publicKey: 'pk_test_019c344f-bd29-e95d-46df-8dcda6d1644b  '
+});
+</script>
+
 @endpush
