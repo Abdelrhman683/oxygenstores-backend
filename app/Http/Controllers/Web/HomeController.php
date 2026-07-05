@@ -257,6 +257,16 @@ class HomeController extends Controller
             return $cats->take(3)->values();
         });
 
+        $discountProducts = Cache::remember('discount_products_home', CACHE_FOR_3_HOURS, function () {
+            return $this->product->active()
+                ->where('discount', '>', 0)
+                ->with(['clearanceSale' => function ($q) {
+                    return $q->active(); }])
+                ->latest()
+                ->take(12)
+                ->get();
+        });
+
         return view(
             VIEW_FILE_NAMES['home'],
             compact(
@@ -283,7 +293,8 @@ class HomeController extends Controller
                 'bestSellerAllTimeProducts',
                 'bestSellerThisMonthProducts',
                 'twoDoorFridgeProducts',
-                'washerProducts'
+                'washerProducts',
+                'discountProducts'
             )
         );
     }

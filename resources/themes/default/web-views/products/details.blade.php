@@ -319,6 +319,7 @@
                                      
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $product->id }}">
+                                             <input type="hidden" id="hidden_quantity" name="quantity" value="{{ $initialProductConfig['quantity'] ?? 1 }}">
                                             <div
                                                 class="position-relative">
                                                 @if (count(json_decode($product->colors)) > 0)
@@ -1150,7 +1151,7 @@
 
          <div class="add_cart my-2">
           
-                                                        <button class="premium-add-to-cart " type="button"
+                                                        <button class="premium-add-to-cart product-add-to-cart-button" type="button"
                                                             data-form=".add-to-cart-details-form"
                                                             data-update="{{ translate('update_cart') }}"
                                                             data-add="{{ translate('add_to_cart') }}">
@@ -1421,38 +1422,7 @@
             </div>
         </div>
 
-        @if (count($relatedProducts)>0)
-            <div class="container rtl text-align-direction">
-                <div class="card __card border-0 mb-4">
-                    <div class="card-body">
-                        <div class="row flex-between align-items-center mb-2">
-                            <div class="ms-1">
-                                <h2 class="text-capitalize font-bold fs-16 mb-0">{{ translate('similar_products') }}</h2>
-                            </div>
-                            <div class="view_all d-flex justify-content-center align-items-center">
-                                <div>
-                                    @if(!empty($product?->category?->slug))
-                                        <a class="view-all-btn-yellow me-1"
-                                           href="{{ route('category-products', ['slug' => $product?->category?->slug]) }}">
-                                            {{ translate('view_all') }}
-                                            <!-- <i class="czi-arrow-{{Session::get('direction') === "rtl" ? 'left mr-1 ml-n1 mt-1 ' : 'right ml-1 mr-n1'}}"></i> -->
-                                        </a>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="row g-3 mt-1">
-                            @foreach($relatedProducts as $key => $relatedProduct)
-                                <div class="col-xl-2 col-sm-3 col-6">
-                                    @include('web-views.partials._inline-single-product-without-eye',['product'=>$relatedProduct,'decimal_point_settings'=>$decimalPointSettings])
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
 
         <div class="modal fade rtl text-align-direction" id="show-modal-view" tabindex="-1" role="dialog"
              aria-labelledby="show-modal-image"
@@ -1469,223 +1439,109 @@
                 </div>
             </div>
         </div>
+<?php if (count($relatedProducts) > 0): ?>
 <div class="container ">
     <div class="row">
         <section class="premium-static-section container rtl px-0 px-md-3">
-    <div class="premium-section-header">
-        <h2 class="premium-section-title">منتجات ذات صلة</h2>
-    </div>
-
-    <div class="premium-carousel-wrapper">
-        <div class="owl-carousel owl-theme related-product-carousel">
-            
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة دولابي">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة دولابي جنرال سوبريم، (21.6 قدم، 612...)</a>
-                        <div class="premium-product-prices">
-                            <del class="premium-price-old">2999 ريال</del>
-                            <span class="premium-price-new">2549 ريال</span>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
+            <div class="premium-section-header">
+                <h2 class="premium-section-title"><?php echo translate('similar_products'); ?></h2>
             </div>
 
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
+            <div class="premium-carousel-wrapper">
+                <div class="owl-carousel owl-theme related-product-carousel">
+                    <?php foreach($relatedProducts as $relatedProduct): 
+                        $wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $relatedProduct->id)->count() : (session()->has('wish_list') && in_array($relatedProduct->id, session('wish_list')) ? 1 : 0);
+                    ?>
+                        <div class="premium-card-item h-100">
+                            <div class="premium-card">
+                                <div class="premium-product-media">
+                                    <?php if(getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0): ?>
+                                        <span class="premium-promo-badge">-<?php echo getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'string'); ?></span>
+                                    <?php endif; ?>
+                                    <div class="premium-card-actions">
+                                        <button type="button" class="premium-action-btn" onclick="addWishlist(<?php echo $relatedProduct->id; ?>)" title="<?php echo translate('Add_to_wishlist'); ?>">
+                                            <i class="fa <?php echo ($wishlist_status == 1?'fa-heart text-danger':'fa-heart-o'); ?> wishlist_icon_<?php echo $relatedProduct->id; ?>"></i>
+                                        </button>
+                                        <button type="button" class="premium-action-btn" onclick="productQuickView(<?php echo $relatedProduct->id; ?>)" title="<?php echo translate('Quick_View'); ?>">
+                                            <i class="czi-eye align-middle"></i>
+                                        </button>
+                                    </div>
+                                    <div class="premium-card-image">
+                                        <a href="<?php echo route('product', $relatedProduct->slug); ?>" class="d-block">
+                                            <img src="<?php echo getStorageImages(path: $relatedProduct->thumbnail_full_url, type: 'product'); ?>" alt="<?php echo $relatedProduct->name; ?>">
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="premium-card-details">
+                                    <span class="premium-category-tag"><?php echo $relatedProduct->category?->name ?? ''; ?></span>
+                                    <a href="<?php echo route('product', $relatedProduct->slug); ?>" class="premium-product-title" title="<?php echo $relatedProduct->name; ?>">
+                                        <?php echo Str::limit($relatedProduct->name, 45); ?>
+                                    </a>
+                                    <div class="premium-product-prices">
+                                        <?php if(getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0): ?>
+                                            <del class="premium-price-old"><?php echo webCurrencyConverter(amount: $relatedProduct->unit_price); ?></del>
+                                        <?php endif; ?>
+                                        <?php
+                                            $finalPrice = $relatedProduct->unit_price;
+                                            if (getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0) {
+                                                if ($relatedProduct->clearanceSale) {
+                                                    $finalPrice = $relatedProduct->unit_price - $relatedProduct->clearanceSale->discount_amount;
+                                                } else {
+                                                    $finalPrice = $relatedProduct->unit_price - $relatedProduct->discount;
+                                                }
+                                            }
+                                        ?>
+                                        <span class="premium-price-new"><?php echo webCurrencyConverter(amount: $finalPrice); ?></span>
+                                    </div>
+                                    <?php
+                                         $hasVariations = false;
+                                         if (isset($relatedProduct->choice_options)) {
+                                             $choices = json_decode($relatedProduct->choice_options, true);
+                                             $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
+                                             if (is_array($choices)) {
+                                                 foreach ($choices as $choice) {
+                                                     $title = trim($choice['title'] ?? '');
+                                                     $optionsCount = count($choice['options'] ?? []);
+                                                     if (!in_array($title, $specTitles) && $optionsCount > 1) {
+                                                         $hasVariations = true;
+                                                         break;
+                                                     }
+                                                 }
+                                             }
+                                         }
+                                         if (isset($relatedProduct->colors)) {
+                                             $colors = json_decode($relatedProduct->colors, true);
+                                             if (is_array($colors) && count($colors) > 0) {
+                                                 $hasVariations = true;
+                                             }
+                                         }
+                                    ?>
+                                    <?php if($hasVariations): ?>
+                                        <button class="premium-add-to-cart" type="button" onclick="productQuickView(<?php echo $relatedProduct->id; ?>)">
+                                            <i class="fa fa-shopping-cart"></i>
+                                            <span class="ms-1">أضف للعربة</span>
+                                        </button>
+                                    <?php else: ?>
+                                        <form class="addToCartDynamicForm d-none" id="add-to-cart-form-rel-<?php echo $relatedProduct->id; ?>">
+                                            <?php echo csrf_field(); ?>
+                                            <input type="hidden" name="id" value="<?php echo $relatedProduct->id; ?>">
+                                            <input type="hidden" name="quantity" value="<?php echo $relatedProduct->minimum_order_qty ?? 1; ?>">
+                                        </form>
+                                        <button class="premium-add-to-cart" type="button" onclick="addToCart($('#add-to-cart-form-rel-<?php echo $relatedProduct->id; ?>'))">
+                                            <i class="fa fa-shopping-cart"></i>
+                                            <span class="ms-1">أضف للعربة</span>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة يوجين">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة يوجين دولابي 637 لتر، 22.4 قدم، ستيل</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">2499 ريال</span>
-                            <del class="premium-price-old">2899 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">1849 ريال</span>
-                            <del class="premium-price-old">2949 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">1999 ريال</span>
-                            <del class="premium-price-old">2985 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم دولابي (15.4 قدم، 436...)</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">2049 ريال</span>
-                            <del class="premium-price-old">2599 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة بابين جنرال سوبريم (21 قدم، 594...)</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">2399 ريال</span>
-                            <del class="premium-price-old">2899 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-{{-- Second redundant static mockup modal removed --}}
-
-
+        </section>
     </div>
 </div>
+<?php endif; ?>
     </div>
 
     @include("web-views.products._product-details-sticky", ['productDetails' => $product])
@@ -1760,6 +1616,11 @@
                     $(this).html($("#all-msg-container").data("afterextend"));
                     productDetailsDescription.addClass('overflow-y-auto');
                 }
+            });
+
+            $(document).on('change keyup input click', '.product-details-cart-qty', function() {
+                var val = $(this).val();
+                $('#hidden_quantity').val(val);
             });
 
         });

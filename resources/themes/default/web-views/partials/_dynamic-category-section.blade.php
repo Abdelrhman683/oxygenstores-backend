@@ -28,6 +28,21 @@
                             @if($discountPercent > 0)
                                 <span class="premium-promo-badge">خصم {{ $discountPercent }}%</span>
                             @endif
+                             <div class="premium-card-actions">
+                                 @php
+                                     $wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $product->id)->count() : (session()->has('wish_list') && in_array($product->id, session('wish_list')) ? 1 : 0);
+                                 @endphp
+                                 <button type="button" data-product-id="{{ $product['id'] }}"
+                                         class="premium-action-btn product-action-add-wishlist"
+                                         title="{{ translate('Add_to_wishlist') }}">
+                                     <i class="fa {{($wishlist_status == 1?'fa-heart text-danger':'fa-heart-o')}} wishlist_icon_{{$product['id']}}"></i>
+                                 </button>
+                                 <button type="button" class="premium-action-btn stopPropagation action-product-quick-view"
+                                         data-product-id="{{ $product->id }}"
+                                         title="{{ translate('Quick_View') }}">
+                                     <i class="czi-eye align-middle"></i>
+                                 </button>
+                             </div>
                             <div class="premium-card-image">
                                 <a href="{{ route('product', $product->slug) }}" class="d-block">
                                     <img loading="lazy"

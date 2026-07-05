@@ -529,24 +529,36 @@
 
 <script>
     function initSliderWithZoom() {
-        $(".easyzoom").each(function () {
+        const modal = document.querySelector('#quick-view-modal');
+        if (!modal) return;
+
+        const mainSliderEl = modal.querySelector(".quickviewSlider2");
+        const thumbSliderEl = modal.querySelector(".quickviewSliderThumb2");
+        const nextEl = modal.querySelector(".swiper-quickview-button-next");
+        const prevEl = modal.querySelector(".swiper-quickview-button-prev");
+
+        if (!mainSliderEl || !thumbSliderEl) return;
+
+        $(modal).find(".easyzoom").each(function () {
             $(this).easyZoom();
         });
 
-        new Swiper(".quickviewSlider2", {
+        const thumbSwiper = new Swiper(thumbSliderEl, {
+            spaceBetween: 10,
+            slidesPerView: 'auto',
+            watchSlidesProgress: true,
+            navigation: {
+                nextEl: nextEl,
+                prevEl: prevEl,
+            },
+        });
+
+        new Swiper(mainSliderEl, {
             slidesPerView: 1,
             spaceBetween: 10,
             loop: false,
             thumbs: {
-                swiper: new Swiper(".quickviewSliderThumb2", {
-                    spaceBetween: 10,
-                    slidesPerView: 'auto',
-                    watchSlidesProgress: true,
-                    navigation: {
-                        nextEl: ".swiper-quickview-button-next",
-                        prevEl: ".swiper-quickview-button-prev",
-                    },
-                }),
+                swiper: thumbSwiper,
             },
         });
     }
