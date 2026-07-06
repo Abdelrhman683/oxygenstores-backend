@@ -1,4 +1,28 @@
-@php use App\Utils\Helpers;use App\Utils\ProductManager; @endphp
+@php
+    use App\Utils\Helpers;
+    use App\Utils\ProductManager;
+
+    $imageSources = ($product->product_type === 'physical' && !empty($product->color_image) && count($product->color_images_full_url) > 0)
+        ? $product->color_images_full_url
+        : $product->images_full_url;
+
+    if (!empty($product->thumbnail_full_url)) {
+        $thumbnailPath = is_array($product->thumbnail_full_url) ? ($product->thumbnail_full_url['path'] ?? null) : $product->thumbnail_full_url;
+        if ($thumbnailPath) {
+            $hasThumbnail = false;
+            foreach ($imageSources as $source) {
+                $sourcePath = is_array($source) ? ($source['path'] ?? '') : $source;
+                if ($sourcePath == $thumbnailPath) {
+                    $hasThumbnail = true;
+                    break;
+                }
+            }
+            if (!$hasThumbnail) {
+                array_unshift($imageSources, is_array($product->thumbnail_full_url) ? $product->thumbnail_full_url : ['key' => $product->thumbnail, 'path' => $thumbnailPath, 'status' => 200]);
+            }
+        }
+    }
+@endphp
 @extends('theme-views.layouts.app')
 
 @section('title', $product['name'].' | '.$web_config['company_name'].' '.translate('ecommerce'))
@@ -97,7 +121,7 @@
                                                         </div>
                                                     </div>
 
-                                                    @if($product->images!=null && count($product->images_full_url)>0)
+                                                    @if(count($imageSources) > 0)
                                                         <div class="swiper-wrapper">
                                                             @if(json_decode($product->colors) && count($product->color_images_full_url)>0)
                                                                 @foreach ($product->color_images_full_url as $key => $photo)
@@ -138,7 +162,7 @@
                                                                     @endif
                                                                 @endforeach
                                                             @else
-                                                                @foreach ($product->images_full_url as $key => $photo)
+                                                                @foreach ($imageSources as $key => $photo)
                                                                     <div class="swiper-slide position-relative rounded aspect--1">
                                                                         @if (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                                                                             <span class="product__discount-badge">
@@ -172,7 +196,7 @@
                                             </div>
                                             <div class="mt-2 user-select-none d-flex align-items-center gap-3">
                                                 <div class="quickviewSliderThumb2 swiper-container active-border position-relative ">
-                                                    @if($product->images!=null && json_decode($product->images)>0)
+                                                    @if(count($imageSources) > 0)
                                                         <div
                                                             class="swiper-wrapper auto-item-width justify-content-start border--gray width--4rem">
                                                             @if(count($product->color_images_full_url)>0)
@@ -191,7 +215,7 @@
                                                                     @endif
                                                                 @endforeach
                                                             @else
-                                                                @foreach ($product->images_full_url as $key => $photo)
+                                                                @foreach ($imageSources as $key => $photo)
                                                                     <div
                                                                         class="swiper-slide position-relative rounded border">
                                                                         <img class="dark-support rounded" alt=""

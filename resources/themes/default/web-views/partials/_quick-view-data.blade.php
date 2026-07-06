@@ -34,6 +34,23 @@
                             $imageSources = ($product->product_type === 'physical' && !empty($product->color_image) && count($product->color_images_full_url) > 0)
                                 ? $product->color_images_full_url
                                 : $product->images_full_url;
+
+                            if (!empty($product->thumbnail_full_url)) {
+                                $thumbnailPath = is_array($product->thumbnail_full_url) ? ($product->thumbnail_full_url['path'] ?? null) : $product->thumbnail_full_url;
+                                if ($thumbnailPath) {
+                                    $hasThumbnail = false;
+                                    foreach ($imageSources as $source) {
+                                        $sourcePath = is_array($source) ? ($source['path'] ?? '') : $source;
+                                        if ($sourcePath == $thumbnailPath) {
+                                            $hasThumbnail = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!$hasThumbnail) {
+                                        array_unshift($imageSources, is_array($product->thumbnail_full_url) ? $product->thumbnail_full_url : ['key' => $product->thumbnail, 'path' => $thumbnailPath, 'status' => 200]);
+                                    }
+                                }
+                            }
                         @endphp
 
                         @foreach ($imageSources as $key => $photo)

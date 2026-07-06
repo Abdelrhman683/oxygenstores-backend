@@ -1,4 +1,27 @@
 @php use App\Utils\Helpers; @endphp
+@php
+    $imageSources = ($product->product_type === 'physical' && !empty($product->color_image) && count($product->color_images_full_url) > 0)
+        ? $product->color_images_full_url
+        : $product->images_full_url;
+
+    if (!empty($product->thumbnail_full_url)) {
+        $thumbnailPath = is_array($product->thumbnail_full_url) ? ($product->thumbnail_full_url['path'] ?? null) : $product->thumbnail_full_url;
+        if ($thumbnailPath) {
+            $hasThumbnail = false;
+            foreach ($imageSources as $source) {
+                $sourcePath = is_array($source) ? ($source['path'] ?? '') : $source;
+                if ($sourcePath == $thumbnailPath) {
+                    $hasThumbnail = true;
+                    break;
+                }
+            }
+            if (!$hasThumbnail) {
+                array_unshift($imageSources, is_array($product->thumbnail_full_url) ? $product->thumbnail_full_url : ['key' => $product->thumbnail, 'path' => $thumbnailPath, 'status' => 200]);
+            }
+        }
+    }
+@endphp
+
 <div class="modal-body">
     <div class="product-quickview">
         <button type="button" class="btn-close outside opacity-100 shadow top-0-lg" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -84,7 +107,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @if($product->images!=null && count($product->images_full_url)>0)
+                                @if(count($imageSources) > 0)
                                     <div class="swiper-wrapper">
                                         @if(json_decode($product->colors) && $product->color_images_full_url)
                                             @foreach ($product->color_images_full_url as $key => $photo)
@@ -121,7 +144,7 @@
                                                 @endif
                                             @endforeach
                                         @else
-                                            @foreach ($product->images_full_url as $key => $photo)
+                                            @foreach ($imageSources as $key => $photo)
                                                 <div class="swiper-slide position-relative">
                                                     <div class="easyzoom easyzoom--overlay">
                                                         @if (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
@@ -143,7 +166,7 @@
                         </div>
                         <div class="mt-2 d-flex align-items-center gap-3 justify-content-between">
                             <div class="quickviewSliderThumb2 swiper-container active-border position-relative">
-                                @if($product->images!=null && count($product->images_full_url)>0)
+                                @if(count($imageSources) > 0)
                                     <div class="swiper-wrapper auto-item-width width--4rem border--gray">
                                         @if(json_decode($product->colors) && $product->color_images_full_url)
                                             @foreach ($product->color_images_full_url as $key => $photo)
@@ -168,7 +191,7 @@
                                                 @endif
                                             @endforeach
                                         @else
-                                            @foreach ($product->images_full_url as $key => $photo)
+                                            @foreach ($imageSources as $key => $photo)
                                                 <div class="swiper-slide position-relative rounded border slider-thumb-img-preview"
                                                     style="--size: 54px;"
                                                     data-thumb-key="thumb_{{$key}}">

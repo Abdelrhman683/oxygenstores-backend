@@ -17,7 +17,7 @@ class DetectMobile
         $userAgent = $request->header('User-Agent');
         $isAndroid = preg_match('/android/i', $userAgent);
         $isIOS = preg_match('/(iphone|ipad)/i', $userAgent);
-        $isMobile = $isAndroid || $isIOS;
+        $isMobile = false; // $isAndroid || $isIOS;
 
         view()->share([
             'isMobile' => $isMobile,

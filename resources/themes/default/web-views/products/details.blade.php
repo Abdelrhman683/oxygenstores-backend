@@ -4,67 +4,67 @@
 
 @push('css_or_js')
     @include(VIEW_FILE_NAMES['product_seo_meta_content_partials'], ['metaContentData' => $product?->seoInfo, 'productDetails' => $product])
-    <link rel="stylesheet" href="{{ theme_asset(path: 'public/assets/front-end/css/product-details.css') }}"/>
+    <link rel="stylesheet" href="{{ theme_asset(path: 'public/assets/front-end/css/product-details.css') }}" />
 @endpush
 
 @section('content')
-    @php
-        $productCategory = $product->category;
-        $productSubCategory = $product->subCategory;
-        $productSubSubCategory = $product->subSubCategory;
-        $brandName = $product->brand?->name ?? '';
-        $brandImage = $product->brand?->image_full_url['path'] ?? null;
-        $productSummary = $brandName
-            ? 'المنتج من علامة ' . $brandName
-            : 'السعر يشمل الضريبة والتركيب';
-        $shippingMessage = $product->current_stock > 0
-            ? 'متوفر في المخزون ويمكن شحنه حالياً.'
-            : 'غير متوفر حالياً في المخزون.';
-        $installmentAmount = $product->unit_price > 0 ? round($product->unit_price / 4, 2) : null;
+@php
+    $productCategory = $product->category;
+    $productSubCategory = $product->subCategory;
+    $productSubSubCategory = $product->subSubCategory;
+    $brandName = $product->brand?->name ?? '';
+    $brandImage = $product->brand?->image_full_url['path'] ?? null;
+    $productSummary = $brandName
+        ? 'المنتج من علامة ' . $brandName
+        : 'السعر يشمل الضريبة والتركيب';
+    $shippingMessage = $product->current_stock > 0
+        ? 'متوفر في المخزون ويمكن شحنه حالياً.'
+        : 'غير متوفر حالياً في المخزون.';
+    $installmentAmount = $product->unit_price > 0 ? round($product->unit_price / 4, 2) : null;
 
-        $dynamicAttributes = [];
-        $rawAttributes = $product->attributes;
-        if (is_string($rawAttributes)) {
-            $rawAttributes = json_decode($rawAttributes, true);
-        }
-        if (is_array($rawAttributes)) {
-            foreach ($rawAttributes as $attribute) {
-                if (is_array($attribute)) {
-                    $label = $attribute['name'] ?? $attribute['title'] ?? $attribute['key'] ?? null;
-                    $value = $attribute['value'] ?? $attribute['values'] ?? null;
-                    if ($label && $value) {
-                        $dynamicAttributes[] = [
-                            'label' => $label,
-                            'value' => is_array($value) ? implode(', ', $value) : $value,
-                        ];
-                    }
-                }
-            }
-        }
-
-        $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
-        $filteredChoiceOptions = [];
-        $rawChoiceOptions = json_decode($product->choice_options);
-        if (is_array($rawChoiceOptions)) {
-            foreach ($rawChoiceOptions as $choice) {
-                $title = trim($choice->title);
-                $optionsCount = count($choice->options);
-                if (in_array($title, $specTitles) || $optionsCount <= 1) {
+    $dynamicAttributes = [];
+    $rawAttributes = $product->attributes;
+    if (is_string($rawAttributes)) {
+        $rawAttributes = json_decode($rawAttributes, true);
+    }
+    if (is_array($rawAttributes)) {
+        foreach ($rawAttributes as $attribute) {
+            if (is_array($attribute)) {
+                $label = $attribute['name'] ?? $attribute['title'] ?? $attribute['key'] ?? null;
+                $value = $attribute['value'] ?? $attribute['values'] ?? null;
+                if ($label && $value) {
                     $dynamicAttributes[] = [
-                        'label' => $title,
-                        'value' => implode(', ', $choice->options)
+                        'label' => $label,
+                        'value' => is_array($value) ? implode(', ', $value) : $value,
                     ];
-                } else {
-                    $filteredChoiceOptions[] = $choice;
                 }
             }
         }
-    @endphp
-    <div class="__inline-23">
-        <div class="container-fluid  rtl text-align-direction">
-                    <nav aria-label="breadcrumb">
+    }
+
+    $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
+    $filteredChoiceOptions = [];
+    $rawChoiceOptions = json_decode($product->choice_options);
+    if (is_array($rawChoiceOptions)) {
+        foreach ($rawChoiceOptions as $choice) {
+            $title = trim($choice->title);
+            $optionsCount = count($choice->options);
+            if (in_array($title, $specTitles) || $optionsCount <= 1) {
+                $dynamicAttributes[] = [
+                    'label' => $title,
+                    'value' => implode(', ', $choice->options)
+                ];
+            } else {
+                $filteredChoiceOptions[] = $choice;
+            }
+        }
+    }
+@endphp
+<div class="__inline-23">
+    <div class="container-fluid  rtl text-align-direction">
+        <nav aria-label="breadcrumb">
             <style>
-                .breadcrumb-item + .breadcrumb-item::before {
+                .breadcrumb-item+.breadcrumb-item::before {
                     display: none;
                 }
             </style>
@@ -73,24 +73,24 @@
                     <a href="{{route('home')}}" class="breadcrumb-title">
                         {{translate('الرئيسية')}}
                     </a>
-                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2"></i>
                 </li>
-                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page">
                     {{ $productSubSubCategory?->name ?? $productSubCategory?->name ?? $productCategory?->name ?? translate('category') }}
-                  <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2" ></i>
+                    <i class="fa fa-angle-{{ session('direction') === 'rtl' ? 'left' : 'right' }} mx-2"></i>
                 </li>
-                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page" >
+                <li class="breadcrumb-item active d-flex align-items-center" aria-current="page">
                     {{ $product->name }}
                 </li>
             </ol>
         </nav>
-            <div class="row g-3 {{Session::get('direction') === "rtl" ? '__dir-rtl' : ''}}">
-                <div class="col-lg-9">
-                    <div class="h-100 d-flex flex-column gap-4 pb-2">
-                        <div class="card card-body flex-grow-0" style="border: none ; background: transparent;">
-                            <div class="row g-3">
-                                <div class="col-lg-6 col-md-4">
-                              <div class="gallery_wrapper_deta">
+        <div class="row g-3 {{Session::get('direction') === "rtl" ? '__dir-rtl' : ''}}">
+            <div class="col-lg-9">
+                <div class="h-100 d-flex flex-column gap-4 pb-2">
+                    <div class="card card-body flex-grow-0" style="border: none ; background: transparent;">
+                        <div class="row g-3">
+                            <div class="col-lg-6 col-md-4">
+                                <div class="gallery_wrapper_deta">
 
                                     <div class="pd-img-wrap position-relative d-flex gap-3 flex-row-reverse">
                                         <div class="swiper-container quickviewSlider2 flex-grow-1  aspect-1">
@@ -99,6 +99,23 @@
                                                     $imageSources = ($product->product_type === 'physical' && !empty($product->color_image) && count($product->color_images_full_url) > 0)
                                                         ? $product->color_images_full_url
                                                         : $product->images_full_url;
+
+                                                    if (!empty($product->thumbnail_full_url)) {
+                                                        $thumbnailPath = is_array($product->thumbnail_full_url) ? ($product->thumbnail_full_url['path'] ?? null) : $product->thumbnail_full_url;
+                                                        if ($thumbnailPath) {
+                                                            $hasThumbnail = false;
+                                                            foreach ($imageSources as $source) {
+                                                                $sourcePath = is_array($source) ? ($source['path'] ?? '') : $source;
+                                                                if ($sourcePath == $thumbnailPath) {
+                                                                    $hasThumbnail = true;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (!$hasThumbnail) {
+                                                                array_unshift($imageSources, is_array($product->thumbnail_full_url) ? $product->thumbnail_full_url : ['key' => $product->thumbnail, 'path' => $thumbnailPath, 'status' => 200]);
+                                                            }
+                                                        }
+                                                    }
                                                 @endphp
 
                                                 @foreach ($imageSources as $key => $photo)
@@ -109,10 +126,12 @@
 
                                                         $colorCode = $photo['color'] ?? '';
                                                     @endphp
-                                                    <div class="swiper-slide position-relative" data-color="{{ $colorCode }}">
+                                                    <div class="swiper-slide position-relative"
+                                                        data-color="{{ $colorCode }}">
                                                         <div class="easyzoom easyzoom--overlay is-ready">
                                                             <a href="{{ $imagePath }}">
-                                                                <img class="rounded h-100 aspect-1" alt="" src="{{ $imagePath }}">
+                                                                <img class="rounded h-100 aspect-1" alt=""
+                                                                    src="{{ $imagePath }}">
                                                             </a>
                                                         </div>
                                                     </div>
@@ -120,17 +139,18 @@
                                             </div>
                                         </div>
                                         @if (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
-                                        <div class="discount-badge-wrapper">
-                                            <span class="">
-                                                <span class="direction-ltr d-block dic_">
-                                                 -{{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
+                                            <div class="discount-badge-wrapper">
+                                                <span class="">
+                                                    <span class="direction-ltr d-block dic_">
+                                                        -{{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
+                                                    </span>
                                                 </span>
-                                            </span>
-                                        </div>
+                                            </div>
                                         @endif
-                                        
+
                                         <div class="user-select-none thumb-vertical-wrapper" style="width: 65px;">
-                                            <div class="quickviewSliderThumb2 swiper-container position-relative active-border h-100">
+                                            <div
+                                                class="quickviewSliderThumb2 swiper-container position-relative active-border h-100">
                                                 <div class="swiper-wrapper justify-content-start">
                                                     @foreach ($imageSources as $key => $photo)
                                                         @php
@@ -150,28 +170,28 @@
                                         </div>
                                     </div>
 
-                              </div>
                                 </div>
+                            </div>
 
-                                <div class="col-lg-6 col-md-8 mt-md-0 mt-sm-3 web-direction">
-                                    <div class="details __h-100 product-cart-option-container p-0">
-                                        <div class="head_det">
-                                           <a href="#" class="sub_cat_title">
+                            <div class="col-lg-6 col-md-8 mt-md-0 mt-sm-3 web-direction">
+                                <div class="details __h-100 product-cart-option-container p-0">
+                                    <div class="head_det">
+                                        <a href="#" class="sub_cat_title">
                                             {{ $productSubCategory?->name ?? $productCategory?->name ?? translate('category') }}
-                                        </a >  
-                                      <a href="javascript:void(0)"
-                                            class="head_fav product-action-add-wishlist"
+                                        </a>
+                                        <a href="javascript:void(0)" class="head_fav product-action-add-wishlist"
                                             data-product-id="{{ $product['id'] }}">
 
-                                                <i class="fa {{ ($wishlistStatus == 1 ? 'fa-heart' : 'fa-heart-o') }} wishlist_icon_{{ $product['id'] }}"></i>
+                                            <i
+                                                class="fa {{ ($wishlistStatus == 1 ? 'fa-heart' : 'fa-heart-o') }} wishlist_icon_{{ $product['id'] }}"></i>
 
-                                            </a>
-                                           
-                                       
-                                        </div>
-                                      
-                                        <h2 class=" __inline-24 cat_title_det">{{ $product->name }}</h2>
-                                        <!-- <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
+                                        </a>
+
+
+                                    </div>
+
+                                    <h2 class=" __inline-24 cat_title_det">{{ $product->name }}</h2>
+                                    <!-- <div class="d-flex flex-wrap align-items-center gap-3 mb-4 pro">
                                             @if($overallRating[0] !=0)
                                             <div class="star-rating me-2">
                                                 @for($inc=1;$inc<=5;$inc++)
@@ -209,77 +229,84 @@
                                             </span>
                                         </div> -->
 
-                                        @if($product['product_type'] == 'digital')
-                                            <div class="digital-product-authors mb-2">
-                                                @if(count($productPublishingHouseInfo['data']) > 0)
-                                                    <div class="d-flex align-items-center g-2 me-2">
-                                                        <span class="text-capitalize digital-product-author-title">{{ translate('Publishing_House') }} :</span>
-                                                        <div class="item-list">
-                                                            @foreach($productPublishingHouseInfo['data'] as $publishingHouseName)
-                                                                <a href="{{ route('products', ['publishing_house_id' => $publishingHouseName['id'], 'product_type' => 'digital', 'page'=>1]) }}"
-                                                                   class="text-base">
-                                                                    {{ $publishingHouseName['name'] }}
-                                                                </a>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                @endif
-
-                                                @if(count($productAuthorsInfo['data']) > 0)
-                                                    <div class="d-flex align-items-center g-2 me-2">
-                                                        <span class="text-capitalize digital-product-author-title">{{ translate('Author') }} :</span>
-                                                        <div class="item-list">
-                                                            @foreach($productAuthorsInfo['data'] as $productAuthor)
-                                                                <a href="{{ route('products',['author_id' => $productAuthor['id'], 'product_type' => 'digital', 'page' => 1]) }}"
-                                                                   class="text-base">
-                                                                    {{ $productAuthor['name'] }}
-                                                                </a>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        @endif
-
-                                        <form class="addToCartDynamicForm add-to-cart-details-form d-flex flex-column gap-4">
-
-                                            <div class="">
-                                                <h3 class="font-weight-normal  d-flex align-items-end gap-2 mb-0">
-                                                          <span class="discounted-unit-price fs-18 font-bold">
-                                                        {{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'string') }}
-                                                    </span>
-                                                    @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
-                                                        <del
-                                                            class="product-total-unit-price align-middle text-muted fs-15 font-semibold">
-                                                            {{ webCurrencyConverter(amount: $product->unit_price) }}
-                                                        </del>
-                                                    @endif
-                                              
-                                                </h3>
-                                                <div class="summary_det">
-                                                    <p>
-                                                        @if($product->brand && $product->brand->slug)
-                                                            المنتج من علامة 
-                                                            <a href="{{ route('brand-products', ['slug' => $product->brand->slug]) }}" class="web-text-primary font-semibold hover:underline">
-                                                                {{ $brandName }}
+                                    @if($product['product_type'] == 'digital')
+                                        <div class="digital-product-authors mb-2">
+                                            @if(count($productPublishingHouseInfo['data']) > 0)
+                                                <div class="d-flex align-items-center g-2 me-2">
+                                                    <span
+                                                        class="text-capitalize digital-product-author-title">{{ translate('Publishing_House') }}
+                                                        :</span>
+                                                    <div class="item-list">
+                                                        @foreach($productPublishingHouseInfo['data'] as $publishingHouseName)
+                                                            <a href="{{ route('products', ['publishing_house_id' => $publishingHouseName['id'], 'product_type' => 'digital', 'page' => 1]) }}"
+                                                                class="text-base">
+                                                                {{ $publishingHouseName['name'] }}
                                                             </a>
-                                                        @else
-                                                            {{ $productSummary }}
-                                                        @endif
-                                                    </p>
+                                                        @endforeach
+                                                    </div>
                                                 </div>
-                                                @if($brandImage)
-                                                    <div class="brand">
-                                                        @if($product->brand && $product->brand->slug)
-                                                            <a href="{{ route('brand-products', ['slug' => $product->brand->slug]) }}">
-                                                                <img loading="lazy" src="{{ $brandImage }}" alt="{{ $brandName }}">
+                                            @endif
+
+                                            @if(count($productAuthorsInfo['data']) > 0)
+                                                <div class="d-flex align-items-center g-2 me-2">
+                                                    <span
+                                                        class="text-capitalize digital-product-author-title">{{ translate('Author') }}
+                                                        :</span>
+                                                    <div class="item-list">
+                                                        @foreach($productAuthorsInfo['data'] as $productAuthor)
+                                                            <a href="{{ route('products', ['author_id' => $productAuthor['id'], 'product_type' => 'digital', 'page' => 1]) }}"
+                                                                class="text-base">
+                                                                {{ $productAuthor['name'] }}
                                                             </a>
-                                                        @else
-                                                            <img loading="lazy" src="{{ $brandImage }}" alt="{{ $brandName }}">
-                                                        @endif
+                                                        @endforeach
                                                     </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
+
+                                    <form
+                                        class="addToCartDynamicForm add-to-cart-details-form d-flex flex-column gap-4">
+
+                                        <div class="">
+                                            <h3 class="font-weight-normal  d-flex align-items-end gap-2 mb-0">
+                                                <span class="discounted-unit-price fs-18 font-bold">
+                                                    {{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'string') }}
+                                                </span>
+                                                @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+                                                    <del
+                                                        class="product-total-unit-price align-middle text-muted fs-15 font-semibold">
+                                                        {{ webCurrencyConverter(amount: $product->unit_price) }}
+                                                    </del>
                                                 @endif
-                                                <!-- <div class="product-details__short-description">
+
+                                            </h3>
+                                            <div class="summary_det">
+                                                <p>
+                                                    @if($product->brand && $product->brand->slug)
+                                                        المنتج من علامة
+                                                        <a href="{{ route('brand-products', ['slug' => $product->brand->slug]) }}"
+                                                            class="web-text-primary font-semibold hover:underline">
+                                                            {{ $brandName }}
+                                                        </a>
+                                                    @else
+                                                        {{ $productSummary }}
+                                                    @endif
+                                                </p>
+                                            </div>
+                                            @if($brandImage)
+                                                <div class="brand">
+                                                    @if($product->brand && $product->brand->slug)
+                                                        <a
+                                                            href="{{ route('brand-products', ['slug' => $product->brand->slug]) }}">
+                                                            <img loading="lazy" src="{{ $brandImage }}" alt="{{ $brandName }}">
+                                                        </a>
+                                                    @else
+                                                        <img loading="lazy" src="{{ $brandImage }}" alt="{{ $brandName }}">
+                                                    @endif
+                                                </div>
+                                            @endif
+                                            <!-- <div class="product-details__short-description">
                                                     <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
                                                     <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
                                                     <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
@@ -287,142 +314,144 @@
                                                     <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
                                                     <p>الكهرباء والفريون: 220V-1Ph-60Hz – R32.</p>
                                                 </div> -->
-                                                <div class="product-details__short-description">
-                                                   @if ($product['details'])
-                                                    <div
-                                                        class="p-details-description text-body col-lg-12 col-md-12 fs-14 text-justify details-text-justify rich-editor-html-content" style="max-height: 525px">
+                                            <div class="product-details__short-description">
+                                                @if ($product['details'])
+                                                    <div class="p-details-description text-body col-lg-12 col-md-12 fs-14 text-justify details-text-justify rich-editor-html-content"
+                                                        style="max-height: 525px">
                                                         {!! $product['details'] !!}
                                                     </div>
                                                 @endif
+                                            </div>
+                                            @if($product->current_stock <= 0)
+                                                <div class="shipping-alert">
+                                                    {{ $shippingMessage }}
                                                 </div>
-                                                @if($product->current_stock <= 0)
-                                                    <div class="shipping-alert">
-                                                        {{ $shippingMessage }}
-                                                    </div>
-                                                @endif
-                                            </div>
-
-                                  @if($installmentAmount)
-    <div class="installment-text">
-
-     <tamara-widget
-    type="tamara-summary"
-    amount="{{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'value') }}"
-    inline-type="2">
-</tamara-widget>
-
-<div id="TabbyPromo" class="mt-2"></div>
-    </div>
-
-@endif
-
-                                     
-                                            @csrf
-                                            <input type="hidden" name="id" value="{{ $product->id }}">
-                                             <input type="hidden" id="hidden_quantity" name="quantity" value="{{ $initialProductConfig['quantity'] ?? 1 }}">
-                                            <div
-                                                class="position-relative">
-                                                @if (count(json_decode($product->colors)) > 0)
-                                                    <div class="d-flex align-items-center gap-3 my-0">
-                                                        <div class="product-description-label m-0 __color-9B9B9B fs-14">
-                                                            {{ translate('color') }}
-                                                        </div>
-                                                        <div>
-                                                            <ul class="list-inline checkbox-color mb-0 p-0 flex-start gap-2">
-                                                                @foreach (json_decode($product->colors) as $key => $color)
-                                                                    <li>
-                                                                        <input type="radio"
-                                                                               id="{{ str_replace(' ', '', ($product->id. '-color-'. str_replace('#','',$color))) }}"
-                                                                               name="color" value="{{ $color }}"
-                                                                               @if($key == 0) checked @endif>
-                                                                        <label style="background: {{ $color }};"
-                                                                               class="focus-preview-image-by-color shadow-border"
-                                                                               for="{{ str_replace(' ', '', ($product->id. '-color-'. str_replace('#','',$color))) }}"
-                                                                               data-toggle="tooltip"
-                                                                               data-key="{{ str_replace('#','',$color) }}"
-                                                                               data-colorid="preview-box-{{ str_replace('#','',$color) }}"
-                                                                               data-title="{{ getColorNameByCode(code: $color) }}">
-                                                                            <span class="outline"></span></label>
-                                                                    </li>
-                                                                @endforeach
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                                @php
-                                                    $qty = 0;
-                                                    if(!empty($product->variation)){
-                                                    foreach (json_decode($product->variation) as $key => $variation) {
-                                                            $qty += $variation->qty;
-                                                        }
-                                                    }
-                                                @endphp
-                                            </div>
-
-                                            @php($extensionIndex=0)
-                                            @if($product['product_type'] == 'digital' && $product['digital_product_file_types'] && count($product['digital_product_file_types']) > 0 && $product['digital_product_extensions'])
-                                                @foreach($product['digital_product_extensions'] as $extensionKey => $extensionGroup)
-                                                    <div class="row flex-start mx-0 align-items-center gap-3 flex-nowrap">
-                                                        <div
-                                                            class="product-description-label __color-9B9B9B fs-14 text-capitalize flex-shrink-0">
-                                                            {{ translate($extensionKey) }}
-                                                        </div>
-                                                        <div>
-                                                            @if(count($extensionGroup) > 0)
-                                                                <div
-                                                                    class="list-inline checkbox-alphanumeric checkbox-alphanumeric--style-1 mb-0 mx-1 flex-start ps-0">
-                                                                    @foreach($extensionGroup as $index => $extension)
-                                                                        <div class="user-select-none">
-                                                                            <div class="for-mobile-capacity">
-                                                                                <input type="radio" hidden
-                                                                                       id="extension_{{ str_replace(' ', '-', $extension) }}"
-                                                                                       name="variant_key"
-                                                                                       value="{{ $extensionKey.'-'.preg_replace('/\s+/', '-', $extension) }}"
-                                                                                    {{ $extensionIndex == 0 ? 'checked' : ''}}>
-                                                                                <label
-                                                                                    for="extension_{{ str_replace(' ', '-', $extension) }}"
-                                                                                    class="__text-12px">
-                                                                                    <span class="text-nowrap max-w-180 line--limit-1">{{ $extension }}</span>
-                                                                                </label>
-                                                                            </div>
-                                                                        </div>
-                                                                        @php($extensionIndex++)
-                                                                    @endforeach
-                                                                </div>
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                @endforeach
                                             @endif
+                                        </div>
 
-                                             @foreach ($filteredChoiceOptions as $key => $choice)
-                                                <div class="row flex-start mx-0  gap-3 flex-nowrap">
-                                                    <div
-                                                        class="product-description-label fs-14 __color-9B9B9B text-capitalize flex-shrink-0">{{ $choice->title }}
+                                        @if($installmentAmount)
+                                            <div class="installment-text">
+
+                                                <tamara-widget type="tamara-summary"
+                                                    amount="{{ getProductPriceByType(product: $product, type: 'discounted_unit_price', result: 'value') }}"
+                                                    inline-type="2">
+                                                </tamara-widget>
+
+                                                <div id="TabbyPromo" class="mt-2"></div>
+                                            </div>
+
+                                        @endif
+
+
+                                        @csrf
+                                        <input type="hidden" name="id" value="{{ $product->id }}">
+                                        <input type="hidden" id="hidden_quantity" name="quantity"
+                                            value="{{ $initialProductConfig['quantity'] ?? 1 }}">
+                                        <div class="position-relative">
+                                            @if (count(json_decode($product->colors)) > 0)
+                                                <div class="d-flex align-items-center gap-3 my-0">
+                                                    <div class="product-description-label m-0 __color-9B9B9B fs-14">
+                                                        {{ translate('color') }}
                                                     </div>
                                                     <div>
-                                                        <div
-                                                            class="list-inline checkbox-alphanumeric checkbox-alphanumeric--style-1 mb-0 mx-1 flex-start row ps-0">
-                                                            @foreach ($choice->options as $index => $option)
-                                                                <div class="user-select-none">
-                                                                    <div class="for-mobile-capacity">
-                                                                        <input type="radio"
-                                                                               id="{{ str_replace(' ', '', ($choice->name. '-'. $option)) }}"
-                                                                               name="{{ $choice->name }}" value="{{ $option }}"
-                                                                               @if($index == 0) checked @endif >
-                                                                        <label class="__text-12px"
-                                                                               for="{{ str_replace(' ', '', ($choice->name. '-'. $option)) }}">
-                                                                                <span class="text-nowrap max-w-180 line--limit-1">{{ $option }}</span>
-                                                                            </label>
-                                                                    </div>
-                                                                </div>
+                                                        <ul class="list-inline checkbox-color mb-0 p-0 flex-start gap-2">
+                                                            @foreach (json_decode($product->colors) as $key => $color)
+                                                                <li>
+                                                                    <input type="radio"
+                                                                        id="{{ str_replace(' ', '', ($product->id . '-color-' . str_replace('#', '', $color))) }}"
+                                                                        name="color" value="{{ $color }}" @if($key == 0) checked
+                                                                        @endif>
+                                                                    <label style="background: {{ $color }};"
+                                                                        class="focus-preview-image-by-color shadow-border"
+                                                                        for="{{ str_replace(' ', '', ($product->id . '-color-' . str_replace('#', '', $color))) }}"
+                                                                        data-toggle="tooltip"
+                                                                        data-key="{{ str_replace('#', '', $color) }}"
+                                                                        data-colorid="preview-box-{{ str_replace('#', '', $color) }}"
+                                                                        data-title="{{ getColorNameByCode(code: $color) }}">
+                                                                        <span class="outline"></span></label>
+                                                                </li>
                                                             @endforeach
-                                                        </div>
+                                                        </ul>
                                                     </div>
                                                 </div>
-                                            @endforeach
+                                            @endif
+                                            @php
+                                                $qty = 0;
+                                                if (!empty($product->variation)) {
+                                                    foreach (json_decode($product->variation) as $key => $variation) {
+                                                        $qty += $variation->qty;
+                                                    }
+                                                }
+                                            @endphp
+                                        </div>
 
-                                            <!-- <div class="">
+                                        @php($extensionIndex = 0)
+                                        @if($product['product_type'] == 'digital' && $product['digital_product_file_types'] && count($product['digital_product_file_types']) > 0 && $product['digital_product_extensions'])
+                                        @foreach($product['digital_product_extensions'] as $extensionKey => $extensionGroup)
+                                        <div class="row flex-start mx-0 align-items-center gap-3 flex-nowrap">
+                                            <div
+                                                class="product-description-label __color-9B9B9B fs-14 text-capitalize flex-shrink-0">
+                                                {{ translate($extensionKey) }}
+                                            </div>
+                                            <div>
+                                                @if(count($extensionGroup) > 0)
+                                                <div
+                                                    class="list-inline checkbox-alphanumeric checkbox-alphanumeric--style-1 mb-0 mx-1 flex-start ps-0">
+                                                    @foreach($extensionGroup as $index => $extension)
+                                                    <div class="user-select-none">
+                                                        <div class="for-mobile-capacity">
+                                                            <input type="radio" hidden
+                                                                id="extension_{{ str_replace(' ', '-', $extension) }}"
+                                                                name="variant_key"
+                                                                value="{{ $extensionKey . '-' . preg_replace('/\s+/', '-', $extension) }}"
+                                                                {{ $extensionIndex == 0 ? 'checked' : ''}}>
+                                                            <label
+                                                                for="extension_{{ str_replace(' ', '-', $extension) }}"
+                                                                class="__text-12px">
+                                                                <span
+                                                                    class="text-nowrap max-w-180 line--limit-1">{{ $extension }}</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    @php($extensionIndex++)
+                                                    @endforeach
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                        @endif
+
+                                        @foreach ($filteredChoiceOptions as $key => $choice)
+                                            <div class="row flex-start mx-0  gap-3 flex-nowrap">
+                                                <div
+                                                    class="product-description-label fs-14 __color-9B9B9B text-capitalize flex-shrink-0">
+                                                    {{ $choice->title }}
+                                                </div>
+                                                <div>
+                                                    <div
+                                                        class="list-inline checkbox-alphanumeric checkbox-alphanumeric--style-1 mb-0 mx-1 flex-start row ps-0">
+                                                        @foreach ($choice->options as $index => $option)
+                                                            <div class="user-select-none">
+                                                                <div class="for-mobile-capacity">
+                                                                    <input type="radio"
+                                                                        id="{{ str_replace(' ', '', ($choice->name . '-' . $option)) }}"
+                                                                        name="{{ $choice->name }}" value="{{ $option }}"
+                                                                        @if($index == 0) checked @endif>
+                                                                    <label class="__text-12px"
+                                                                        for="{{ str_replace(' ', '', ($choice->name . '-' . $option)) }}">
+                                                                        <span
+                                                                            class="text-nowrap max-w-180 line--limit-1">{{ $option }}</span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+
+                                        <!-- <div class="">
                                                 <div class="product-quantity d-flex flex-column __gap-15">
                                                     <div class="d-flex align-items-center gap-4">
                                                         <div class="product-description-label __color-9B9B9B fs-14">
@@ -475,10 +504,10 @@
                                                     </div>
                                                 </div>
                                             </div> -->
-{{--
-                                            <div class="__btn-grp product-add-and-buy-section-parent">
+                                        {{--
+                                        <div class="__btn-grp product-add-and-buy-section-parent">
 
-                                                <?php
+                                            <?php
 
 
                                                 $isTemporaryClose = false;
@@ -494,40 +523,37 @@
                                                 }
                                                 ?>
 
-                                                <div
-                                                    class="product-add-and-buy-section gap-2 {!! $firstVariationQuantity <= 0 ? '' : 'd-flex' !!}"
-                                                    {!! $firstVariationQuantity <= 0 ? 'style="display: none;"' : '' !!}>
+                                            <div class="product-add-and-buy-section gap-2 {!! $firstVariationQuantity <= 0 ? '' : 'd-flex' !!}"
+                                                {!! $firstVariationQuantity <=0 ? 'style="display: none;"' : '' !!}>
 
-                                                    @if($isTemporaryClose || $isVacationMode)
-                                                        <button class="btn btn-secondary" type="button" disabled>
-                                                            {{ translate('buy_now') }}
-                                                        </button>
-                                                        <button class="btn btn--primary string-limit" type="button" disabled>
-                                                            {{ translate('add_to_cart') }}
-                                                        </button>
-                                                    @else
-                                                        <button type="button"
-                                                                class="btn btn-secondary element-center btn-gap-{{ Session::get('direction') === 'rtl' ? 'left' : 'right' }} product-buy-now-button"
-                                                                data-form=".add-to-cart-details-form"
-                                                                data-auth="{{ (getWebConfig(name: 'guest_checkout') == 1 || Auth::guard('customer')->check()) ? 'true' : 'false' }}"
-                                                                data-route="{{ route('shop-cart') }}"
-                                                        >
-                                                            <span class="string-limit">{{ translate('buy_now') }}</span>
-                                                        </button>
-                                                        <button
-                                                            class="btn btn--primary element-center product-add-to-cart-button"
-                                                            type="button"
-                                                            data-form=".add-to-cart-details-form"
-                                                            data-update="{{ translate('update_cart') }}"
-                                                            data-add="{{ translate('add_to_cart') }}"
-                                                        >
-                                                            <span class="string-limit">
-                                                                {{ $initialProductConfig['first_variant_in_cart'] ? translate('update_cart') : translate('add_to_cart') }}
-                                                            </span>
-                                                        </button>
-                                                    @endif
-                                                </div>
-<!-- 
+                                                @if($isTemporaryClose || $isVacationMode)
+                                                <button class="btn btn-secondary" type="button" disabled>
+                                                    {{ translate('buy_now') }}
+                                                </button>
+                                                <button class="btn btn--primary string-limit" type="button" disabled>
+                                                    {{ translate('add_to_cart') }}
+                                                </button>
+                                                @else
+                                                <button type="button"
+                                                    class="btn btn-secondary element-center btn-gap-{{ Session::get('direction') === 'rtl' ? 'left' : 'right' }} product-buy-now-button"
+                                                    data-form=".add-to-cart-details-form"
+                                                    data-auth="{{ (getWebConfig(name: 'guest_checkout') == 1 || Auth::guard('customer')->check()) ? 'true' : 'false' }}"
+                                                    data-route="{{ route('shop-cart') }}">
+                                                    <span class="string-limit">{{ translate('buy_now') }}</span>
+                                                </button>
+                                                <button
+                                                    class="btn btn--primary element-center product-add-to-cart-button"
+                                                    type="button" data-form=".add-to-cart-details-form"
+                                                    data-update="{{ translate('update_cart') }}"
+                                                    data-add="{{ translate('add_to_cart') }}">
+                                                    <span class="string-limit">
+                                                        {{ $initialProductConfig['first_variant_in_cart'] ?
+                                                        translate('update_cart') : translate('add_to_cart') }}
+                                                    </span>
+                                                </button>
+                                                @endif
+                                            </div>
+                                            <!-- 
                                                 @if(($product['product_type'] == 'physical'))
                                                     <div
                                                         class="product-restock-request-section collapse" {!! $firstVariationQuantity <= 0 ? 'style="display: block;"' : '' !!}>
@@ -542,7 +568,7 @@
                                                         </button>
                                                     </div>
                                                 @endif -->
-                                                <!-- <button type="button" data-product-id="{{ $product['id'] }}"
+                                            <!-- <button type="button" data-product-id="{{ $product['id'] }}"
                                                         class="btn __text-18px border product-action-add-wishlist">
                                                     <i class="fa {{($wishlistStatus == 1?'fa-heart':'fa-heart-o') }} wishlist_icon_{{ $product['id'] }} web-text-primary"
                                                        aria-hidden="true"></i>
@@ -557,635 +583,653 @@
                                                     </div>
                                                 </button> -->
 
-                                                @if($product->added_by == 'admin')
-                                                    @if(checkVendorAbility(type: 'inhouse', status: 'temporary_close') || checkVendorAbility(type: 'inhouse', status: 'vacation_status'))
-                                                        <div class="alert alert-danger mt-2" role="alert">
-                                                            {{ translate('this_shop_is_temporary_closed_or_on_vacation._You_cannot_add_product_to_cart_from_this_shop_for_now') }}
-                                                        </div>
-                                                    @endif
-                                                @elseif($product->added_by == 'seller')
-                                                    @if(checkVendorAbility(type: 'vendor', status: 'temporary_close', vendor: $product->seller->shop) || checkVendorAbility(type: 'vendor', status: 'vacation_status', vendor: $product->seller->shop))
-                                                        <div class="alert alert-danger mt-2" role="alert">
-                                                            {{ translate('this_shop_is_temporary_closed_or_on_vacation._You_cannot_add_product_to_cart_from_this_shop_for_now') }}
-                                                        </div>
-                                                    @endif
-                                                @endif
+                                            @if($product->added_by == 'admin')
+                                            @if(checkVendorAbility(type: 'inhouse', status: 'temporary_close') ||
+                                            checkVendorAbility(type: 'inhouse', status: 'vacation_status'))
+                                            <div class="alert alert-danger mt-2" role="alert">
+                                                {{
+                                                translate('this_shop_is_temporary_closed_or_on_vacation._You_cannot_add_product_to_cart_from_this_shop_for_now')
+                                                }}
                                             </div>
---}}
-                                        </form>
-                                    </div>
+                                            @endif
+                                            @elseif($product->added_by == 'seller')
+                                            @if(checkVendorAbility(type: 'vendor', status: 'temporary_close', vendor:
+                                            $product->seller->shop) || checkVendorAbility(type: 'vendor', status:
+                                            'vacation_status', vendor: $product->seller->shop))
+                                            <div class="alert alert-danger mt-2" role="alert">
+                                                {{
+                                                translate('this_shop_is_temporary_closed_or_on_vacation._You_cannot_add_product_to_cart_from_this_shop_for_now')
+                                                }}
+                                            </div>
+                                            @endif
+                                            @endif
+                                        </div>
+                                        --}}
+                                    </form>
                                 </div>
                             </div>
                         </div>
-                        <div class="rtl text-align-direction flex-grow-1">
-                            <div class="  h-100">
-                               <ul class="nav nav-tabs nav--tabs d-flex justify-content-lg-start justify-content-center gap-2 p-0" role="tablist">
-                                          <li class="nav-item">
-                                        <a class="nav-link __inline-27 mb-0 tab_link"
-                                        data-toggle="tab"
-                                        href="#specifications"
+                    </div>
+                    <div class="rtl text-align-direction flex-grow-1">
+                        <div class="  h-100">
+                            <ul class="nav nav-tabs nav--tabs d-flex justify-content-lg-start justify-content-center gap-2 p-0"
+                                role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link __inline-27 mb-0 tab_link" data-toggle="tab"
+                                        href="#specifications" role="tab">
+                                        {{ translate('المواصفات') }}
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link __inline-27 mb-0 tab_link active" data-toggle="tab"
+                                        href="#overview" role="tab">
+                                        {{ translate('overview') }}
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link __inline-27 mb-0 tab_link" data-toggle="tab" href="#reviews"
                                         role="tab">
-                                            {{ translate('المواصفات') }}
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link __inline-27 mb-0 tab_link active"
-                                        data-toggle="tab"
-                                        href="#overview"
-                                        role="tab">
-                                            {{ translate('overview') }}
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link __inline-27 mb-0 tab_link"
-                                        data-toggle="tab"
-                                        href="#reviews"
-                                        role="tab">
-                                            {{ translate('reviews') }}
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link __inline-27 mb-0 tab_link"
-                                        data-toggle="tab"
-                                        href="#other_products"
-                                        role="tab">
-                                            {{ translate('منتجات اخرى') }}
-                                        </a>
-                                    </li>
-                          
-                                </ul>
+                                        {{ translate('reviews') }}
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link __inline-27 mb-0 tab_link" data-toggle="tab"
+                                        href="#other_products" role="tab">
+                                        {{ translate('منتجات اخرى') }}
+                                    </a>
+                                </li>
+
+                            </ul>
 
 
-                                <div class="tab-content px-lg-3">
-                                    <div class="tab-pane fade show active text-justify" id="overview"
-                                         role="tabpanel">
-                                        <div class="details-content-wrap ov-hidden show-more--content">
-                                            <div class="row pt-2 specification">
+                            <div class="tab-content px-lg-3">
+                                <div class="tab-pane fade show active text-justify" id="overview" role="tabpanel">
+                                    <div class="details-content-wrap ov-hidden show-more--content">
+                                        <div class="row pt-2 specification">
 
-                                                @if($product->video_url != null && (str_contains($product->video_url, "youtube.com/embed/")))
-                                                    <div class="col-12 mb-4">
-                                                        <iframe width="420" height="315" src="{{ $product->video_url }}"
-                                                                title="YouTube video player" frameborder="0"
-                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                                referrerpolicy="strict-origin-when-cross-origin"
-                                                                allowfullscreen></iframe>
-                                                    </div>
-                                                @endif
-                                                @if ($product['details'])
-                                                    <h4 class="fs-16 fw-bold mb-3 px-1">{{ translate('Detail_Description') }}</h4>
-                                                    <div
-                                                        class="p-details-description text-body col-lg-12 col-md-12 fs-14 text-justify details-text-justify rich-editor-html-content" style="max-height: 525px">
-                                                        {!! $product['details'] !!}
-                                                    </div>
-                                                @endif
+                                            @if($product->video_url != null && (str_contains($product->video_url, "youtube.com/embed/")))
+                                                <div class="col-12 mb-4">
+                                                    <iframe width="420" height="315" src="{{ $product->video_url }}"
+                                                        title="YouTube video player" frameborder="0"
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                        referrerpolicy="strict-origin-when-cross-origin"
+                                                        allowfullscreen></iframe>
+                                                </div>
+                                            @endif
+                                            @if ($product['details'])
+                                                <h4 class="fs-16 fw-bold mb-3 px-1">{{ translate('Detail_Description') }}
+                                                </h4>
+                                                <div class="p-details-description text-body col-lg-12 col-md-12 fs-14 text-justify details-text-justify rich-editor-html-content"
+                                                    style="max-height: 525px">
+                                                    {!! $product['details'] !!}
+                                                </div>
+                                            @endif
 
+                                        </div>
+                                        @if (!$product['details'] && ($product->video_url == null || !(str_contains($product->video_url, "youtube.com/embed/"))))
+                                            <div>
+                                                <div class="text-center text-capitalize py-5">
+                                                    <img class="mw-90"
+                                                        src="{{ theme_asset(path: 'public/assets/front-end/img/icons/nodata.svg') }}"
+                                                        alt="">
+                                                    <p class="text-capitalize mt-2">
+                                                        <small>{{ translate('product_details_not_found') }}
+                                                            !</small>
+                                                    </p>
+                                                </div>
                                             </div>
-                                            @if (!$product['details'] && ($product->video_url == null || !(str_contains($product->video_url, "youtube.com/embed/"))))
-                                                <div>
-                                                    <div class="text-center text-capitalize py-5">
-                                                        <img class="mw-90"
-                                                             src="{{ theme_asset(path: 'public/assets/front-end/img/icons/nodata.svg') }}"
-                                                             alt="">
-                                                        <p class="text-capitalize mt-2">
-                                                            <small>{{ translate('product_details_not_found') }}
-                                                                !</small>
-                                                        </p>
+                                        @endif
+                                    </div>
+                                    <div class="d-flex justify-content-center mt-2">
+                                        <button
+                                            class="btn btn-outline-primary text-capitalize px-4 py-2 see-more-details">{{translate('see_more')}}</button>
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="reviews" role="tabpanel">
+                                    <div class="">
+                                        @if(count($product->reviews) == 0 && $productReviews->total() == 0)
+                                            <div>
+                                                <div class="text-center text-capitalize">
+                                                    <img class="mw-100"
+                                                        src="{{ theme_asset(path: 'public/assets/front-end/img/icons/empty-review.svg') }}"
+                                                        alt="">
+                                                    <p class="text-capitalize">
+                                                        <small>{{ translate('No_review_given_yet') }}!</small>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="row pt-2 pb-3">
+                                                <div class="col-lg-4 col-md-5 ">
+                                                    <div class=" row d-flex justify-content-center align-items-center">
+                                                        <div
+                                                            class="col-12 d-flex justify-content-center align-items-center">
+                                                            <h2 class="overall_review mb-2 __inline-28">
+                                                                {{ $overallRating[0] }}
+                                                            </h2>
+                                                        </div>
+                                                        <div
+                                                            class="d-flex justify-content-center align-items-center star-rating ">
+                                                            @for($inc = 1; $inc <= 5; $inc++)
+                                                                @if ($inc <= (int) $overallRating[0])
+                                                                    <i class="tio-star text-warning"></i>
+                                                                @elseif ($overallRating[0] != 0 && $inc <= (int) $overallRating[0] + 1.1 && $overallRating[0] > ((int) $overallRating[0]))
+                                                                    <i class="tio-star-half text-warning"></i>
+                                                                @else
+                                                                    <i class="tio-star-outlined text-warning"></i>
+                                                                @endif
+                                                            @endfor
+                                                        </div>
+                                                        <div
+                                                            class="col-12 d-flex justify-content-center align-items-center mt-2">
+                                                            <span class="text-center">
+                                                                {{ $productReviews->total() }} {{ translate('ratings') }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-8 col-md-7 pt-sm-3 pt-md-0">
+                                                    <div class="d-flex align-items-center mb-2 font-size-sm">
+                                                        <div class="__rev-txt"><span
+                                                                class="d-inline-block align-middle text-body">{{ translate('excellent') }}</span>
+                                                        </div>
+                                                        <div class="w-0 flex-grow">
+                                                            <div class="progress text-body __h-5px">
+                                                                <div class="progress-bar web--bg-primary" role="progressbar"
+                                                                    style="width: <?php    echo $widthRating = ($rating[0] != 0) ? ($rating[0] / $overallRating[1]) * 100 : (0); ?>%;"
+                                                                    aria-valuenow="60" aria-valuemin="0"
+                                                                    aria-valuemax="100"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-1 text-body">
+                                                            <span
+                                                                class=" {{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}} ">
+                                                                {{ $rating[0] }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center mb-2 text-body font-size-sm">
+                                                        <div class="__rev-txt"><span
+                                                                class="d-inline-block align-middle ">{{ translate('good') }}</span>
+                                                        </div>
+                                                        <div class="w-0 flex-grow">
+                                                            <div class="progress __h-5px">
+                                                                <div class="progress-bar web--bg-primary" role="progressbar"
+                                                                    style="width: <?php    echo $widthRating = ($rating[1] != 0) ? ($rating[1] / $overallRating[1]) * 100 : (0); ?>%; background-color: #a7e453;"
+                                                                    aria-valuenow="27" aria-valuemin="0"
+                                                                    aria-valuemax="100"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <span
+                                                                class="{{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}}">
+                                                                {{ $rating[1] }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center mb-2 text-body font-size-sm">
+                                                        <div class="__rev-txt"><span
+                                                                class="d-inline-block align-middle ">{{ translate('average') }}</span>
+                                                        </div>
+                                                        <div class="w-0 flex-grow">
+                                                            <div class="progress __h-5px">
+                                                                <div class="progress-bar web--bg-primary" role="progressbar"
+                                                                    style="width: <?php    echo $widthRating = ($rating[2] != 0) ? ($rating[2] / $overallRating[1]) * 100 : (0); ?>%; background-color: #ffda75;"
+                                                                    aria-valuenow="17" aria-valuemin="0"
+                                                                    aria-valuemax="100"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <span
+                                                                class="{{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}}">
+                                                                {{ $rating[2] }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center mb-2 text-body font-size-sm">
+                                                        <div class="__rev-txt "><span
+                                                                class="d-inline-block align-middle">{{ translate('below_Average') }}</span>
+                                                        </div>
+                                                        <div class="w-0 flex-grow">
+                                                            <div class="progress __h-5px">
+                                                                <div class="progress-bar web--bg-primary" role="progressbar"
+                                                                    style="width: <?php    echo $widthRating = ($rating[3] != 0) ? ($rating[3] / $overallRating[1]) * 100 : (0); ?>%; background-color: #fea569;"
+                                                                    aria-valuenow="9" aria-valuemin="0" aria-valuemax="100">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <span
+                                                                class="{{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}}">
+                                                                {{ $rating[3] }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="d-flex align-items-center text-body font-size-sm">
+                                                        <div class="__rev-txt"><span
+                                                                class="d-inline-block align-middle ">{{ translate('poor') }}</span>
+                                                        </div>
+                                                        <div class="w-0 flex-grow">
+                                                            <div class="progress __h-5px">
+                                                                <div class="progress-bar web--bg-primary" role="progressbar"
+                                                                    style="width: <?php    echo $widthRating = ($rating[4] != 0) ? ($rating[4] / $overallRating[1]) * 100 : (0); ?>%;"
+                                                                    aria-valuenow="4" aria-valuemin="0" aria-valuemax="100">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <span
+                                                                class="{{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}}">
+                                                                {{ $rating[4] }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row pb-4 mb-3">
+                                                <div class="__inline-30">
+                                                    <span class="text-capitalize">{{ translate('Product_review') }}</span>
+                                                </div>
+                                            </div>
+                                        @endif
+
+                                        <div class="row pb-4">
+                                            <div class="col-12" id="product-review-list">
+                                                @include('web-views.partials._product-reviews')
+                                            </div>
+
+                                            @if(count($product->reviews) > 2)
+                                                <div class="col-12">
+                                                    <div
+                                                        class="card-footer d-flex justify-content-center align-items-center">
+                                                        <button class="btn text-white view_more_button web--bg-primary">
+                                                            {{ translate('view_more') }}
+                                                        </button>
                                                     </div>
                                                 </div>
                                             @endif
-                                        </div>
-                                        <div class="d-flex justify-content-center mt-2">
-                                            <button class="btn btn-outline-primary text-capitalize px-4 py-2 see-more-details">{{translate('see_more')}}</button>
                                         </div>
                                     </div>
-
-                                    <div class="tab-pane fade" id="reviews" role="tabpanel">
-                                        <div class="">
-                                            @if(count($product->reviews)==0 && $productReviews->total() == 0)
-                                                <div>
-                                                    <div class="text-center text-capitalize">
-                                                        <img class="mw-100"
-                                                             src="{{ theme_asset(path: 'public/assets/front-end/img/icons/empty-review.svg') }}"
-                                                             alt="">
-                                                        <p class="text-capitalize">
-                                                            <small>{{ translate('No_review_given_yet') }}!</small>
-                                                        </p>
-                                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="specifications" role="tabpanel">
+                                    <div class="specs-table">
+                                        @if(count($dynamicAttributes) > 0)
+                                            @foreach($dynamicAttributes as $attribute)
+                                                <div class="spec-row">
+                                                    <div class="spec-label">{{ $attribute['label'] }}</div>
+                                                    <div class="spec-value">{{ $attribute['value'] }}</div>
                                                 </div>
-                                            @else
-                                                <div class="row pt-2 pb-3">
-                                                    <div class="col-lg-4 col-md-5 ">
-                                                        <div
-                                                            class=" row d-flex justify-content-center align-items-center">
-                                                            <div
-                                                                class="col-12 d-flex justify-content-center align-items-center">
-                                                                <h2 class="overall_review mb-2 __inline-28">
-                                                                    {{ $overallRating[0] }}
-                                                                </h2>
+                                            @endforeach
+                                        @else
+                                            <div class="spec-row">
+                                                <div class="spec-label">{{ translate('description') }}</div>
+                                                <div class="spec-value">{{ $product->details }}</div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="other_products" role="tabpanel">
+
+                                    <section class="premium-static-section container rtl px-0 px-md-3">
+
+
+                                        <div class="premium-carousel-wrapper">
+                                            <div class="owl-carousel owl-theme other-product-carousel">
+
+                                                <div class="premium-card-item h-100">
+                                                    <div class="premium-card">
+                                                        <div class="premium-product-media">
+                                                            <span class="premium-promo-badge">إستخدم كود OX26</span>
+                                                            <div class="premium-card-actions">
+                                                                <button type="button" class="premium-action-btn"
+                                                                    title="Add to wishlist">
+                                                                    <i class="fa fa-heart-o"></i>
+                                                                </button>
+                                                                <button type="button" class="premium-action-btn"
+                                                                    data-toggle="modal"
+                                                                    data-target="#premium-static-quickview"
+                                                                    title="Quick View">
+                                                                    <i class="czi-eye align-middle"></i>
+                                                                </button>
                                                             </div>
-                                                            <div
-                                                                class="d-flex justify-content-center align-items-center star-rating ">
-                                                                @for($inc=1;$inc<=5;$inc++)
-                                                                    @if ($inc <= (int)$overallRating[0])
-                                                                        <i class="tio-star text-warning"></i>
-                                                                    @elseif ($overallRating[0] != 0 && $inc <= (int)$overallRating[0] + 1.1 && $overallRating[0] > ((int)$overallRating[0]))
-                                                                        <i class="tio-star-half text-warning"></i>
-                                                                    @else
-                                                                        <i class="tio-star-outlined text-warning"></i>
-                                                                    @endif
-                                                                @endfor
-                                                            </div>
-                                                            <div
-                                                                class="col-12 d-flex justify-content-center align-items-center mt-2">
-                                                                <span class="text-center">
-                                                                    {{ $productReviews->total() }} {{ translate('ratings') }}
-                                                                </span>
+                                                            <div class="premium-card-image">
+                                                                <a href="#" class="d-block">
+                                                                    <img src="assets/front-end/img/Group-2-1.webp"
+                                                                        alt="ثلاجة دولابي">
+                                                                </a>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-lg-8 col-md-7 pt-sm-3 pt-md-0">
-                                                        <div
-                                                            class="d-flex align-items-center mb-2 font-size-sm">
-                                                            <div
-                                                                class="__rev-txt"><span
-                                                                    class="d-inline-block align-middle text-body">{{ translate('excellent') }}</span>
+                                                        <div class="premium-card-details">
+                                                            <span class="premium-category-tag">ثلاجات بابين</span>
+                                                            <a href="#" class="premium-product-title">ثلاجة دولابي جنرال
+                                                                سوبريم، (21.6 قدم، 612...)</a>
+                                                            <div class="premium-product-prices">
+                                                                <del class="premium-price-old">2999 ريال</del>
+                                                                <span class="premium-price-new">2549 ريال</span>
                                                             </div>
-                                                            <div class="w-0 flex-grow">
-                                                                <div class="progress text-body __h-5px">
-                                                                    <div class="progress-bar web--bg-primary"
-                                                                         role="progressbar"
-                                                                         style="width: <?php echo $widthRating = ($rating[0] != 0) ? ($rating[0] / $overallRating[1]) * 100 : (0); ?>%;"
-                                                                         aria-valuenow="60" aria-valuemin="0"
-                                                                         aria-valuemax="100"></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-1 text-body">
-                                                                <span
-                                                                    class=" {{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}} ">
-                                                                    {{ $rating[0] }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div
-                                                            class="d-flex align-items-center mb-2 text-body font-size-sm">
-                                                            <div
-                                                                class="__rev-txt"><span
-                                                                    class="d-inline-block align-middle ">{{ translate('good') }}</span>
-                                                            </div>
-                                                            <div class="w-0 flex-grow">
-                                                                <div class="progress __h-5px">
-                                                                    <div class="progress-bar web--bg-primary" role="progressbar"
-                                                                         style="width: <?php echo $widthRating = ($rating[1] != 0) ? ($rating[1] / $overallRating[1]) * 100 : (0); ?>%; background-color: #a7e453;"
-                                                                         aria-valuenow="27" aria-valuemin="0"
-                                                                         aria-valuemax="100"></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-1">
-                                                                <span
-                                                                    class="{{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}}">
-                                                                        {{ $rating[1] }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div
-                                                            class="d-flex align-items-center mb-2 text-body font-size-sm">
-                                                            <div
-                                                                class="__rev-txt"><span
-                                                                    class="d-inline-block align-middle ">{{ translate('average') }}</span>
-                                                            </div>
-                                                            <div class="w-0 flex-grow">
-                                                                <div class="progress __h-5px">
-                                                                    <div class="progress-bar web--bg-primary" role="progressbar"
-                                                                         style="width: <?php echo $widthRating = ($rating[2] != 0) ? ($rating[2] / $overallRating[1]) * 100 : (0); ?>%; background-color: #ffda75;"
-                                                                         aria-valuenow="17" aria-valuemin="0"
-                                                                         aria-valuemax="100"></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-1">
-                                                                <span
-                                                                    class="{{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}}">
-                                                                    {{ $rating[2] }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div
-                                                            class="d-flex align-items-center mb-2 text-body font-size-sm">
-                                                            <div
-                                                                class="__rev-txt "><span
-                                                                    class="d-inline-block align-middle">{{ translate('below_Average') }}</span>
-                                                            </div>
-                                                            <div class="w-0 flex-grow">
-                                                                <div class="progress __h-5px">
-                                                                    <div class="progress-bar web--bg-primary" role="progressbar"
-                                                                         style="width: <?php echo $widthRating = ($rating[3] != 0) ? ($rating[3] / $overallRating[1]) * 100 : (0); ?>%; background-color: #fea569;"
-                                                                         aria-valuenow="9" aria-valuemin="0"
-                                                                         aria-valuemax="100"></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-1">
-                                                                <span
-                                                                    class="{{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}}">
-                                                                    {{ $rating[3] }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div
-                                                            class="d-flex align-items-center text-body font-size-sm">
-                                                            <div
-                                                                class="__rev-txt"><span
-                                                                    class="d-inline-block align-middle ">{{ translate('poor') }}</span>
-                                                            </div>
-                                                            <div class="w-0 flex-grow">
-                                                                <div class="progress __h-5px">
-                                                                    <div class="progress-bar web--bg-primary" role="progressbar"
-                                                                         style="width: <?php echo $widthRating = ($rating[4] != 0) ? ($rating[4] / $overallRating[1]) * 100 : (0); ?>%;"
-                                                                         aria-valuenow="4" aria-valuemin="0"
-                                                                         aria-valuemax="100"></div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-1">
-                                                                <span
-                                                                    class="{{Session::get('direction') === "rtl" ? 'me-3 float-left' : 'ml-3 float-right'}}">
-                                                                        {{ $rating[4] }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row pb-4 mb-3">
-                                                    <div class="__inline-30">
-                                                        <span
-                                                            class="text-capitalize">{{ translate('Product_review') }}</span>
-                                                    </div>
-                                                </div>
-                                            @endif
-
-                                            <div class="row pb-4">
-                                                <div class="col-12" id="product-review-list">
-                                                    @include('web-views.partials._product-reviews')
-                                                </div>
-
-                                                @if(count($product->reviews) > 2)
-                                                    <div class="col-12">
-                                                        <div
-                                                            class="card-footer d-flex justify-content-center align-items-center">
-                                                            <button class="btn text-white view_more_button web--bg-primary">
-                                                                {{ translate('view_more') }}
+                                                            <button class="premium-add-to-cart" type="button">
+                                                                <i class="fa fa-shopping-cart"></i>
+                                                                <span class="ms-1">أضف للعربة</span>
                                                             </button>
                                                         </div>
                                                     </div>
-                                                @endif
+                                                </div>
+
+                                                <div class="premium-card-item h-100">
+                                                    <div class="premium-card">
+                                                        <div class="premium-product-media">
+                                                            <span class="premium-promo-badge">إستخدم كود OX26</span>
+                                                            <div class="premium-card-actions">
+                                                                <button type="button" class="premium-action-btn"
+                                                                    title="Add to wishlist">
+                                                                    <i class="fa fa-heart-o"></i>
+                                                                </button>
+                                                                <button type="button" class="premium-action-btn"
+                                                                    data-toggle="modal"
+                                                                    data-target="#premium-static-quickview"
+                                                                    title="Quick View">
+                                                                    <i class="czi-eye align-middle"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div class="premium-card-image">
+                                                                <a href="#" class="d-block">
+                                                                    <img src="assets/front-end/img/Group-1-1.webp"
+                                                                        alt="ثلاجة يوجين">
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="premium-card-details">
+                                                            <span class="premium-category-tag">ثلاجات بابين</span>
+                                                            <a href="#" class="premium-product-title">ثلاجة يوجين دولابي
+                                                                637 لتر، 22.4 قدم، ستيل</a>
+                                                            <div class="premium-product-prices">
+                                                                <span class="premium-price-new">2499 ريال</span>
+                                                                <del class="premium-price-old">2899 ريال</del>
+                                                            </div>
+                                                            <button class="premium-add-to-cart" type="button">
+                                                                <i class="fa fa-shopping-cart"></i>
+                                                                <span class="ms-1">أضف للعربة</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="premium-card-item h-100">
+                                                    <div class="premium-card">
+                                                        <div class="premium-product-media">
+                                                            <span class="premium-promo-badge">إستخدم كود OX26</span>
+                                                            <div class="premium-card-actions">
+                                                                <button type="button" class="premium-action-btn"
+                                                                    title="Add to wishlist">
+                                                                    <i class="fa fa-heart-o"></i>
+                                                                </button>
+                                                                <button type="button" class="premium-action-btn"
+                                                                    data-toggle="modal"
+                                                                    data-target="#premium-static-quickview"
+                                                                    title="Quick View">
+                                                                    <i class="czi-eye align-middle"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div class="premium-card-image">
+                                                                <a href="#" class="d-block">
+                                                                    <img src="assets/front-end/img/Group-3.webp"
+                                                                        alt="ثلاجة سوبريم">
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="premium-card-details">
+                                                            <span class="premium-category-tag">ثلاجات بابين</span>
+                                                            <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم
+                                                                بابين مع فريزر علوي...</a>
+                                                            <div class="premium-product-prices">
+                                                                <span class="premium-price-new">1849 ريال</span>
+                                                                <del class="premium-price-old">2949 ريال</del>
+                                                            </div>
+                                                            <button class="premium-add-to-cart" type="button">
+                                                                <i class="fa fa-shopping-cart"></i>
+                                                                <span class="ms-1">أضف للعربة</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="premium-card-item h-100">
+                                                    <div class="premium-card">
+                                                        <div class="premium-product-media">
+                                                            <span class="premium-promo-badge">إستخدم كود OX26</span>
+                                                            <div class="premium-card-actions">
+                                                                <button type="button" class="premium-action-btn"
+                                                                    title="Add to wishlist">
+                                                                    <i class="fa fa-heart-o"></i>
+                                                                </button>
+                                                                <button type="button" class="premium-action-btn"
+                                                                    data-toggle="modal"
+                                                                    data-target="#premium-static-quickview"
+                                                                    title="Quick View">
+                                                                    <i class="czi-eye align-middle"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div class="premium-card-image">
+                                                                <a href="#" class="d-block">
+                                                                    <img src="assets/front-end/img/Group-2-1.webp"
+                                                                        alt="ثلاجة سوبريم">
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="premium-card-details">
+                                                            <span class="premium-category-tag">ثلاجات بابين</span>
+                                                            <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم
+                                                                بابين مع فريزر علوي...</a>
+                                                            <div class="premium-product-prices">
+                                                                <span class="premium-price-new">1999 ريال</span>
+                                                                <del class="premium-price-old">2985 ريال</del>
+                                                            </div>
+                                                            <button class="premium-add-to-cart" type="button">
+                                                                <i class="fa fa-shopping-cart"></i>
+                                                                <span class="ms-1">أضف للعربة</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="premium-card-item h-100">
+                                                    <div class="premium-card">
+                                                        <div class="premium-product-media">
+                                                            <span class="premium-promo-badge">إستخدم كود OX26</span>
+                                                            <div class="premium-card-actions">
+                                                                <button type="button" class="premium-action-btn"
+                                                                    title="Add to wishlist">
+                                                                    <i class="fa fa-heart-o"></i>
+                                                                </button>
+                                                                <button type="button" class="premium-action-btn"
+                                                                    data-toggle="modal"
+                                                                    data-target="#premium-static-quickview"
+                                                                    title="Quick View">
+                                                                    <i class="czi-eye align-middle"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div class="premium-card-image">
+                                                                <a href="#" class="d-block">
+                                                                    <img src="assets/front-end/img/Group-1-1.webp"
+                                                                        alt="ثلاجة سوبريم">
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="premium-card-details">
+                                                            <span class="premium-category-tag">ثلاجات بابين</span>
+                                                            <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم
+                                                                دولابي (15.4 قدم، 436...)</a>
+                                                            <div class="premium-product-prices">
+                                                                <span class="premium-price-new">2049 ريال</span>
+                                                                <del class="premium-price-old">2599 ريال</del>
+                                                            </div>
+                                                            <button class="premium-add-to-cart" type="button">
+                                                                <i class="fa fa-shopping-cart"></i>
+                                                                <span class="ms-1">أضف للعربة</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="premium-card-item h-100">
+                                                    <div class="premium-card">
+                                                        <div class="premium-product-media">
+                                                            <span class="premium-promo-badge">إستخدم كود OX26</span>
+                                                            <div class="premium-card-actions">
+                                                                <button type="button" class="premium-action-btn"
+                                                                    title="Add to wishlist">
+                                                                    <i class="fa fa-heart-o"></i>
+                                                                </button>
+                                                                <button type="button" class="premium-action-btn"
+                                                                    data-toggle="modal"
+                                                                    data-target="#premium-static-quickview"
+                                                                    title="Quick View">
+                                                                    <i class="czi-eye align-middle"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div class="premium-card-image">
+                                                                <a href="#" class="d-block">
+                                                                    <img src="assets/front-end/img/Group-3.webp"
+                                                                        alt="ثلاجة سوبريم">
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="premium-card-details">
+                                                            <span class="premium-category-tag">ثلاجات بابين</span>
+                                                            <a href="#" class="premium-product-title">ثلاجة بابين جنرال
+                                                                سوبريم (21 قدم، 594...)</a>
+                                                            <div class="premium-product-prices">
+                                                                <span class="premium-price-new">2399 ريال</span>
+                                                                <del class="premium-price-old">2899 ريال</del>
+                                                            </div>
+                                                            <button class="premium-add-to-cart" type="button">
+                                                                <i class="fa fa-shopping-cart"></i>
+                                                                <span class="ms-1">أضف للعربة</span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="specifications" role="tabpanel">
-                                        <div class="specs-table">
-                                            @if(count($dynamicAttributes) > 0)
-                                                @foreach($dynamicAttributes as $attribute)
-                                                    <div class="spec-row">
-                                                        <div class="spec-label">{{ $attribute['label'] }}</div>
-                                                        <div class="spec-value">{{ $attribute['value'] }}</div>
-                                                    </div>
-                                                @endforeach
-                                            @else
-                                                <div class="spec-row">
-                                                    <div class="spec-label">{{ translate('description') }}</div>
-                                                    <div class="spec-value">{{ $product->details }}</div>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="other_products" role="tabpanel">
-                           
-<section class="premium-static-section container rtl px-0 px-md-3">
- 
+                                    </section>
 
-    <div class="premium-carousel-wrapper">
-        <div class="owl-carousel owl-theme other-product-carousel">
-            
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة دولابي">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة دولابي جنرال سوبريم، (21.6 قدم، 612...)</a>
-                        <div class="premium-product-prices">
-                            <del class="premium-price-old">2999 ريال</del>
-                            <span class="premium-price-new">2549 ريال</span>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة يوجين">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة يوجين دولابي 637 لتر، 22.4 قدم، ستيل</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">2499 ريال</span>
-                            <del class="premium-price-old">2899 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">1849 ريال</span>
-                            <del class="premium-price-old">2949 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-2-1.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم بابين مع فريزر علوي...</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">1999 ريال</span>
-                            <del class="premium-price-old">2985 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-1-1.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة جنرال سوبريم دولابي (15.4 قدم، 436...)</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">2049 ريال</span>
-                            <del class="premium-price-old">2599 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="premium-card-item h-100">
-                <div class="premium-card">
-                    <div class="premium-product-media">
-                        <span class="premium-promo-badge">إستخدم كود OX26</span>
-                        <div class="premium-card-actions">
-                            <button type="button" class="premium-action-btn" title="Add to wishlist">
-                                <i class="fa fa-heart-o"></i>
-                            </button>
-                            <button type="button" class="premium-action-btn" data-toggle="modal" data-target="#premium-static-quickview" title="Quick View">
-                                <i class="czi-eye align-middle"></i>
-                            </button>
-                        </div>
-                        <div class="premium-card-image">
-                            <a href="#" class="d-block">
-                                <img src="assets/front-end/img/Group-3.webp" alt="ثلاجة سوبريم">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="premium-card-details">
-                        <span class="premium-category-tag">ثلاجات بابين</span>
-                        <a href="#" class="premium-product-title">ثلاجة بابين جنرال سوبريم (21 قدم، 594...)</a>
-                        <div class="premium-product-prices">
-                            <span class="premium-price-new">2399 ريال</span>
-                            <del class="premium-price-old">2899 ريال</del>
-                        </div>
-                        <button class="premium-add-to-cart" type="button">
-                            <i class="fa fa-shopping-cart"></i>
-                            <span class="ms-1">أضف للعربة</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-{{-- Redundant static mockup modal removed --}}
+                                    {{-- Redundant static mockup modal removed --}}
 
 
 
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3">
-                   
-                        <div class="product-details-shipping-details px-3 py-3">
-                           @if($product->current_stock <= 0)
-                               <p class="stock out-of-stock-danger">
-                                   غير متوفر في المخزون
-                               </p>
-                           @endif
-                                    <div class="shipping-details-bottom-border">
-                                        <div class=" d-flex align-items-center justify-content-center">
-                                            <?php
-                                                 $shopName = '';
-                                                 $shopRoute = '#';
-                                                 
-                                                 if ($product->added_by == 'seller' && isset($product->seller->shop)) {
-                                                     $shopName = $product->seller->shop->name;
-                                                     $shopRoute = route('vendor-shop', ['slug' => $product->seller->shop->slug]);
-                                                 } else {
-                                                     $shopName = getInHouseShopConfig(key: 'name') ?: 'متجر ذرة أكسجين الإلكتروني';
-                                                     $shopRoute = route('vendor-shop', ['slug' => getInHouseShopConfig(key: 'slug')]);
-                                                 }
+            </div>
+            <div class="col-lg-3">
+
+                <div class="product-details-shipping-details px-3 py-3">
+                    @if($product->current_stock <= 0)
+                        <p class="stock out-of-stock-danger">
+                            غير متوفر في المخزون
+                        </p>
+                    @endif
+                    <div class="shipping-details-bottom-border">
+                        <div class=" d-flex align-items-center justify-content-center">
+                            <?php
+$shopName = '';
+$shopRoute = '#';
+
+if ($product->added_by == 'seller' && isset($product->seller->shop)) {
+    $shopName = $product->seller->shop->name;
+    $shopRoute = route('vendor-shop', ['slug' => $product->seller->shop->slug]);
+} else {
+    $shopName = getInHouseShopConfig(key: 'name') ?: 'متجر ذرة أكسجين الإلكتروني';
+    $shopRoute = route('vendor-shop', ['slug' => getInHouseShopConfig(key: 'slug')]);
+}
                                              ?>
-                                            <span class="store_name">البائع :</span>
-                                             <a href="{{ $shopRoute }}" class="store_bold d-inline-flex align-items-center gap-1">
-                                                 <img class="store_img" loading="lazy" src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}">
-                                                 <span>{{ $shopName }}</span>
-                                             </a>
-                                        </div>
-                                   
-
-                                    </div>
-            <div class="d-flex align-items-center gap-4">
-                                                        <div class="product-description-label __color-9B9B9B fs-14">
-                                                            {{ translate('qty') }}
-                                                        </div>
-                                                        <div
-                                                            class="d-flex justify-content-between align-items-center quantity-box  overflow-hidden">
-                                                            <span class="input-group-btn h-100">
-                                                                <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 h-100 w-32px"
-                                                                        type="button"
-                                                                        data-type="minus" data-field="quantity"
-                                                                        disabled="disabled">
-                                                                    -
-                                                                </button>
-                                                            </span>
-                                                            <input type="text" name="quantity"
-                                                                   class="form-control input-number text-center product-details-cart-qty __inline-29 border-0 w-100 fs-12"
-                                                                   placeholder="{{ translate('1') }}"
-                                                                   value="{{ $initialProductConfig['quantity'] ?? 1 }}"
-                                                                   data-producttype="{{ $product->product_type }}"
-                                                                   min="{{ $product->minimum_order_qty ?? 1 }}"
-                                                                   max="{{ $product['product_type'] == 'physical' ? $product->current_stock : 100}}">
-                                                            <span class="input-group-btn h-100">
-                                                                <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 h-100 w-32px"
-                                                                        type="button"
-                                                                        data-producttype="{{ $product->product_type }}"
-                                                                        data-type="plus" data-field="quantity">
-                                                                        +
-                                                                </button>
-                                                            </span>
-                                                        </div>
-                                                        <input type="hidden" class="product-generated-variation-code"
-                                                               name="product_variation_code"
-                                                               data-product-id="{{ $product['id'] }}">
-                                                        <input type="hidden" value=""
-                                                               class="product-exist-in-cart-list form-control w-50" name="key">
-                                                    </div>
+                            <span class="store_name">البائع :</span>
+                            <a href="{{ $shopRoute }}" class="store_bold d-inline-flex align-items-center gap-1">
+                                <img class="store_img" loading="lazy"
+                                    src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}">
+                                <span>{{ $shopName }}</span>
+                            </a>
+                        </div>
 
 
-         <div class="add_cart my-2">
-          
-                                                        <button class="premium-add-to-cart product-add-to-cart-button" type="button"
-                                                            data-form=".add-to-cart-details-form"
-                                                            data-update="{{ translate('update_cart') }}"
-                                                            data-add="{{ translate('add_to_cart') }}">
-                                                                              <i class="fa fa-shopping-cart"></i>
-                                                                           <span class="ms-1"> {{ $initialProductConfig['first_variant_in_cart'] ? translate('update_cart') : translate('add_to_cart') }}</span>
-                                                                             </button>
-                                                                         </div>
-                                                                         <hr class="bar">
-                                                                <div class="shipping-info-card">
-                                                                    <div class="shipping-info-row ">
-                                                                        <span class="shipping-label">منطقتك:</span>
-                                                                        <span class="shipping-value">الرياض</span>
-                                                                    </div>
-
-                                                                    <div class="shipping-info-row">
-                                                                        <span class="shipping-label">تكاليف الشحن:</span>
-                                                                        <span class="shipping-value">﷼ 0</span>
-                                                                    </div>
-
-                                                                    <div class="shipping-info-row">
-                                                                        <span class="shipping-label">الوقت المقدر للشحن:</span>
-                                                                        <span class="shipping-value">ثلاث إلى سبع أيام</span>
-                                                                    </div>
-                                                                </div>
-
-
-                                        </div>
-                           
-                          
-                                                     
+                    </div>
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="product-description-label __color-9B9B9B fs-14">
+                            {{ translate('qty') }}
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center quantity-box  overflow-hidden">
+                            <span class="input-group-btn h-100">
+                                <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 h-100 w-32px"
+                                    type="button" data-type="minus" data-field="quantity" disabled="disabled">
+                                    -
+                                </button>
+                            </span>
+                            <input type="text" name="quantity"
+                                class="form-control input-number text-center product-details-cart-qty __inline-29 border-0 w-100 fs-12"
+                                placeholder="{{ translate('1') }}" value="{{ $initialProductConfig['quantity'] ?? 1 }}"
+                                data-producttype="{{ $product->product_type }}"
+                                min="{{ $product->minimum_order_qty ?? 1 }}"
+                                max="{{ $product['product_type'] == 'physical' ? $product->current_stock : 100}}">
+                            <span class="input-group-btn h-100">
+                                <button class="btn btn-number __p-10 web-text-primary bg-ECF1F6 rounded-0 h-100 w-32px"
+                                    type="button" data-producttype="{{ $product->product_type }}" data-type="plus"
+                                    data-field="quantity">
+                                    +
+                                </button>
+                            </span>
+                        </div>
+                        <input type="hidden" class="product-generated-variation-code" name="product_variation_code"
+                            data-product-id="{{ $product['id'] }}">
+                        <input type="hidden" value="" class="product-exist-in-cart-list form-control w-50" name="key">
+                    </div>
 
 
-                                                </div>
-                    <!-- @php($companyReliability = getWebConfig('company_reliability'))
+                    <div class="add_cart my-2">
+
+                        <button class="premium-add-to-cart product-add-to-cart-button" type="button"
+                            data-form=".add-to-cart-details-form" data-update="{{ translate('update_cart') }}"
+                            data-add="{{ translate('add_to_cart') }}">
+                            <i class="fa fa-shopping-cart"></i>
+                            <span class="ms-1">
+                                {{ $initialProductConfig['first_variant_in_cart'] ? translate('update_cart') : translate('add_to_cart') }}</span>
+                        </button>
+                    </div>
+                    <hr class="bar">
+                    <div class="shipping-info-card">
+                        <div class="shipping-info-row ">
+                            <span class="shipping-label">منطقتك:</span>
+                            <span class="shipping-value">الرياض</span>
+                        </div>
+
+                        <div class="shipping-info-row">
+                            <span class="shipping-label">تكاليف الشحن:</span>
+                            <span class="shipping-value">﷼ 0</span>
+                        </div>
+
+                        <div class="shipping-info-row">
+                            <span class="shipping-label">الوقت المقدر للشحن:</span>
+                            <span class="shipping-value">ثلاث إلى سبع أيام</span>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+
+
+
+            </div>
+            <!-- @php($companyReliability = getWebConfig('company_reliability'))
                     @if($companyReliability != null)
                         <div class="product-details-shipping-details">
                             @foreach ($companyReliability as $key=>$value)
@@ -1204,7 +1248,7 @@
                         </div>
                     @endif -->
 
-                    <!-- @if(getWebConfig(name: 'business_mode')=='multi')
+            <!-- @if(getWebConfig(name: 'business_mode')=='multi')
                         <div class="__inline-31">
 
                             @if($product->added_by=='seller')
@@ -1392,7 +1436,7 @@
                         </div>
                     @endif -->
 
-                    <!-- <div class="pt-4 pb-3 d-flex justify-content-between align-items-center">
+            <!-- <div class="pt-4 pb-3 d-flex justify-content-between align-items-center">
                         <h2 class="__text-16px font-bold text-capitalize mb-0">
                             @if(getWebConfig(name: 'business_mode') == 'multi')
                                 {{ translate('more_from_the_store') }}
@@ -1417,149 +1461,163 @@
                             @include('web-views.partials._seller-products-product-details',['product' => $item, 'decimal_point_settings' => $decimalPointSettings])
                         @endforeach
                     </div> -->
-                </div>
-                <!-- <div class="col-lg-3"></div> -->
+        </div>
+        <!-- <div class="col-lg-3"></div> -->
+    </div>
+</div>
+
+
+
+<div class="modal fade rtl text-align-direction" id="show-modal-view" tabindex="-1" role="dialog"
+    aria-labelledby="show-modal-image" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body flex justify-content-center">
+                <button class="btn btn-default __inline-33 dir-end-minus-7px" data-dismiss="modal">
+                    <i class="fa fa-close"></i>
+                </button>
+                <img class="element-center" id="attachment-view" src="" alt="">
             </div>
         </div>
-
-
-
-        <div class="modal fade rtl text-align-direction" id="show-modal-view" tabindex="-1" role="dialog"
-             aria-labelledby="show-modal-image"
-             aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-body flex justify-content-center">
-                        <button class="btn btn-default __inline-33 dir-end-minus-7px"
-                                data-dismiss="modal">
-                            <i class="fa fa-close"></i>
-                        </button>
-                        <img class="element-center" id="attachment-view" src="" alt="">
-                    </div>
-                </div>
-            </div>
-        </div>
+    </div>
+</div>
 <?php if (count($relatedProducts) > 0): ?>
 <div class="container ">
     <div class="row">
         <section class="premium-static-section container rtl px-0 px-md-3">
             <div class="premium-section-header">
-                <h2 class="premium-section-title"><?php echo translate('similar_products'); ?></h2>
+                <h2 class="premium-section-title"><?php    echo translate('similar_products'); ?></h2>
             </div>
 
             <div class="premium-carousel-wrapper">
                 <div class="owl-carousel owl-theme related-product-carousel">
-                    <?php foreach($relatedProducts as $relatedProduct): 
-                        $wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $relatedProduct->id)->count() : (session()->has('wish_list') && in_array($relatedProduct->id, session('wish_list')) ? 1 : 0);
+                    <?php    foreach ($relatedProducts as $relatedProduct):
+        $wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $relatedProduct->id)->count() : (session()->has('wish_list') && in_array($relatedProduct->id, session('wish_list')) ? 1 : 0);
                     ?>
-                        <div class="premium-card-item h-100">
-                            <div class="premium-card">
-                                <div class="premium-product-media">
-                                    <?php if(getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0): ?>
-                                        <span class="premium-promo-badge">-<?php echo getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'string'); ?></span>
-                                    <?php endif; ?>
-                                    <div class="premium-card-actions">
-                                        <button type="button" class="premium-action-btn" onclick="addWishlist(<?php echo $relatedProduct->id; ?>)" title="<?php echo translate('Add_to_wishlist'); ?>">
-                                            <i class="fa <?php echo ($wishlist_status == 1?'fa-heart text-danger':'fa-heart-o'); ?> wishlist_icon_<?php echo $relatedProduct->id; ?>"></i>
-                                        </button>
-                                        <button type="button" class="premium-action-btn" onclick="productQuickView(<?php echo $relatedProduct->id; ?>)" title="<?php echo translate('Quick_View'); ?>">
-                                            <i class="czi-eye align-middle"></i>
-                                        </button>
-                                    </div>
-                                    <div class="premium-card-image">
-                                        <a href="<?php echo route('product', $relatedProduct->slug); ?>" class="d-block">
-                                            <img src="<?php echo getStorageImages(path: $relatedProduct->thumbnail_full_url, type: 'product'); ?>" alt="<?php echo $relatedProduct->name; ?>">
-                                        </a>
-                                    </div>
+                    <div class="premium-card-item h-100">
+                        <div class="premium-card">
+                            <div class="premium-product-media">
+                                <?php        if (getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0): ?>
+                                <span
+                                    class="premium-promo-badge">-<?php            echo getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'string'); ?></span>
+                                <?php        endif; ?>
+                                <div class="premium-card-actions">
+                                    <button type="button" class="premium-action-btn product-action-add-wishlist"
+                                        data-product-id="<?php        echo $relatedProduct->id; ?>"
+                                        title="<?php        echo translate('Add_to_wishlist'); ?>">
+                                        <i
+                                            class="fa <?php        echo ($wishlist_status == 1 ? 'fa-heart text-danger' : 'fa-heart-o'); ?> wishlist_icon_<?php        echo $relatedProduct->id; ?>"></i>
+                                    </button>
+                                    <button type="button" class="premium-action-btn action-product-quick-view"
+                                        data-product-id="<?php        echo $relatedProduct->id; ?>"
+                                        title="<?php        echo translate('Quick_View'); ?>">
+                                        <i class="czi-eye align-middle"></i>
+                                    </button>
                                 </div>
-                                <div class="premium-card-details">
-                                    <span class="premium-category-tag"><?php echo $relatedProduct->category?->name ?? ''; ?></span>
-                                    <a href="<?php echo route('product', $relatedProduct->slug); ?>" class="premium-product-title" title="<?php echo $relatedProduct->name; ?>">
-                                        <?php echo Str::limit($relatedProduct->name, 45); ?>
+                                <div class="premium-card-image">
+                                    <a href="<?php        echo route('product', $relatedProduct->slug); ?>" class="d-block">
+                                        <img src="<?php        echo getStorageImages(path: $relatedProduct->thumbnail_full_url, type: 'product'); ?>"
+                                            alt="<?php        echo $relatedProduct->name; ?>">
                                     </a>
-                                    <div class="premium-product-prices">
-                                        <?php if(getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0): ?>
-                                            <del class="premium-price-old"><?php echo webCurrencyConverter(amount: $relatedProduct->unit_price); ?></del>
-                                        <?php endif; ?>
-                                        <?php
-                                            $finalPrice = $relatedProduct->unit_price;
-                                            if (getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0) {
-                                                if ($relatedProduct->clearanceSale) {
-                                                    $finalPrice = $relatedProduct->unit_price - $relatedProduct->clearanceSale->discount_amount;
-                                                } else {
-                                                    $finalPrice = $relatedProduct->unit_price - $relatedProduct->discount;
-                                                }
-                                            }
-                                        ?>
-                                        <span class="premium-price-new"><?php echo webCurrencyConverter(amount: $finalPrice); ?></span>
-                                    </div>
-                                    <?php
-                                         $hasVariations = false;
-                                         if (isset($relatedProduct->choice_options)) {
-                                             $choices = json_decode($relatedProduct->choice_options, true);
-                                             $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
-                                             if (is_array($choices)) {
-                                                 foreach ($choices as $choice) {
-                                                     $title = trim($choice['title'] ?? '');
-                                                     $optionsCount = count($choice['options'] ?? []);
-                                                     if (!in_array($title, $specTitles) && $optionsCount > 1) {
-                                                         $hasVariations = true;
-                                                         break;
-                                                     }
-                                                 }
-                                             }
-                                         }
-                                         if (isset($relatedProduct->colors)) {
-                                             $colors = json_decode($relatedProduct->colors, true);
-                                             if (is_array($colors) && count($colors) > 0) {
-                                                 $hasVariations = true;
-                                             }
-                                         }
-                                    ?>
-                                    <?php if($hasVariations): ?>
-                                        <button class="premium-add-to-cart" type="button" onclick="productQuickView(<?php echo $relatedProduct->id; ?>)">
-                                            <i class="fa fa-shopping-cart"></i>
-                                            <span class="ms-1">أضف للعربة</span>
-                                        </button>
-                                    <?php else: ?>
-                                        <form class="addToCartDynamicForm d-none" id="add-to-cart-form-rel-<?php echo $relatedProduct->id; ?>">
-                                            <?php echo csrf_field(); ?>
-                                            <input type="hidden" name="id" value="<?php echo $relatedProduct->id; ?>">
-                                            <input type="hidden" name="quantity" value="<?php echo $relatedProduct->minimum_order_qty ?? 1; ?>">
-                                        </form>
-                                        <button class="premium-add-to-cart" type="button" onclick="addToCart($('#add-to-cart-form-rel-<?php echo $relatedProduct->id; ?>'))">
-                                            <i class="fa fa-shopping-cart"></i>
-                                            <span class="ms-1">أضف للعربة</span>
-                                        </button>
-                                    <?php endif; ?>
                                 </div>
                             </div>
+                            <div class="premium-card-details">
+                                <span
+                                    class="premium-category-tag"><?php        echo $relatedProduct->category?->name ?? ''; ?></span>
+                                <a href="<?php        echo route('product', $relatedProduct->slug); ?>"
+                                    class="premium-product-title" title="<?php        echo $relatedProduct->name; ?>">
+                                    <?php        echo Str::limit($relatedProduct->name, 45); ?>
+                                </a>
+                                <div class="premium-product-prices">
+                                    <?php        if (getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0): ?>
+                                    <del
+                                        class="premium-price-old"><?php            echo webCurrencyConverter(amount: $relatedProduct->unit_price); ?></del>
+                                    <?php        endif; ?>
+                                    <?php
+        $finalPrice = $relatedProduct->unit_price;
+        if (getProductPriceByType(product: $relatedProduct, type: 'discount', result: 'value') > 0) {
+            if ($relatedProduct->clearanceSale) {
+                $finalPrice = $relatedProduct->unit_price - $relatedProduct->clearanceSale->discount_amount;
+            } else {
+                $finalPrice = $relatedProduct->unit_price - $relatedProduct->discount;
+            }
+        }
+                                        ?>
+                                    <span
+                                        class="premium-price-new"><?php        echo webCurrencyConverter(amount: $finalPrice); ?></span>
+                                </div>
+                                <?php
+        $hasVariations = false;
+        if (isset($relatedProduct->choice_options)) {
+            $choices = json_decode($relatedProduct->choice_options, true);
+            $specTitles = ['الصناعة', 'الضمان', 'الضمان الشامل', 'ضمان الكمبروسر', 'سعة التبريد', 'حار و بارد / بارد', 'حار وبارد / بارد', 'التردد', 'ارتفاع الاستاند', 'الجهد الكهربائي', 'الفريون'];
+            if (is_array($choices)) {
+                foreach ($choices as $choice) {
+                    $title = trim($choice['title'] ?? '');
+                    $optionsCount = count($choice['options'] ?? []);
+                    if (!in_array($title, $specTitles) && $optionsCount > 1) {
+                        $hasVariations = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (isset($relatedProduct->colors)) {
+            $colors = json_decode($relatedProduct->colors, true);
+            if (is_array($colors) && count($colors) > 0) {
+                $hasVariations = true;
+            }
+        }
+                                    ?>
+                                <?php        if ($hasVariations): ?>
+                                <button class="premium-add-to-cart action-product-quick-view" type="button"
+                                    data-product-id="<?php            echo $relatedProduct->id; ?>">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span class="ms-1">أضف للعربة</span>
+                                </button>
+                                <?php        else: ?>
+                                <form class="addToCartDynamicForm d-none"
+                                    id="add-to-cart-form-rel-<?php            echo $relatedProduct->id; ?>">
+                                    <?php            echo csrf_field(); ?>
+                                    <input type="hidden" name="id" value="<?php            echo $relatedProduct->id; ?>">
+                                    <input type="hidden" name="quantity"
+                                        value="<?php            echo $relatedProduct->minimum_order_qty ?? 1; ?>">
+                                </form>
+                                <button class="premium-add-to-cart product-add-to-cart-button" type="button"
+                                    data-form="#add-to-cart-form-rel-<?php            echo $relatedProduct->id; ?>">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span class="ms-1">أضف للعربة</span>
+                                </button>
+                                <?php        endif; ?>
+                            </div>
                         </div>
-                    <?php endforeach; ?>
+                    </div>
+                    <?php    endforeach; ?>
                 </div>
             </div>
         </section>
     </div>
 </div>
 <?php endif; ?>
-    </div>
+</div>
 
-    @include("web-views.products._product-details-sticky", ['productDetails' => $product])
+@include("web-views.products._product-details-sticky", ['productDetails' => $product])
 
-    @if($product?->preview_file_full_url['path'])
-        @include('web-views.partials._product-preview-modal', ['previewFileInfo' => $previewFileInfo])
-    @endif
+@if($product?->preview_file_full_url['path'])
+    @include('web-views.partials._product-preview-modal', ['previewFileInfo' => $previewFileInfo])
+@endif
 
-    @include('layouts.front-end.partials.modal._chatting',['seller'=>$product->seller, 'user_type'=>$product->added_by])
+@include('layouts.front-end.partials.modal._chatting', ['seller' => $product->seller, 'user_type' => $product->added_by])
 
-    <span id="route-review-list-product" data-url="{{ route('review-list-product') }}"></span>
-    <span id="products-details-page-data" data-id="{{ $product['id'] }}"></span>
-    <span id="all-msg-container" data-afterextend="{{translate('see_less')}}" data-seemore="{{translate('see_more')}}"></span>
+<span id="route-review-list-product" data-url="{{ route('review-list-product') }}"></span>
+<span id="products-details-page-data" data-id="{{ $product['id'] }}"></span>
+<span id="all-msg-container" data-afterextend="{{translate('see_less')}}"
+    data-seemore="{{translate('see_more')}}"></span>
 @endsection
 
 @push('script')
     <script>
-        $(document).on('change', 'input[name="color"]', function() {
+        $(document).on('change', 'input[name="color"]', function () {
             const selectedColor = $(this).val();
             const colors = @json(json_decode($product->colors));
             console.log(colors);
@@ -1574,7 +1632,7 @@
     </script>
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/product-details.js') }}"></script>
     <script type="text/javascript" async="async"
-            src="https://platform-api.sharethis.com/js/sharethis.js#property=5f55f75bde227f0012147049&product=sticky-share-buttons"></script>
+        src="https://platform-api.sharethis.com/js/sharethis.js#property=5f55f75bde227f0012147049&product=sticky-share-buttons"></script>
 
     <script>
         $(document).ready(function () {
@@ -1582,7 +1640,7 @@
             function applyShowMoreLogic() {
                 $(".tab-pane.active").each(function () {
                     let content = $(this).find(".details-content-wrap");
-                    let button  = $(this).find(".see-more-details");
+                    let button = $(this).find(".see-more-details");
 
                     if (!content.length || !button.length) return;
 
@@ -1618,7 +1676,7 @@
                 }
             });
 
-            $(document).on('change keyup input click', '.product-details-cart-qty', function() {
+            $(document).on('change keyup input click', '.product-details-cart-qty', function () {
                 var val = $(this).val();
                 $('#hidden_quantity').val(val);
             });
@@ -1626,25 +1684,25 @@
         });
     </script>
     <script>
-window.tamaraWidgetConfig = {
-    lang: 'ar',
-    country: 'SA',
-    publicKey: 'd5eee77d-f5d5-4177-b6f6-8a0f913e61c0'
-};
-</script>
+        window.tamaraWidgetConfig = {
+            lang: 'ar',
+            country: 'SA',
+            publicKey: 'd5eee77d-f5d5-4177-b6f6-8a0f913e61c0'
+        };
+    </script>
 
-<script defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
-<script src="https://checkout.tabby.ai/tabby-promo.js"></script>
+    <script defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
+    <script src="https://checkout.tabby.ai/tabby-promo.js"></script>
 
-<script>
-new TabbyPromo({
-    selector: '#TabbyPromo',
-    currency: 'SAR',
-    price: '{{ getProductPriceByType(product: $product, type: "discounted_unit_price", result: "value") }}',
-    lang: 'ar',
-    source: 'product',
-    publicKey: 'pk_test_019c344f-bd29-e95d-46df-8dcda6d1644b  '
-});
-</script>
+    <script>
+        new TabbyPromo({
+            selector: '#TabbyPromo',
+            currency: 'SAR',
+            price: '{{ getProductPriceByType(product: $product, type: "discounted_unit_price", result: "value") }}',
+            lang: 'ar',
+            source: 'product',
+            publicKey: 'pk_test_019c344f-bd29-e95d-46df-8dcda6d1644b  '
+        });
+    </script>
 
 @endpush
