@@ -387,7 +387,7 @@ class CartManager
         $user = Helpers::getCustomerInformation($request);
         $guestId = session('guest_id') ?? ($request->guest_id ?? 0);
 
-        if (($product['product_type'] == 'physical') && ($product['current_stock'] < $request['quantity'])) {
+        if (($product['product_type'] == 'physical') && (CartManager::getBranchStock($product) < $request['quantity'])) {
             return ['status' => 0, 'message' => translate('out_of_stock!')];
         }
 
@@ -747,7 +747,7 @@ class CartManager
                     }
                 }
             }
-        } else if (($product['product_type'] == 'physical') && $product['current_stock'] < $request->quantity) {
+        } else if (($product['product_type'] == 'physical') && CartManager::getBranchStock($product) < $request->quantity) {
             $status = 0;
             $qty = $cart['quantity'];
         }
@@ -872,7 +872,7 @@ class CartManager
                             }
                         }
                     }
-                } else if (($product['product_type'] == 'physical') && $product['current_stock'] < $cart->quantity) {
+                } else if (($product['product_type'] == 'physical') && CartManager::getBranchStock($product) < $cart->quantity) {
                     $status = false;
                 }
             } else {
@@ -986,5 +986,21 @@ class CartManager
             'item_tax' => $totalTaxAmount,
             'shipping_cost_tax' => $totalShippingTaxAmount,
         ];
+    }
+
+    public static function getBranchStock($product)
+    {
+        $branchId = auth('customer')->check()
+            ? auth('customer')->user()->branch_id
+            : session('branch_id');
+
+        if ($branchId) {
+            $branchStock = \App\Models\ProductStock::where('product_id', $product['id'])
+                ->where('branch_id', $branchId)
+                ->value('qty');
+            return $branchStock !== null ? (int)$branchStock : 0;
+        }
+
+        return (int)$product['current_stock'];
     }
 }

@@ -40,6 +40,7 @@ use App\Http\Controllers\Web\UserLoyaltyController;
 use App\Http\Controllers\Web\UserProfileController;
 use App\Http\Controllers\Web\UserWalletController;
 use App\Http\Controllers\Web\WebController;
+use App\Http\Controllers\Web\BranchController;
 use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
@@ -86,6 +87,8 @@ Route::group(['namespace' => 'Web', 'middleware' => ['maintenance_mode', 'guestC
     Route::controller(HomeController::class)->group(function () {
         Route::get('/', 'index')->name('home');
     });
+
+    Route::post('set-branch', [BranchController::class, 'setBranch'])->name('set-branch');
 
     Route::controller(WebController::class)->group(function () {
         Route::get('quick-view', 'getQuickView')->name('quick-view');

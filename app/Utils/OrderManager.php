@@ -80,6 +80,16 @@ class OrderManager
 
     public static function getStockUpdateOnOrderStatusChange($order, $status): void
     {
+        $branchId = null;
+        if ($order) {
+            if ($order->is_guest) {
+                $guest = \App\Models\GuestUser::find($order->customer_id);
+                $branchId = $guest?->branch_id;
+            } else {
+                $branchId = $order->customer?->branch_id;
+            }
+        }
+
         if ($status == 'returned' || $status == 'failed' || $status == 'canceled') {
             foreach ($order->details as $detail) {
                 if ($detail['is_stock_decreased'] == 1) {
@@ -92,10 +102,29 @@ class OrderManager
                         }
                         $variationData[] = $var;
                     }
-                    Product::where(['id' => $product['id']])->update([
-                        'variation' => json_encode($variationData),
-                        'current_stock' => $product['current_stock'] + $detail['qty'],
-                    ]);
+
+                    if ($branchId) {
+                        DB::table('product_stocks')
+                            ->where('product_id', $product['id'])
+                            ->where('branch_id', $branchId)
+                            ->increment('qty', $detail['qty']);
+
+                        $totalStock = DB::table('product_stocks')
+                            ->where('product_id', $product['id'])
+                            ->whereNotNull('branch_id')
+                            ->sum('qty');
+
+                        Product::where(['id' => $product['id']])->update([
+                            'variation' => json_encode($variationData),
+                            'current_stock' => $totalStock,
+                        ]);
+                    } else {
+                        Product::where(['id' => $product['id']])->update([
+                            'variation' => json_encode($variationData),
+                            'current_stock' => $product['current_stock'] + $detail['qty'],
+                        ]);
+                    }
+
                     OrderDetail::where(['id' => $detail['id']])->update([
                         'is_stock_decreased' => 0,
                         'delivery_status' => $status
@@ -115,10 +144,29 @@ class OrderManager
                         }
                         $variationData[] = $var;
                     }
-                    Product::where(['id' => $product['id']])->update([
-                        'variation' => json_encode($variationData),
-                        'current_stock' => $product['current_stock'] - $detail['qty'],
-                    ]);
+
+                    if ($branchId) {
+                        DB::table('product_stocks')
+                            ->where('product_id', $product['id'])
+                            ->where('branch_id', $branchId)
+                            ->decrement('qty', $detail['qty']);
+
+                        $totalStock = DB::table('product_stocks')
+                            ->where('product_id', $product['id'])
+                            ->whereNotNull('branch_id')
+                            ->sum('qty');
+
+                        Product::where(['id' => $product['id']])->update([
+                            'variation' => json_encode($variationData),
+                            'current_stock' => $totalStock,
+                        ]);
+                    } else {
+                        Product::where(['id' => $product['id']])->update([
+                            'variation' => json_encode($variationData),
+                            'current_stock' => max(0, $product['current_stock'] - $detail['qty']),
+                        ]);
+                    }
+
                     OrderDetail::where(['id' => $detail['id']])->update([
                         'is_stock_decreased' => 1,
                         'delivery_status' => $status
@@ -1068,9 +1116,38 @@ class OrderManager
                     'variation' => json_encode($variationData),
                 ]);
             }
-            Product::where(['id' => $product['id']])->update([
-                'current_stock' => $product['current_stock'] - $cartSingleItem['quantity']
-            ]);
+
+            // Decrement branch-specific stock in product_stocks table
+            $order = Order::find($orderId);
+            $branchId = null;
+            if ($order) {
+                if ($order->is_guest) {
+                    $branchId = session('branch_id');
+                } else {
+                    $branchId = $order->customer?->branch_id ?? session('branch_id');
+                }
+            }
+
+            if ($branchId) {
+                DB::table('product_stocks')
+                    ->where('product_id', $product['id'])
+                    ->where('branch_id', $branchId)
+                    ->decrement('qty', $cartSingleItem['quantity']);
+
+                $totalStock = DB::table('product_stocks')
+                    ->where('product_id', $product['id'])
+                    ->whereNotNull('branch_id')
+                    ->sum('qty');
+
+                Product::where(['id' => $product['id']])->update([
+                    'current_stock' => $totalStock
+                ]);
+            } else {
+                Product::where(['id' => $product['id']])->update([
+                    'current_stock' => max(0, $product['current_stock'] - $cartSingleItem['quantity'])
+                ]);
+            }
+
             $orderDetailsId = DB::table('order_details')->insertGetId($orderDetails);
 
             foreach ($vendorCart['applied_tax_cart_list'] as $cartItem) {

@@ -209,7 +209,17 @@ class Product extends Model
             ->where(['status' => 1])
             ->where(['request_status' => 1])
             ->SellerApproved()
-            ->whereIn('product_type', $productType);
+            ->whereIn('product_type', $productType)
+            ->when(!request()->is('admin/*') && !request()->is('seller/*') && !request()->is('api/v1/admin/*') && !request()->is('api/v1/seller/*'), function ($query) {
+                $branchId = auth('customer')->check()
+                    ? auth('customer')->user()->branch_id
+                    : session('branch_id');
+                if ($branchId) {
+                    $query->whereHas('stocks', function ($q) use ($branchId) {
+                        $q->where('branch_id', $branchId)->where('qty', '>', 0);
+                    });
+                }
+            });
     }
 
     public function scopeSellerApproved($query): void

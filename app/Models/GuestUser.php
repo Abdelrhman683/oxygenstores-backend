@@ -29,6 +29,7 @@ class GuestUser extends Model
     protected $fillable = [
         'ip_address',
         'fcm_token',
+        'branch_id',
     ];
 
     /**
@@ -40,6 +41,7 @@ class GuestUser extends Model
         'id' => 'integer',
         'ip_address' => 'string',
         'fcm_token' => 'string',
+        'branch_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

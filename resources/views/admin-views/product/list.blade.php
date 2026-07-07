@@ -156,7 +156,7 @@
                                     <td>
                                         <div class="d-flex justify-content-center gap-2 align-items-center lh-1">
                                             @if ($product['product_type'] === 'physical')
-                                                <span>{{ $product->current_stock }}</span>
+                                                <span class="product-stock-total">{{ $product->current_stock }}</span>
                                                 @if ($product->current_stock <= 0)
                                                     <span class="text-danger-dark fs-18"
                                                           data-bs-toggle="tooltip"
@@ -170,6 +170,15 @@
                                                         <i class="fi fi-sr-exclamation"></i>
                                                     </span>
                                                 @endif
+                                                {{-- Branch Stock Button --}}
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-info p-1 btn-branch-stock"
+                                                        data-product-id="{{ $product->id }}"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#branchStockModal"
+                                                        title="{{ translate('Manage Branch Stock') }}">
+                                                    <i class="fi fi-sr-sitemap fs-12"></i>
+                                                </button>
                                             @else
                                                 <span>-</span>
                                             @endif
@@ -284,5 +293,51 @@
     <span id="message-select-word" data-text="{{ translate('select') }}"></span>
 
     @include('admin-views.product.partials.offcanvas._filter-offcanvas')
+
+    {{-- Branch Stock Modal --}}
+    <div class="modal fade" id="branchStockModal" tabindex="-1" role="dialog"
+         aria-labelledby="branchStockModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title" id="branchStockModalLabel">
+                        <i class="fi fi-sr-sitemap me-2"></i>
+                        {{ translate('Manage Branch Stock') }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="branchStockModalBody">
+                    <div class="text-center p-4">
+                        <div class="spinner-border text-primary"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@push('script')
+<script>
+    "use strict";
+
+    // Load branch stock when modal button is clicked
+    $(document).on('click', '.btn-branch-stock', function () {
+        const productId = $(this).data('product-id');
+        // Store ref to calling row for updating total after save
+        $('#branchStockModal').data('product-id', productId);
+        $('#branchStockModalBody').html(
+            '<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>'
+        );
+
+        $.get('{{ route("admin.products.branch-stock") }}', { product_id: productId }, function (res) {
+            $('#branchStockModalBody').html(res.view);
+        }).fail(function () {
+            $('#branchStockModalBody').html(
+                '<div class="alert alert-danger m-3">{{ translate("Failed to load branch stock data") }}</div>'
+            );
+        });
+    });
+</script>
+@endpush
 @endsection
 

@@ -1,4 +1,6 @@
-@php($announcement=getWebConfig(name: 'announcement'))
+@php
+    $announcement = getWebConfig(name: 'announcement');
+@endphp
 
 @if (isset($announcement) && $announcement['status']==1)
     <div class="text-center position-relative px-4 py-1 d--none" id="announcement"
@@ -24,7 +26,9 @@
             </div>
 
             <div>
-                @php($currency_model = getWebConfig(name: 'currency_model'))
+                @php
+                    $currency_model = getWebConfig(name: 'currency_model');
+                @endphp
                 @if($currency_model=='multi_currency')
                     <div class="topbar-text dropdown disable-autohide mr-4">
                         <a class="topbar-link dropdown-toggle" href="#" data-toggle="dropdown">
@@ -130,10 +134,17 @@
 
                 <!-- Actions -->
                 <div class="actions-section d-flex align-items-center text-white flex-shrink-0">
-                    @php($selected_region = $_COOKIE['selected_region'] ?? 'الرياض')
-                    <div class="action-item d-none d-md-inline-flex cursor-pointer" data-toggle="modal" data-target="#regionModal" style="cursor: pointer;">
+                    @php
+                        $currentBranchId = auth('customer')->check()
+                            ? auth('customer')->user()->branch_id
+                            : session('branch_id');
+                        $currentBranch = $currentBranchId
+                            ? \App\Models\Branch::find($currentBranchId)
+                            : null;
+                    @endphp
+                    <div class="action-item d-none d-md-inline-flex cursor-pointer" data-toggle="modal" data-target="#branchModal" style="cursor: pointer;" id="branch-selector-btn">
                         <i class="fa fa-map-marker"></i>
-                        <span class="d-none d-lg-block">المنطقة (<span id="current-region-name">{{ $selected_region }}</span>)</span>
+                        <span class="d-none d-lg-block">الفرع (<span id="current-branch-name">{{ $currentBranch?->name ?? 'اختر الفرع' }}</span>)</span>
                     </div>
                     <span class="separator-line d-none d-md-inline-block">|</span>
                     <a href="{{route('wishlists')}}" class="action-item d-none d-md-inline-flex">
@@ -308,34 +319,45 @@
     </div>
 </header>
 
-<div class="modal fade" id="regionModal" tabindex="-1" role="dialog" aria-labelledby="regionModalLabel" aria-hidden="true">
+{{-- Branch Selection Modal --}}
+<div class="modal fade" id="branchModal" tabindex="-1" role="dialog" aria-labelledby="branchModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content border-0 position-relative" style="border-radius: 8px; overflow: hidden; padding: 25px 20px;">
-            
-            <button type="button" class="close-region-modal" data-dismiss="modal" aria-label="Close">
+
+            <button type="button" class="close-region-modal" data-dismiss="modal" aria-label="Close"
+                    @if(!$currentBranchId) style="display:none;" @endif>
                 <i class="fa fa-times"></i>
             </button>
 
             <div class="text-center mb-4">
-                <h3 class="modal-title-custom">يرجى إختيار منطقتك لتخصيص العرض</h3>
+                <h3 class="modal-title-custom">يرجى اختيار الفرع لتخصيص العرض</h3>
                 <p class="modal-subtitle-custom">
-                    المنطقة الحالية: "<span class="text-primary-color">منطقة <span class="current-region-placeholder">{{ $selected_region }}</span> - <span class="current-region-placeholder">{{ $selected_region }}</span></span>"، يمكنك تغيير المنطقة أسفله.
+                    @if($currentBranch)
+                        الفرع الحالي: "<span class="text-primary-color">{{ $currentBranch->name }}</span>"، يمكنك تغييره أدناه.
+                    @else
+                        اختر الفرع المناسب لك لعرض المنتجات المتاحة.
+                    @endif
                 </p>
             </div>
 
             <div class="regions-grid">
-                @php($regions = ['الرياض', 'الدمام', 'المجمعة', 'الخرج', 'الأحساء', 'الجبيل', 'حفر الباطن', 'المدينة المنورة', 'ينبع', 'الرس', 'بريدة', 'عنيزة', 'مكة المكرمة', 'جدة', 'الطائف', 'الباحة', 'القنفذة', 'الدوادمي'])
-                @foreach($regions as $region)
-                    <button type="button" class="region-card @if($region == $selected_region) active @endif" data-region="{{ $region }}">
-                        {{ $region }}
+                @php
+                    $allBranches = \App\Models\Branch::orderBy('name')->get();
+                @endphp
+                @foreach($allBranches as $branch)
+                    <button type="button"
+                            class="region-card {{ $currentBranchId == $branch->id ? 'active' : '' }}"
+                            data-branch-id="{{ $branch->id }}"
+                            data-branch-name="{{ $branch->name }}">
+                        {{ $branch->name }}
                     </button>
                 @endforeach
             </div>
 
             <div class="text-center mt-4">
-                <button type="button" class="btn-save-region" id="save-region-btn">حفظ</button>
+                <button type="button" class="btn-save-region" id="save-branch-btn">حفظ</button>
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -349,23 +371,48 @@
             .append("<i class='czi-arrow-{{Session::get('direction') === "rtl" ? 'left' : 'right'}}'></i>");
 
         $(document).ready(function() {
-            let tempSelectedRegion = "{{ $selected_region }}";
+            let tempSelectedBranchId   = null;
+            let tempSelectedBranchName = null;
 
+            // Auto-open modal if no branch selected
+            @if(!$currentBranchId)
+                $('#branchModal').modal({ backdrop: 'static', keyboard: false });
+                $('#branchModal').modal('show');
+            @endif
+
+            // Branch card selection
             $(document).on('click', '.region-card', function() {
                 $('.region-card').removeClass('active');
                 $(this).addClass('active');
-                tempSelectedRegion = $(this).data('region');
+                tempSelectedBranchId   = $(this).data('branch-id');
+                tempSelectedBranchName = $(this).data('branch-name');
             });
 
-            $('#save-region-btn').on('click', function() {
-                document.cookie = "selected_region=" + encodeURIComponent(tempSelectedRegion) + "; path=/; max-age=" + (30*24*60*60);
-                
-                $('#current-region-name').text(tempSelectedRegion);
-                $('.current-region-placeholder').text(tempSelectedRegion);
-                
-                $('#regionModal').modal('hide');
-                
-                location.reload();
+            // Save branch
+            $('#save-branch-btn').on('click', function() {
+                if (!tempSelectedBranchId) {
+                    alert('يرجى اختيار فرع أولاً');
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route("set-branch") }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        branch_id: tempSelectedBranchId
+                    },
+                    success: function(res) {
+                        if (res.success) {
+                            $('#current-branch-name').text(tempSelectedBranchName);
+                            $('#branchModal').modal('hide');
+                            location.reload();
+                        }
+                    },
+                    error: function() {
+                        alert('حدث خطأ، يرجى المحاولة مجدداً');
+                    }
+                });
             });
         });
     </script>

@@ -41,12 +41,16 @@ use App\Traits\FileManagerTrait;
 use App\Traits\ProductTrait;
 use App\Utils\CartManager;
 use App\Utils\ProductManager;
+use App\Models\Branch;
+use App\Models\Product;
+use App\Models\ProductStock;
 use Devrabiul\ToastMagic\Facades\ToastMagic;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Modules\TaxModule\app\Models\SystemTaxSetup;
 use Modules\TaxModule\app\Models\Taxable;
@@ -1110,6 +1114,63 @@ class ProductController extends BaseController
             'endDate' => $endDate,
         ];
         return Excel::download(new RestockProductListExport($data), 'restock-product-list.xlsx');
+    }
+    /**
+     * GET  /admin/products/branch-stock?product_id=X
+     * Load branch stock data for the AJAX modal.
+     */
+    public function getBranchStock(Request $request): JsonResponse
+    {
+        $product  = Product::findOrFail($request->product_id);
+        $branches = Branch::orderBy('name')->get();
+        // pluck returns Collection [branch_id => qty]
+        $stocks   = ProductStock::where('product_id', $request->product_id)
+                        ->whereNotNull('branch_id')
+                        ->pluck('qty', 'branch_id');
+
+        return response()->json([
+            'view' => view(
+                'admin-views.product.partials._branch-stock-modal',
+                compact('product', 'branches', 'stocks')
+            )->render()
+        ]);
+    }
+
+    /**
+     * POST /admin/products/branch-stock
+     * Save per-branch stock and update products.current_stock as the sum.
+     */
+    public function updateBranchStock(Request $request): JsonResponse
+    {
+        $productId    = (int) $request->product_id;
+        $branchStocks = $request->input('branch_stocks', []);
+
+        DB::transaction(function () use ($productId, $branchStocks) {
+            foreach ($branchStocks as $branchId => $qty) {
+                ProductStock::updateOrCreate(
+                    ['product_id' => $productId, 'branch_id' => (int) $branchId],
+                    ['qty'        => max(0, (int) $qty)]
+                );
+            }
+
+            // Sync products.current_stock = sum of all branch qtys
+            $totalStock = ProductStock::where('product_id', $productId)
+                            ->whereNotNull('branch_id')
+                            ->sum('qty');
+
+            Product::where('id', $productId)->update(['current_stock' => $totalStock]);
+        });
+
+        $totalStock = ProductStock::where('product_id', $productId)
+                        ->whereNotNull('branch_id')
+                        ->sum('qty');
+
+        return response()->json([
+            'success'     => true,
+            'product_id'  => $productId,
+            'total_stock' => $totalStock,
+            'message'     => translate('Branch stock updated successfully'),
+        ]);
     }
 
 }

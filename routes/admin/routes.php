@@ -231,6 +231,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin', '
             Route::get('request-restock-list', 'getRequestRestockListView')->name('request-restock-list');
             Route::get('export-restock', 'exportRestockList')->name('restock-export');
             Route::delete('restock-delete/{id}', 'deleteRestock')->name('restock-delete');
+            Route::get('branch-stock', 'getBranchStock')->name('branch-stock');
+            Route::post('branch-stock', 'updateBranchStock')->name('branch-stock.update');
         });
     });
 

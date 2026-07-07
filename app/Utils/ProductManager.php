@@ -2558,18 +2558,40 @@ class ProductManager
         $getCategoryWiseProductIds = [];
 
         if (!empty($filteredCategoryIds)) {
+            $categoryIdsToQuery = $filteredCategoryIds;
+            $childIds = Category::whereIn('parent_id', $filteredCategoryIds)->pluck('id')->toArray();
+            if (!empty($childIds)) {
+                $categoryIdsToQuery = array_merge($categoryIdsToQuery, $childIds);
+                $grandchildIds = Category::whereIn('parent_id', $childIds)->pluck('id')->toArray();
+                if (!empty($grandchildIds)) {
+                    $categoryIdsToQuery = array_merge($categoryIdsToQuery, $grandchildIds);
+                }
+            }
             $getCategoryWiseProductIds = array_merge($getCategoryWiseProductIds, self::addAdditionalQueryForCategoryProduct(
                 request: $request,
-                query: Product::whereIn('category_id', $filteredCategoryIds),
+                query: Product::where(function($q) use ($categoryIdsToQuery) {
+                    $q->whereIn('category_id', $categoryIdsToQuery)
+                      ->orWhereIn('sub_category_id', $categoryIdsToQuery)
+                      ->orWhereIn('sub_sub_category_id', $categoryIdsToQuery);
+                }),
                 productAddedBy: $productAddedBy,
                 productUserID: $productUserID
             ));
         }
 
         if (!empty($filteredSubCategoryIds)) {
+            $subCategoryIdsToQuery = $filteredSubCategoryIds;
+            $childIds = Category::whereIn('parent_id', $filteredSubCategoryIds)->pluck('id')->toArray();
+            if (!empty($childIds)) {
+                $subCategoryIdsToQuery = array_merge($subCategoryIdsToQuery, $childIds);
+            }
             $getCategoryWiseProductIds = array_merge($getCategoryWiseProductIds, self::addAdditionalQueryForCategoryProduct(
                 request: $request,
-                query: Product::whereIn('sub_category_id', $filteredSubCategoryIds),
+                query: Product::where(function($q) use ($subCategoryIdsToQuery) {
+                    $q->whereIn('category_id', $subCategoryIdsToQuery)
+                      ->orWhereIn('sub_category_id', $subCategoryIdsToQuery)
+                      ->orWhereIn('sub_sub_category_id', $subCategoryIdsToQuery);
+                }),
                 productAddedBy: $productAddedBy,
                 productUserID: $productUserID
             ));
@@ -2578,7 +2600,11 @@ class ProductManager
         if (!empty($filteredSubSubCategoryIds)) {
             $getCategoryWiseProductIds = array_merge($getCategoryWiseProductIds, self::addAdditionalQueryForCategoryProduct(
                 request: $request,
-                query: Product::whereIn('sub_sub_category_id', $filteredSubSubCategoryIds),
+                query: Product::where(function($q) use ($filteredSubSubCategoryIds) {
+                    $q->whereIn('category_id', $filteredSubSubCategoryIds)
+                      ->orWhereIn('sub_category_id', $filteredSubSubCategoryIds)
+                      ->orWhereIn('sub_sub_category_id', $filteredSubSubCategoryIds);
+                }),
                 productAddedBy: $productAddedBy,
                 productUserID: $productUserID
             ));

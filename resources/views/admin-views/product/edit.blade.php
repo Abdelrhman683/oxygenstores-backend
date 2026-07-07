@@ -353,23 +353,8 @@
                                        name="minimum_order_qty" class="form-control" required>
                             </div>
                         </div>
-                        <div class="col-md-6 col-lg-4 col-xl-3 show-for-physical-product" id="quantity">
-                            <div class="form-group">
-                                <label class="form-label" for="current_stock">
-                                    {{ translate('current_stock_qty') }}
-                                    <span class="input-required-icon">*</span>
-                                    <span class="tooltip-icon cursor-pointer" data-bs-toggle="tooltip"
-                                          aria-label="{{ translate('add_the_Stock_Quantity_of_this_product_that_will_be_visible_to_customers') }}."
-                                          data-bs-title="{{ translate('add_the_Stock_Quantity_of_this_product_that_will_be_visible_to_customers') }}."
-                                    >
-                                        <i class="fi fi-sr-info"></i>
-                                    </span>
-                                </label>
-                                <input type="number" min="0" value={{ $product->current_stock }} step="1"
-                                       placeholder="{{ translate('quantity') }}"
-                                       name="current_stock" id="current_stock" class="form-control" required>
-                            </div>
-                        </div>
+                        {{-- current_stock is managed per-branch via the branch stock modal in the product list --}}
+                        <input type="hidden" name="current_stock" value="{{ $product->current_stock }}">
                         <div class="col-md-6 col-lg-4 col-xl-3">
                             <div class="form-group">
                                 <label class="form-label" for="discount_Type">

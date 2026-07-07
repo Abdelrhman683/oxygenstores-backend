@@ -97,6 +97,7 @@ class User extends Authenticatable
         'temp_block_time',
         'referral_code',
         'referred_by',
+        'branch_id',
     ];
 
     /**
@@ -149,6 +150,7 @@ class User extends Authenticatable
         'temp_block_time' => 'datetime',
         'referral_code' => 'string',
         'referred_by' => 'integer',
+        'branch_id' => 'integer',
     ];
 
     // Old Relation: wish_list
