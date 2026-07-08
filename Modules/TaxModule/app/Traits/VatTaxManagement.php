@@ -37,7 +37,7 @@ trait VatTaxManagement
                     return [
                         'SystemTaxVat' => $systemTaxVat ?? null,
                         'SystemTaxVatType' => $systemTaxVat?->tax_type ?? 'order_wise',
-                        'is_included' => $systemTaxVat?->is_included ?? 0,
+                        'is_included' => 1,
                         'productWiseTax' => false,
                         'categoryWiseTax' => false,
                         'taxVats' => []
@@ -58,7 +58,7 @@ trait VatTaxManagement
             return [
                 'SystemTaxVat' => $systemTaxVat ?? null,
                 'SystemTaxVatType' => $systemTaxVat?->tax_type ?? 'order_wise',
-                'is_included' => $systemTaxVat?->is_included ?? 0,
+                'is_included' => 1,
                 'productWiseTax' => $productWiseTax ?? false,
                 'categoryWiseTax' => $categoryWiseTax ?? false,
                 'taxVats' => $taxVats ?? collect([])

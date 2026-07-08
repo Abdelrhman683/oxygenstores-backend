@@ -248,10 +248,10 @@
                         <input type="hidden" name="keep_customer_login_redirect_url" value="{{ $keepCustomerLoginRedirectUrl ?? old('keep_customer_login_redirect_url', url()->previous()) }}">
                         <input type="hidden" name="login_type" value="manual-login">
 
-                        <div class="form-group mb-3">
-                            <label class="form-label">إسم المستخدم او البريد الإلكتروني او رقم الهاتف *</label>
-                            <input class="form-control" type="text" name="user_identity" value="{{ old('user_identity') }}" placeholder="admin" required>
-                        </div>
+                         <div class="form-group mb-3">
+                             <label class="form-label">إسم المستخدم او البريد الإلكتروني او رقم الهاتف *</label>
+                             <input class="form-control" type="text" name="user_identity" value="{{ old('user_identity') }}" placeholder="+966*********" required>
+                         </div>
 
                         <!-- <div class="custom-control custom-checkbox mb-2">
                             <input type="checkbox" class="custom-control-input" id="use-password" checked>

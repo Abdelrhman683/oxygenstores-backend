@@ -49,6 +49,9 @@
                                          src="{{ getStorageImages(path: $product->thumbnail_full_url ?? $product->thumbnail, type: 'product') }}"
                                          alt="{{ $product->name }}">
                                 </a>
+                                @if($product->product_type == 'physical' && $product->current_stock <= 0)
+                                    <span class="out_fo_stock">{{translate('out_of_stock')}}</span>
+                                @endif
                             </div>
                         </div>
                         <div class="premium-card-details">

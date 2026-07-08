@@ -209,17 +209,7 @@ class Product extends Model
             ->where(['status' => 1])
             ->where(['request_status' => 1])
             ->SellerApproved()
-            ->whereIn('product_type', $productType)
-            ->when(!request()->is('admin/*') && !request()->is('seller/*') && !request()->is('api/v1/admin/*') && !request()->is('api/v1/seller/*'), function ($query) {
-                $branchId = auth('customer')->check()
-                    ? auth('customer')->user()->branch_id
-                    : session('branch_id');
-                if ($branchId) {
-                    $query->whereHas('stocks', function ($q) use ($branchId) {
-                        $q->where('branch_id', $branchId)->where('qty', '>', 0);
-                    });
-                }
-            });
+            ->whereIn('product_type', $productType);
     }
 
     public function scopeSellerApproved($query): void
@@ -469,6 +459,40 @@ class Product extends Model
         return $images;
     }
 
+    public function getCurrentStockAttribute($value)
+    {
+        $segment = request()->segment(1);
+        // If we are in the admin/seller/vendor panels, return the actual database value (total stock)
+        if (in_array($segment, ['admin', 'vendor', 'seller', 'api/v1/admin', 'api/v1/seller'], true)) {
+            return $value;
+        }
+
+        if ($this->product_type === 'digital') {
+            return $value;
+        }
+
+        $branchId = getSelectedBranchId();
+
+        // Automatically default to Riyadh branch if no branch is selected
+        if (!$branchId) {
+            $branchId = \Illuminate\Support\Facades\DB::table('branches')
+                ->where('name', 'like', '%الرياض%')
+                ->orWhere('name', 'like', '%Riyadh%')
+                ->value('id') ?? 1;
+        }
+
+
+        if ($branchId) {
+            $branchStock = \Illuminate\Support\Facades\DB::table('product_stocks')
+                ->where('product_id', $this->id)
+                ->where('branch_id', $branchId)
+                ->value('qty');
+            return $branchStock !== null ? (int)$branchStock : 0;
+        }
+
+        return $value;
+    }
+
     protected static function boot(): void
     {
         parent::boot();
@@ -495,5 +519,31 @@ class Product extends Model
                 });
             }]);
         });
+    }
+
+    protected static $firstTaxRate = null;
+
+    public function getTaxAttribute($value)
+    {
+        if (self::$firstTaxRate === null) {
+            try {
+                self::$firstTaxRate = \Illuminate\Support\Facades\DB::table('taxes')
+                    ->where('is_active', 1)
+                    ->value('tax_rate') ?? 15;
+            } catch (\Exception $e) {
+                self::$firstTaxRate = 15;
+            }
+        }
+        return self::$firstTaxRate;
+    }
+
+    public function getTaxModelAttribute($value)
+    {
+        return 'include';
+    }
+
+    public function getShippingCostAttribute($value)
+    {
+        return 0.0;
     }
 }

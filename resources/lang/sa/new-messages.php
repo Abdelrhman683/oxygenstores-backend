@@ -6882,6 +6882,7 @@ return [
 	"Payment_Info" => "Payment Info",
 	"Enter_your_payment_info" => "Enter your payment info",
 	"Type_payment_info" => "Type payment info",
+<<<<<<< HEAD
 	"Order_is_editable" => "Order is editable",
 	"Order_Amount_Calculation_Success" => "Order Amount Calculation Success",
 	"Edit_Products" => "Edit Products",
@@ -6912,4 +6913,12 @@ return [
 	"Processing" => "Processing",
 	"Update_Cart" => "Update Cart",
 	"Change_the_status_to_Paid_only_when_you_receive_the_customers_payment_and_have_verified_it." => "Change the status to Paid only when you receive the customers payment and have verified it.",
+=======
+	"orders_selected" => "Orders selected",
+	"change_status_to" => "Change status to",
+	"something_went_wrong" => "Something went wrong",
+	"please_select_at_least_one_order" => "Please select at least one order",
+	"please_select_a_status" => "Please select a status",
+	"orders_updated_successfully" => "Orders updated successfully",
+>>>>>>> 94b6819e57bcc681e077225e241848495135e457
 ];

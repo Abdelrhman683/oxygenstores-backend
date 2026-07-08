@@ -180,46 +180,7 @@ class CartManager
 
     public static function get_shipping_cost($groupId = null, $type = null)
     {
-        self::updateOrderSummaryShippingCost($groupId, $type);
-        $cartShippingCost = Cart::where(['product_type' => 'physical'])
-            ->whereHas('product', function ($query) {
-                return $query->active();
-            })->when(($groupId == null && $type != 'checked'), function ($query) {
-                return $query->whereIn('cart_group_id', CartManager::get_cart_group_ids());
-            })
-            ->when(($groupId == null && $type == 'checked'), function ($query) {
-                return $query->whereIn('cart_group_id', CartManager::get_cart_group_ids(type: 'checked'));
-            })
-            ->when($groupId != null, function ($query) use ($groupId) {
-                return $query->where(['cart_group_id' => $groupId]);
-            })
-            ->when($type == 'checked', function ($query) {
-                return $query->where(['is_checked' => 1]);
-            })->sum('shipping_cost');
-
-        $orderWiseShippingCostData = CartShipping::whereHas('cart', function ($query) use ($type) {
-                return $query->where(['product_type' => 'physical'])->whereHas('product', function ($query) {
-                    return $query->active();
-                })->when($type == 'checked', function ($query) {
-                    return $query->where(['is_checked' => 1]);
-                });
-            })->when(($groupId == null && $type != 'checked'), function ($query) {
-                return $query->whereIn('cart_group_id', CartManager::get_cart_group_ids());
-            })
-            ->when(($groupId == null && $type == 'checked'), function ($query) {
-                return $query->whereIn('cart_group_id', CartManager::get_cart_group_ids(type: 'checked'));
-            })
-            ->when(($groupId != null), function ($query) use ($groupId) {
-                return $query->where('cart_group_id', $groupId);
-            });
-
-        if ($groupId == null) {
-            $orderWiseShippingCost = $orderWiseShippingCostData->sum('shipping_cost');
-        } else {
-            $data = $orderWiseShippingCostData->first();
-            $orderWiseShippingCost = isset($data) ? $data->shipping_cost : 0;
-        }
-        return ($orderWiseShippingCost + $cartShippingCost);
+        return 0.0;
     }
 
     public static function updateOrderSummaryShippingCost($groupId = null, $type = null): void
@@ -775,55 +736,7 @@ class CartManager
 
     public static function get_shipping_cost_for_product_category_wise($product, $qty)
     {
-        $shippingMethod = getWebConfig(name: 'shipping_method');
-        $cost = 0;
-
-        if ($shippingMethod == 'inhouse_shipping') {
-            $adminShipping = ShippingType::where('seller_id', 0)->first();
-            $shippingType = isset($adminShipping) ? $adminShipping->shipping_type : 'order_wise';
-        } else {
-            if ($product['added_by'] == 'admin') {
-                $adminShipping = ShippingType::where('seller_id', 0)->first();
-                $shippingType = isset($adminShipping) ? $adminShipping->shipping_type : 'order_wise';
-            } else {
-                $sellerShipping = ShippingType::where('seller_id', $product['user_id'])->first();
-                $shippingType = isset($sellerShipping) ? $sellerShipping->shipping_type : 'order_wise';
-            }
-        }
-
-        if ($shippingType == 'category_wise') {
-            $categoryID = 0;;
-            foreach (json_decode($product['category_ids'] ?? '') as $ct) {
-                if ($ct->position == 1) {
-                    $categoryID = $ct->id;
-                }
-            }
-
-            if ($shippingMethod == 'inhouse_shipping') {
-                $categoryShippingCost = CategoryShippingCost::where('seller_id', 0)->where('category_id', $categoryID)->first();
-            } else {
-                if ($product['added_by'] == 'admin') {
-                    $categoryShippingCost = CategoryShippingCost::where('seller_id', 0)->where('category_id', $categoryID)->first();
-                } else {
-                    $categoryShippingCost = CategoryShippingCost::where('seller_id', $product['user_id'])->where('category_id', $categoryID)->first();
-                }
-            }
-
-            if (isset($categoryShippingCost->multiply_qty) && $categoryShippingCost->multiply_qty == 1) {
-                $cost = $qty * $categoryShippingCost->cost;
-            } else {
-                $cost = $categoryShippingCost->cost ?? 0;
-            }
-
-        } else if ($shippingType == 'product_wise') {
-            if ($product['multiply_qty'] == 1) {
-                $cost = $qty * $product['shipping_cost'];
-            } else {
-                $cost = $product['shipping_cost'];
-            }
-        }
-
-        return $cost;
+        return 0.0;
     }
 
     public static function getShippingCostSavedForFreeDelivery($groupId = null, $type = null)
@@ -990,9 +903,7 @@ class CartManager
 
     public static function getBranchStock($product)
     {
-        $branchId = auth('customer')->check()
-            ? auth('customer')->user()->branch_id
-            : session('branch_id');
+        $branchId = getSelectedBranchId();
 
         if ($branchId) {
             $branchStock = \App\Models\ProductStock::where('product_id', $product['id'])

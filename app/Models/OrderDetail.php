@@ -182,4 +182,9 @@ class OrderDetail extends Model
             cacheRemoveByType(type: 'order_details');
         });
     }
+
+    public function getTaxModelAttribute($value)
+    {
+        return 'include';
+    }
 }
