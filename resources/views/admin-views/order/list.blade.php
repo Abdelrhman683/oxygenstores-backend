@@ -205,21 +205,46 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Bulk Action Card -->
+                    <div id="bulk-action-card" class="card card-body mb-3 bg-light border d-none" style="border-radius: 8px;">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold text-dark fs-14">
+                                    <span id="selected-orders-count">0</span> {{ translate('orders_selected') }}
+                                </span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <label class="mb-0 text-dark fw-medium fs-13">{{ translate('change_status_to') }}:</label>
+                                <select id="bulk-order-status" class="form-control form-select form-select-sm w-auto" style="min-width: 150px;">
+                                    <option value="">--- {{ translate('select_status') }} ---</option>
+                                    <option value="pending">{{ translate('pending') }}</option>
+                                    <option value="confirmed">{{ translate('confirmed') }}</option>
+                                    <option value="processing">{{ translate('Packaging') }}</option>
+                                    <option value="out_for_delivery">{{ translate('out_for_delivery') }}</option>
+                                    <option value="delivered">{{ translate('delivered') }}</option>
+                                    <option value="returned">{{ translate('returned') }}</option>
+                                    <option value="failed">{{ translate('failed_to_deliver') }}</option>
+                                    <option value="canceled">{{ translate('canceled') }}</option>
+                                </select>
+                                <button type="button" id="apply-bulk-status" class="btn btn-primary btn-sm">{{ translate('Apply') }}</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-hover table-borderless">
                             <thead class="text-capitalize">
                             <tr>
+                                <th>
+                                    <input type="checkbox" id="select-all-orders" style="width: 17px; height: 17px; cursor: pointer;">
+                                </th>
                                 <th>{{ translate('SL') }}</th>
                                 <th>{{ translate('order_ID') }}</th>
                                 <th class="text-capitalize">{{ translate('order_date') }}</th>
                                 <th class="text-capitalize">{{ translate('customer_info') }}</th>
                                 <th>{{ translate('store') }}</th>
                                 <th class="text-capitalize text-end">{{ translate('total_amount') }}</th>
-                                @if ($status == 'all')
-                                    <th class="text-center">{{ translate('order_status') }} </th>
-                                @else
-                                    <th class="text-capitalize">{{ translate('payment_method') }} </th>
-                                @endif
+                                <th class="text-center">{{ translate('order_status') }}</th>
                                 <th class="text-center">{{ translate('action') }}</th>
                             </tr>
                             </thead>
@@ -228,6 +253,9 @@
                             @foreach ($orders as $key => $order)
 
                                 <tr class="status-{{ $order['order_status'] }} class-all">
+                                    <td>
+                                        <input type="checkbox" class="order-checkbox" value="{{ $order['id'] }}" style="width: 17px; height: 17px; cursor: pointer;">
+                                    </td>
                                     <td class="">
                                         {{ $orders->firstItem() + $key }}
                                     </td>
@@ -319,39 +347,18 @@
                                                 class="fs-12 fw-medium text-danger">{{ translate('unpaid') }}</span>
                                         @endif
                                     </td>
-                                    @if ($status == 'all')
-                                        <td class="text-center text-capitalize">
-                                            @if ($order['order_status'] == 'pending')
-                                                <span class="badge badge-info text-bg-info">
-                                                        {{ translate($order['order_status']) }}
-                                                    </span>
-                                            @elseif($order['order_status'] == 'processing' || $order['order_status'] == 'out_for_delivery')
-                                                <span class="badge badge-warning text-bg-warning">
-                                                        {{ str_replace('_', ' ', $order['order_status'] == 'processing' ? translate('packaging') : translate($order['order_status'])) }}
-                                                    </span>
-                                            @elseif($order['order_status'] == 'confirmed')
-                                                <span class="badge badge-success text-bg-success">
-                                                        {{ translate($order['order_status']) }}
-                                                    </span>
-                                            @elseif($order['order_status'] == 'failed')
-                                                <span class="badge badge-danger text-bg-danger">
-                                                        {{ translate('failed_to_deliver') }}
-                                                    </span>
-                                            @elseif($order['order_status'] == 'delivered')
-                                                <span class="badge badge-success text-bg-success">
-                                                        {{ translate($order['order_status']) }}
-                                                    </span>
-                                            @else
-                                                <span class="badge badge-danger text-bg-danger">
-                                                        {{ translate($order['order_status']) }}
-                                                    </span>
-                                            @endif
-                                        </td>
-                                    @else
-                                        <td class="text-capitalize">
-                                            {{ str_replace('_', ' ', $order['payment_method']) }}
-                                        </td>
-                                    @endif
+                                    <td class="text-center">
+                                        <select class="form-control form-select form-select-sm inline-order-status" data-order-id="{{ $order['id'] }}" style="min-width: 145px; font-size: 12px; padding-right: 2rem;">
+                                            <option value="pending" {{ $order['order_status'] == 'pending' ? 'selected' : '' }}>{{ translate('pending') }}</option>
+                                            <option value="confirmed" {{ $order['order_status'] == 'confirmed' ? 'selected' : '' }}>{{ translate('confirmed') }}</option>
+                                            <option value="processing" {{ $order['order_status'] == 'processing' ? 'selected' : '' }}>{{ translate('Packaging') }}</option>
+                                            <option value="out_for_delivery" {{ $order['order_status'] == 'out_for_delivery' ? 'selected' : '' }}>{{ translate('out_for_delivery') }}</option>
+                                            <option value="delivered" {{ $order['order_status'] == 'delivered' ? 'selected' : '' }}>{{ translate('delivered') }}</option>
+                                            <option value="returned" {{ $order['order_status'] == 'returned' ? 'selected' : '' }}>{{ translate('returned') }}</option>
+                                            <option value="failed" {{ $order['order_status'] == 'failed' ? 'selected' : '' }}>{{ translate('failed_to_deliver') }}</option>
+                                            <option value="canceled" {{ $order['order_status'] == 'canceled' ? 'selected' : '' }}>{{ translate('canceled') }}</option>
+                                        </select>
+                                    </td>
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
                                             @if($order->edited_status == 1 && $order?->edit_return_amount > 0)
@@ -428,4 +435,105 @@
 
 @push('script')
     <script src="{{ dynamicAsset(path: 'public/assets/back-end/js/admin/order.js') }}"></script>
+    <script>
+        const BULK_STATUS_URL = '{{ route("admin.orders.bulk-status-update") }}';
+        const ORDER_STATUS_URL = '{{ route("admin.orders.status") }}';
+        const CSRF_TOKEN = '{{ csrf_token() }}';
+
+        /* ---- inline single-order status change ---- */
+        /* Store original value before any change */
+        $(document).on('focus', '.inline-order-status', function () {
+            if (!$(this).data('original')) {
+                $(this).data('original', $(this).val());
+            }
+        });
+
+        $(document).on('change', '.inline-order-status', function () {
+            const $select = $(this);
+            const orderId = $select.data('order-id');
+            const newStatus = $select.val();
+            const originalVal = $select.data('original') || newStatus;
+
+            $.ajax({
+                url: ORDER_STATUS_URL,
+                method: 'POST',
+                data: { id: orderId, order_status: newStatus, _token: CSRF_TOKEN },
+                success: function (res) {
+                    if (res.status === 1) {
+                        toastMagic.success(res.message || '{{ translate("status_change_successfully") }}');
+                        $select.data('original', newStatus);
+                    } else {
+                        toastMagic.error(res.message || '{{ translate("something_went_wrong") }}');
+                        $select.val(originalVal);
+                    }
+                },
+                error: function () {
+                    toastMagic.error('{{ translate("something_went_wrong") }}');
+                    $select.val(originalVal);
+                }
+            });
+        });
+
+        /* ---- checkbox logic ---- */
+        function updateBulkCard() {
+            const count = $('.order-checkbox:checked').length;
+            $('#selected-orders-count').text(count);
+            if (count > 0) {
+                $('#bulk-action-card').removeClass('d-none');
+            } else {
+                $('#bulk-action-card').addClass('d-none');
+            }
+        }
+
+        $('#select-all-orders').on('change', function () {
+            $('.order-checkbox').prop('checked', $(this).is(':checked'));
+            updateBulkCard();
+        });
+
+        $(document).on('change', '.order-checkbox', function () {
+            const total = $('.order-checkbox').length;
+            const checked = $('.order-checkbox:checked').length;
+            $('#select-all-orders').prop('indeterminate', checked > 0 && checked < total);
+            $('#select-all-orders').prop('checked', checked === total);
+            updateBulkCard();
+        });
+
+        /* ---- bulk status apply ---- */
+        $('#apply-bulk-status').on('click', function () {
+            const ids = $('.order-checkbox:checked').map(function () { return $(this).val(); }).get();
+            const newStatus = $('#bulk-order-status').val();
+
+            if (!ids.length) {
+                toastMagic.warning('{{ translate("please_select_at_least_one_order") }}');
+                return;
+            }
+            if (!newStatus) {
+                toastMagic.warning('{{ translate("please_select_a_status") }}');
+                return;
+            }
+
+            const btn = $(this);
+            btn.prop('disabled', true).text('{{ translate("processing") }}...');
+
+            $.ajax({
+                url: BULK_STATUS_URL,
+                method: 'POST',
+                data: { ids: ids, order_status: newStatus, _token: CSRF_TOKEN },
+                success: function (res) {
+                    if (res.status === 1) {
+                        toastMagic.success(res.message || '{{ translate("status_change_successfully") }}');
+                        setTimeout(function () { location.reload(); }, 1200);
+                    } else {
+                        toastMagic.error(res.message || '{{ translate("something_went_wrong") }}');
+                    }
+                },
+                error: function () {
+                    toastMagic.error('{{ translate("something_went_wrong") }}');
+                },
+                complete: function () {
+                    btn.prop('disabled', false).text('{{ translate("Apply") }}');
+                }
+            });
+        });
+    </script>
 @endpush

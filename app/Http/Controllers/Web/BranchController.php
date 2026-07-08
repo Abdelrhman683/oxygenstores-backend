@@ -26,9 +26,24 @@ class BranchController extends Controller
             // Logged-in customer: persist branch_id in the users table
             Auth::guard('customer')->user()->update(['branch_id' => $branchId]);
         } else {
-            // Guest: store in session
+            // Guest: store in session and database
             session(['branch_id' => $branchId]);
+            $guestId = session('guest_id');
+            $guest = $guestId ? \App\Models\GuestUser::find($guestId) : null;
+            if ($guest) {
+                $guest->update(['branch_id' => $branchId]);
+            } else {
+                $guest = \App\Models\GuestUser::create([
+                    'ip_address' => $request->ip(),
+                    'branch_id' => $branchId,
+                    'created_at' => now(),
+                ]);
+                session(['guest_id' => $guest->id]);
+            }
         }
+
+
+        session(['branch_selected' => true]);
 
         $branch = Branch::find($branchId);
 

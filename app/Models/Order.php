@@ -317,4 +317,9 @@ class Order extends Model
         parent::boot();
         //static::addGlobalScope(new RememberScope);
     }
+
+    public function getShippingCostAttribute($value)
+    {
+        return 0.0;
+    }
 }

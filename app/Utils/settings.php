@@ -442,3 +442,25 @@ if (!function_exists('cacheRemoveByType')) {
     }
 }
 
+if (!function_exists('getSelectedBranchId')) {
+    function getSelectedBranchId()
+    {
+        if (auth('customer')->check()) {
+            return auth('customer')->user()->branch_id;
+        }
+
+        $guestId = session('guest_id');
+        if ($guestId) {
+            $guest = \App\Models\GuestUser::find($guestId);
+            if ($guest) {
+                return $guest->branch_id;
+            }
+            // If the guest record was deleted from the DB, forget the guest_id session key
+            session()->forget('guest_id');
+        }
+
+        return null;
+    }
+}
+
+

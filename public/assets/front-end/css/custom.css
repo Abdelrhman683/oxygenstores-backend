@@ -4833,14 +4833,15 @@ width: max-content;
 }
 
 .premium-card-image {
+    position: relative;
     width: 100%;
     height: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-bottom: 15px;
-        border-bottom: 1px solid #EEEEEE;
-        overflow: hidden !important;
+    border-bottom: 1px solid #EEEEEE;
+    overflow: hidden !important;
 }
 
 .premium-card-image img {

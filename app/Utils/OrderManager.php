@@ -1122,9 +1122,10 @@ class OrderManager
             $branchId = null;
             if ($order) {
                 if ($order->is_guest) {
-                    $branchId = session('branch_id');
+                    $guest = \App\Models\GuestUser::find($order->customer_id);
+                    $branchId = $guest?->branch_id ?? getSelectedBranchId();
                 } else {
-                    $branchId = $order->customer?->branch_id ?? session('branch_id');
+                    $branchId = $order->customer?->branch_id ?? getSelectedBranchId();
                 }
             }
 

@@ -18,15 +18,32 @@ class GuestMiddleware
     public function handle(Request $request, Closure $next): mixed
     {
         if (!Auth::guard('customer')->check()) {
-            if (!session('guest_id')) {
-                $guestId = GuestUser::create([
+            $guestId = session('guest_id');
+            $guestExists = $guestId ? GuestUser::where('id', $guestId)->exists() : false;
+
+            if (!$guestExists) {
+                if ($guestId) {
+                    session()->forget('guest_id');
+                }
+
+                $branchId = session('branch_id');
+                if (!$branchId) {
+                    $branchId = \Illuminate\Support\Facades\DB::table('branches')
+                        ->where('name', 'like', '%الرياض%')
+                        ->orWhere('name', 'like', '%Riyadh%')
+                        ->value('id') ?? 1;
+                }
+
+                $guest = GuestUser::create([
                     'ip_address' => $request->ip(),
+                    'branch_id' => $branchId,
                     'created_at' => now(),
                 ]);
 
-                session()->put('guest_id', $guestId?->id);
+                session()->put('guest_id', $guest?->id);
             }
         }
         return $next($request);
     }
+
 }

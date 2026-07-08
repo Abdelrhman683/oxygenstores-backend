@@ -17,9 +17,12 @@
 
         <div class="d-flex">
             <div class="d-flex align-items-center justify-content-center p-12px">
-                <div class="flash-deals-background-image">
+                <div class="flash-deals-background-image position-relative">
                     <img loading="lazy" class="__img-125px" alt=""
-                         src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}">
+                          src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}">
+                    @if($product->product_type == 'physical' && $product->current_stock <= 0)
+                        <span class="out_fo_stock">{{translate('out_of_stock')}}</span>
+                    @endif
                 </div>
             </div>
 

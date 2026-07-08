@@ -257,6 +257,7 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => ['admin', '
             Route::get('inhouse-order-filter', 'filterInHouseOrder')->name('inhouse-order-filter');
             Route::post('digital-file-upload-after-sell', 'uploadDigitalFileAfterSell')->name('digital-file-upload-after-sell');
             Route::post('status', 'updateStatus')->name('status');
+            Route::post('bulk-status-update', 'bulkUpdateStatus')->name('bulk-status-update');
             Route::post('customer-return-amount', 'orderReturnAmountToCustomer')->name('customer-return-amount');
             Route::post('customer-due-amount', 'orderDueAmountSwitchToCOD')->name('customer-due-amount');
             Route::post('customer-due-amount-mark-as-paid', 'orderDueAmountMarkAsPaid')->name('customer-due-amount-mark-as-paid');

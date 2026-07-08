@@ -564,9 +564,7 @@ trait CacheManagerTrait
     {
         $branchId = null;
         if (request()->hasSession()) {
-            $branchId = auth('customer')->check()
-                ? auth('customer')->user()->branch_id
-                : session('branch_id');
+            $branchId = getSelectedBranchId();
         }
 
         return $branchId ? $baseKey . '_branch_' . $branchId : $baseKey;

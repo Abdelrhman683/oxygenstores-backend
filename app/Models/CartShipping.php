@@ -38,4 +38,9 @@ class CartShipping extends Model
     {
         return $this->belongsTo(Cart::class, 'cart_group_id', 'cart_group_id');
     }
+
+    public function getShippingCostAttribute($value)
+    {
+        return 0.0;
+    }
 }

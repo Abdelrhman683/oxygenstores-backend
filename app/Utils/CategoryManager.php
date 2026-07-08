@@ -86,9 +86,7 @@ class CategoryManager
     {
         $branchId = null;
         if (request()->hasSession()) {
-            $branchId = auth('customer')->check()
-                ? auth('customer')->user()->branch_id
-                : session('branch_id');
+            $branchId = getSelectedBranchId();
         }
         $cacheKey = 'cache_main_categories_list_' . (getDefaultLanguage() ?? 'en') . '_' . (request('offer_type') ?? 'default'). '_' . ($dataForm ?? 'default') . ($branchId ? '_branch_' . $branchId : '');
         $cacheKeys = Cache::get(CACHE_CONTAINER_FOR_LANGUAGE_WISE_CACHE_KEYS, []);

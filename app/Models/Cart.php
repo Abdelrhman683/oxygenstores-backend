@@ -124,4 +124,14 @@ class Cart extends Model
             cacheRemoveByType(type: 'carts');
         });
     }
+
+    public function getTaxModelAttribute($value)
+    {
+        return 'include';
+    }
+
+    public function getShippingCostAttribute($value)
+    {
+        return 0.0;
+    }
 }

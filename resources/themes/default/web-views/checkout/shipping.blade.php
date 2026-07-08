@@ -31,17 +31,19 @@
         </nav>
         <div class="kr-checkout-options container py-3">
 
+    @if(!auth('customer')->check())
     <div class="kr-option-box mb-3">
         <div class="kr-option-content">
             <span class="kr-option-title">
                 عميل سابق؟
             </span>
 
-            <a href="#" class="kr-option-link">
+            <a href="javascript:" class="kr-option-link" data-toggle="modal" data-target="#loginModal">
                 انقر هنا لتسجيل الدخول
             </a>
         </div>
     </div>
+    @endif
 
     <div class="kr-option-box">
         <div class="kr-option-content">
@@ -143,13 +145,13 @@
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="col-12">
+                                                        <div class="col-12 d-none">
                                                             <div class="form-group">
                                                                 <label>{{ translate('country')}}
                                                                     <span class="text-danger">*</span></label>
-                                                                <select name="country" id="country" class="form-control selectpicker" data-live-search="true" required>
+                                                                <select name="country" id="country" class="form-control" required>
                                                                     @forelse($countries as $country)
-                                                                        <option value="{{ $country['name'] }}">{{ $country['name'] }}</option>
+                                                                        <option value="{{ $country['name'] }}" {{ $country['name'] == 'Saudi Arabia' ? 'selected' : '' }}>{{ $country['name'] }}</option>
                                                                     @empty
                                                                         <option value="">{{ translate('no_country_to_deliver') }}</option>
                                                                     @endforelse
@@ -368,12 +370,12 @@
                                                                     </select>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-12">
+                                                            <div class="col-12 d-none">
                                                                 <div class="form-group">
                                                                     <label>{{ translate('country')}}<span class="text-danger">*</span></label>
-                                                                    <select name="billing_country" class="form-control selectpicker" data-live-search="true" id="billing_country">
+                                                                    <select name="billing_country" class="form-control" id="billing_country">
                                                                         @foreach($countries as $country)
-                                                                            <option value="{{ $country['name'] }}">{{ $country['name'] }}</option>
+                                                                            <option value="{{ $country['name'] }}" {{ $country['name'] == 'Saudi Arabia' ? 'selected' : '' }}>{{ $country['name'] }}</option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
@@ -505,6 +507,43 @@
     <span id="default-longitude-address" data-value="{{ $defaultLocation ? $defaultLocation['lng']:'151.2195' }}"></span>
     <span id="route-action-checkout-function" data-route="checkout-details"></span>
     <span id="system-country-restrict-status" data-value="{{ $country_restrict_status }}"></span>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0" style="border-radius: 8px; overflow: hidden; padding: 25px 20px;">
+                <div class="modal-header border-0 p-0 d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="modal-title font-bold" id="loginModalLabel">{{ translate('sign_in') }}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="font-size: 24px; line-height: 1; outline: none; box-shadow: none;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-0">
+                    <form autocomplete="off" action="{{ route('customer.auth.login') }}" method="post" id="customer-login-modal-form">
+                        @csrf
+                        <input type="hidden" name="keep_customer_login_redirect_url" value="{{ url()->current() }}">
+                        <input type="hidden" name="login_type" value="manual-login">
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label font-semibold mb-1">{{ translate('email') }} / {{ translate('phone')}}</label>
+                            <input class="form-control text-align-direction" type="text" name="user_identity" placeholder="+966*********" required>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="form-label font-semibold mb-1">{{ translate('password') }}</label>
+                            <div class="password-toggle rtl">
+                                <input class="form-control text-align-direction" name="password" type="password" placeholder="{{ translate('enter_password')}}" required>
+                            </div>
+                        </div>
+
+                        <button class="btn btn--primary btn-block btn-shadow font-semi-bold py-2 w-100" type="submit" style="height: auto;">
+                            {{ translate('sign_in') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('script')

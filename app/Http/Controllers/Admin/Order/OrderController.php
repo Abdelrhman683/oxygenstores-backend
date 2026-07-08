@@ -958,4 +958,151 @@ class OrderController extends BaseController
         ]);
     }
 
+    public function bulkUpdateStatus(
+        Request                       $request,
+        DeliveryManTransactionService $deliveryManTransactionService,
+        DeliveryManWalletService      $deliveryManWalletService,
+        OrderStatusHistoryService     $orderStatusHistoryService,
+    ): JsonResponse
+    {
+        $ids = $request->input('ids', []);
+        $newStatus = $request->input('order_status');
+
+        if (empty($ids) || !$newStatus) {
+            return response()->json([
+                'status' => 0,
+                'message' => translate('invalid_data'),
+            ]);
+        }
+
+        $successCount = 0;
+        $failMessages = [];
+
+        foreach ($ids as $id) {
+            $order = $this->orderRepo->getFirstWhere(params: ['id' => $id], relations: ['customer', 'seller.shop', 'deliveryMan', 'latestEditHistory']);
+            if (!$order) {
+                continue;
+            }
+
+            if (!$order['is_guest'] && !isset($order['customer'])) {
+                $failMessages[] = "Order #{$id}: " . translate('account_has_been_deleted_you_can_not_change_the_status');
+                continue;
+            }
+
+            if ($order['payment_method'] == 'offline_payment' && $order['payment_status'] == 'unpaid') {
+                $failMessages[] = "Order #{$id}: " . translate('Please confirm the offline payment information before changing the order status.');
+                continue;
+            }
+
+            if ($order['payment_method'] !== 'cash_on_delivery' && $order['edit_due_amount'] > 0 && $order?->latestEditHistory?->order_due_payment_method !== 'cash_on_delivery' && $order?->latestEditHistory?->order_due_payment_status == 'unpaid') {
+                $failMessages[] = "Order #{$id}: " . translate('Please confirm the due payment has been paid before changing the order status.');
+                continue;
+            }
+
+            if ($order['payment_method'] !== 'cash_on_delivery' && $order['edit_return_amount'] > 0 && $order?->latestEditHistory?->order_due_payment_method !== 'cash_on_delivery' && $order?->latestEditHistory?->order_return_payment_status == 'pending') {
+                $failMessages[] = "Order #{$id}: " . translate('Please return the amount first before changing the order status.');
+                continue;
+            }
+            if ($order['edit_due_amount'] > 0 && $order?->latestEditHistory?->order_due_payment_method == 'cash_on_delivery' && $order?->latestEditHistory?->order_due_payment_status == 'unpaid' && $newStatus == 'delivered') {
+                $failMessages[] = "Order #{$id}: " . translate('Please mark as paid before delivered this order.');
+                continue;
+            }
+
+            if ($newStatus == 'delivered') {
+                $digitalBlock = false;
+                foreach ($order['details'] as $orderDetail) {
+                    $productDetails = json_decode($orderDetail?->product_details ?? '', true);
+                    if (
+                        $productDetails['product_type'] == 'digital' &&
+                        (isset($productDetails['digital_product_type']) && $productDetails['digital_product_type'] == 'ready_after_sell') &&
+                        is_null($orderDetail['digital_file_after_sell'])
+                    ) {
+                        $digitalBlock = true;
+                        break;
+                    }
+                }
+                if ($digitalBlock) {
+                    $failMessages[] = "Order #{$id}: " . translate('Please_upload_the_digital_product_files_first');
+                    continue;
+                }
+            }
+
+            $this->orderRepo->updateStockOnOrderStatusChange($id, $newStatus);
+            $this->orderRepo->update(id: $id, data: ['order_status' => $newStatus]);
+            if ($newStatus == 'delivered') {
+                $this->orderRepo->update(id: $id, data: ['payment_status' => 'paid', 'is_pause' => 0]);
+                $this->orderDetailRepo->updateWhere(params: ['order_id' => $order['id']], data: ['delivery_status' => $newStatus, 'payment_status' => 'paid']);
+                $this->orderDetailRepo->updateWhere(params: ['order_id' => $order['id'], 'refund_started_at' => null], data: ['refund_started_at' => now()]);
+            }
+            event(new OrderStatusEvent(key: $newStatus, type: 'customer', order: $order));
+            if ($newStatus == 'canceled') {
+                event(new OrderStatusEvent(key: 'canceled', type: 'delivery_man', order: $order));
+            }
+            if ($order['seller_is'] == 'seller') {
+                if ($newStatus == 'canceled') {
+                    event(new OrderStatusEvent(key: 'canceled', type: 'seller', order: $order));
+                } elseif ($newStatus == 'delivered') {
+                    event(new OrderStatusEvent(key: 'delivered', type: 'seller', order: $order));
+                }
+            }
+
+            $loyaltyPointStatus = getWebConfig(name: 'loyalty_point_status');
+            $loyaltyPointEachOrder = getWebConfig(name: 'loyalty_point_for_each_order');
+            $loyaltyPointEachOrder = !is_null($loyaltyPointEachOrder) ? $loyaltyPointEachOrder : $loyaltyPointStatus;
+            $orderDetailsRewards = $this->orderDetailsRewardsRepo->getFirstWhere(params: ['order_id' => $order['id'], 'reward_type' => 'loyalty_point']);
+
+            if ($orderDetailsRewards && $orderDetailsRewards['reward_delivered'] != 1 && $orderDetailsRewards['reward_amount'] > 0 && $loyaltyPointStatus == 1 && $loyaltyPointEachOrder == 1 && !$order['is_guest'] && $newStatus == 'delivered') {
+                $this->loyaltyPointTransactionRepo->addLoyaltyPointTransaction(userId: $order['customer_id'], reference: $order['id'], amount: usdToDefaultCurrency(amount: $order['order_amount'] - $order['shipping_cost']), transactionType: 'order_place');
+                $this->orderDetailsRewardsRepo->update(id: $orderDetailsRewards['id'], data: ['reward_delivered' => 1]);
+            }
+
+            OrderManager::generateReferBonusForFirstOrder(orderId: $order['id']);
+
+            if ($order['delivery_man_id'] && $newStatus == 'delivered') {
+                $deliverymanWallet = $this->deliveryManWalletRepo->getFirstWhere(params: ['delivery_man_id' => $order['delivery_man_id']]);
+                $cashInHand = $order['payment_method'] == 'cash_on_delivery' ? $order['order_amount'] : 0;
+                if (empty($deliverymanWallet)) {
+                    $deliverymanWalletData = $deliveryManWalletService->getDeliveryManData(id: $order['delivery_man_id'], deliverymanCharge: $order['deliveryman_charge'], cashInHand: $cashInHand);
+                    $this->deliveryManWalletRepo->add(data: $deliverymanWalletData);
+                } else {
+                    $deliverymanWalletData = [
+                        'current_balance' => $deliverymanWallet['current_balance'] + $order['deliveryman_charge'] ?? 0,
+                        'cash_in_hand' => $deliverymanWallet['cash_in_hand'] + $cashInHand ?? 0,
+                    ];
+                    $this->deliveryManWalletRepo->updateWhere(params: ['delivery_man_id' => $order['delivery_man_id']], data: $deliverymanWalletData);
+                }
+                if ($order['deliveryman_charge'] && $newStatus == 'delivered') {
+                    $deliveryManTransactionData = $deliveryManTransactionService->getDeliveryManTransactionData(amount: $order['deliveryman_charge'], addedBy: 'admin', id: $order['delivery_man_id'], transactionType: 'deliveryman_charge');
+                    $this->deliveryManTransactionRepo->add($deliveryManTransactionData);
+                }
+            }
+
+            $orderStatusHistoryData = $orderStatusHistoryService->getOrderHistoryData(orderId: $id, userId: 0, userType: 'admin', status: $newStatus);
+            $this->orderStatusHistoryRepo->add($orderStatusHistoryData);
+            OrderManager::removeOldStatusHistory(orderId: $id, orderStatus: $newStatus);
+
+            $transaction = $this->orderTransactionRepo->getFirstWhere(params: ['order_id' => $order['id']]);
+            if (isset($transaction) && $transaction['status'] == 'disburse') {
+                $successCount++;
+                continue;
+            }
+            if ($newStatus == 'delivered' && $order['seller_id'] != null) {
+                $this->orderRepo->manageWalletOnOrderStatusChange(order: $order, receivedBy: 'admin');
+            }
+            if ($newStatus == 'delivered') {
+                $referredUser = ReferralCustomer::where('user_id', $order?->customer?->id)->first();
+                if ($referredUser?->delivered_notify != 1) {
+                    event(new OrderStatusEvent(key: 'your_referred_customer_order_has_been_delivered', type: 'promoter', order: $order));
+                    ReferralCustomer::where('user_id', $order?->customer?->id)->update(['delivered_notify' => 1]);
+                }
+            }
+
+            $successCount++;
+        }
+
+        return response()->json([
+            'status' => $successCount > 0 ? 1 : 0,
+            'message' => $successCount . ' ' . translate('orders_updated_successfully') . '.' . (!empty($failMessages) ? ' ' . implode(', ', $failMessages) : ''),
+        ]);
+    }
 }

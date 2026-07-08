@@ -135,9 +135,7 @@
                 <!-- Actions -->
                 <div class="actions-section d-flex align-items-center text-white flex-shrink-0">
                     @php
-                        $currentBranchId = auth('customer')->check()
-                            ? auth('customer')->user()->branch_id
-                            : session('branch_id');
+                        $currentBranchId = getSelectedBranchId();
                         $currentBranch = $currentBranchId
                             ? \App\Models\Branch::find($currentBranchId)
                             : null;
@@ -324,8 +322,7 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content border-0 position-relative" style="border-radius: 8px; overflow: hidden; padding: 25px 20px;">
 
-            <button type="button" class="close-region-modal" data-dismiss="modal" aria-label="Close"
-                    @if(!$currentBranchId) style="display:none;" @endif>
+            <button type="button" class="close-region-modal" aria-label="Close">
                 <i class="fa fa-times"></i>
             </button>
 
@@ -374,11 +371,37 @@
             let tempSelectedBranchId   = null;
             let tempSelectedBranchName = null;
 
-            // Auto-open modal if no branch selected
-            @if(!$currentBranchId)
+            // Auto-open modal if they haven't explicitly selected/dismissed the branch selection yet
+            @if(!session()->has('branch_selected'))
                 $('#branchModal').modal({ backdrop: 'static', keyboard: false });
                 $('#branchModal').modal('show');
             @endif
+
+            // Close modal handler
+            $(document).on('click', '.close-region-modal', function() {
+                @if(session()->has('branch_selected'))
+                    $('#branchModal').modal('hide');
+                @else
+                    // If they haven't selected a branch yet, default to Riyadh
+                    $.ajax({
+                        url: '{{ route("set-branch") }}',
+                        method: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            branch_id: '{{ \Illuminate\Support\Facades\DB::table("branches")->where("name", "like", "%الرياض%")->orWhere("name", "like", "%Riyadh%")->value("id") ?? 1 }}'
+                        },
+                        success: function(res) {
+                            if (res.success) {
+                                $('#branchModal').modal('hide');
+                                location.reload();
+                            }
+                        },
+                        error: function() {
+                            $('#branchModal').modal('hide');
+                        }
+                    });
+                @endif
+            });
 
             // Branch card selection
             $(document).on('click', '.region-card', function() {

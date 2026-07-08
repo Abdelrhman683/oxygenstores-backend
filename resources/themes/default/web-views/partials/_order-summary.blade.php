@@ -10,6 +10,7 @@
             @php($totalShippingCost = 0)
             @php($referralAmount = 0)
             @php($totalDiscountOnProduct = 0)
+            @php($totalVatIncluded = 0)
             @php($cart = \App\Utils\CartManager::getCartListQuery(type: 'checked'))
             @php($cartGroupIds = \App\Utils\CartManager::get_cart_group_ids())
             @php($getShippingCost = \App\Utils\CartManager::get_shipping_cost(type: 'checked'))
@@ -18,6 +19,12 @@
                 @foreach ($cart as $key => $cartItem)
                     @php($subTotal += $cartItem['price'] * $cartItem['quantity'])
                     @php($totalDiscountOnProduct += $cartItem['discount'] * $cartItem['quantity'])
+                    @php($taxRate = $cartItem->product->tax ?? 0)
+                    @if ($taxRate > 0)
+                        @php($netPrice = $cartItem['price'] - $cartItem['discount'])
+                        @php($itemTotal = $netPrice * $cartItem['quantity'])
+                        @php($totalVatIncluded += $itemTotal - ($itemTotal / (1 + $taxRate / 100)))
+                    @endif
                 @endforeach
 
                 @if (session()->missing('coupon_type') || session('coupon_type') != 'free_delivery')
@@ -162,6 +169,11 @@
                     {{ webCurrencyConverter(amount: $totalAmount - $referralAmount) }}
                 </span>
             </div>
+            @if($totalVatIncluded > 0)
+                <div class="text-end text-muted mt-1 fs-12 font-semibold">
+                    (يشمل {{ webCurrencyConverter(amount: $totalVatIncluded) }} ضريبة القيمة المضافة)
+                </div>
+            @endif
         </div>
         @php($company_reliability = getWebConfig(name: 'company_reliability'))
         @if ($company_reliability != null)
@@ -222,11 +234,18 @@
 </aside>
 
 <div class="bottom-sticky3 bg-white p-3 shadow-sm w-100 d-lg-none">
-    <div class="d-flex justify-content-center align-items-center fs-14 mb-2">
-        <div class="product-description-label fw-semibold text-capitalize">{{ translate('total_price') }} :</div>
-        &nbsp; <strong class="text-base">
-            {{ webCurrencyConverter(amount: $subTotal + ($totalTax['item_tax'] + $totalTax['shipping_cost_tax']) + $totalShippingCost - $coupon_dis - $totalDiscountOnProduct) }}
-        </strong>
+    <div class="d-flex justify-content-center align-items-center fs-14 mb-2 flex-column">
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="product-description-label fw-semibold text-capitalize">{{ translate('total_price') }} :</div>
+            &nbsp; <strong class="text-base">
+                {{ webCurrencyConverter(amount: $totalAmount - $referralAmount) }}
+            </strong>
+        </div>
+        @if($totalVatIncluded > 0)
+            <div class="text-muted small mt-1 font-semibold text-center">
+                (يشمل {{ webCurrencyConverter(amount: $totalVatIncluded) }} ضريبة القيمة المضافة)
+            </div>
+        @endif
     </div>
 
     @if (str_contains(request()->url(), 'checkout-payment'))
