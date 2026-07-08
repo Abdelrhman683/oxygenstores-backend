@@ -1,1134 +1,696 @@
-<!-- @php
+@php
     use Illuminate\Support\Facades\Session;
     $currencyCode = getCurrencyCode(type: 'default');
-    $direction = Session::get('direction');
+    $direction = Session::get('direction') ?? 'rtl';
     $lang = getDefaultLanguage();
-@endphp -->
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{$direction}}"
-      style="text-align: {{$direction === "rtl" ? 'right' : 'left'}};"
+    $orderTotalPriceSummary = \App\Utils\OrderManager::getOrderTotalPriceSummary(order: $order);
+    $companyName = $companyName ?? getWebConfig(name: 'company_name');
+    $companyEmail = $companyEmail ?? getWebConfig(name: 'company_email');
+    $companyPhone = $companyPhone ?? getWebConfig(name: 'company_phone');
+@endphp
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ $direction }}"
+      style="text-align: {{ $direction === 'rtl' ? 'right' : 'left' }};"
       xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-    <title>{{ translate('invoice')}}</title>
+    <title>{{ translate('invoice') }}</title>
     <meta http-equiv="Content-Type" content="text/html;"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url({{dynamicAsset('public/assets/front-end/fonts/Inter/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2JL7SUc.woff2')}}) format('woff2');
-            unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
-        }
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
 
-        /* cyrillic */
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url({{dynamicAsset('public/assets/front-end/fonts/Inter/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa0ZL7SUc.woff')}}) format('woff2');
-            unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-        }
+@font-face {
+    font-family: 'PingARLT';
+    src: url('../fonts/pingarlt/PingARLT-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
 
-        /* greek-ext */
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url({{dynamicAsset('public/assets/front-end/fonts/Inter/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2ZL7SUc.woff')}}) format('woff2');
-            unicode-range: U+1F00-1FFF;
-        }
+@font-face {
+    font-family: 'PingARLT';
+    src: url('../fonts/pingarlt/PingARLT-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
-        /* greek */
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url({{dynamicAsset('public/assets/front-end/fonts/Inter/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1pL7SUc.woff')}}) format('woff2');
-            unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
-        }
+@font-face {
+    font-family: 'PingARLT';
+    src: url('../fonts/pingarlt/PingARLT-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
 
-        /* vietnamese */
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url({{dynamicAsset('public/assets/front-end/fonts/Inter/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa2pL7SUc.woff')}}) format('woff2');
-            unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
-        }
+@font-face {
+    font-family: 'PingARLT';
+    src: url('../fonts/pingarlt/PingARLT-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
 
-        /* latin-ext */
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url({{dynamicAsset('public/assets/front-end/fonts/Inter/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa25L7SUc.woff')}}) format('woff2');
-            unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-        }
+@font-face {
+    font-family: 'PingARLT';
+    src: url('../fonts/pingarlt/PingARLT-Heavy.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
 
-        /* latin */
-        @font-face {
-            font-family: 'Inter';
-            font-style: normal;
-            font-weight: 100 900;
-            font-display: swap;
-            src: url({{dynamicAsset('public/assets/front-end/fonts/Inter/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff')}}) format('woff2');
-            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-        }
+@font-face {
+    font-family: 'PingARLT';
+    src: url('../fonts/pingarlt/PingARLT-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+[dir="rtl"], [dir="rtl"] body, [dir="rtl"] p, [dir="rtl"] a, [dir="rtl"] span, [dir="rtl"] button, [dir="rtl"] input, [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6, [dir="rtl"] div, [dir="rtl"] select, [dir="rtl"] textarea , [dir="rtl"] textarea {
+    font-family: 'PingARLT', 'Cairo', 'Tajawal', sans-serif !important;
+}
 
         * {
             margin: 0;
             padding: 0;
-            line-height: 1.6;
-            font-family: "Inter", sans-serif;
-            color: #7F8185;
-        }
-
-        .ltr {
-            direction: ltr;
-        }
-
-        .rtl {
-            direction: rtl;
+            line-height: 1.5;
+            font-family: "DejaVu Sans", sans-serif;
+            color: #303030;
         }
 
         body {
             font-size: 9px !important;
-            font-family: "Inter", sans-serif;
-            font-optical-sizing: auto;
-            font-weight: < style weight >;
-            font-style: normal;
-            font-variation-settings: "slnt" 0;
-            color: #7F8185;
+            color: #303030;
+            background-color: #FFFFFF;
         }
 
         .main-content {
-            padding: 0 20px 20px;
-            width: 595px;
+            padding: 20px;
+            width: 100%;
+            max-width: 595px;
             margin: 0 auto;
-
         }
 
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
+        /* Top Header Info Table */
+        .header-table {
             width: 100%;
-            background-color: #FAFAFA;
-            text-align: center;
-            padding: 10px;
+            border-collapse: collapse;
+            margin-bottom: 15px;
         }
 
-        .invoice-end-note {
-            position: fixed;
-            bottom: 0;
+        .header-table td {
+            vertical-align: middle;
         }
 
-        img {
-            max-width: 100%;
-        }
-
-        .logo {
-            margin-bottom: 5px;
-            object-fit: contain;
-            width: 80px;
-            height: auto;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-left {
-            text-align: {{$direction === "rtl" ? 'right' : 'left'}}   !important;
-        }
-
-        .text-right {
-            text-align: {{$direction === "rtl" ? 'left' : 'right'}}   !important;
-        }
-
-        table th.text-right {
-            text-align: {{$direction === "rtl" ? 'left' : 'right'}}   !important;
-        }
-
-        .ml-auto {
-            margin- {{ $direction === "rtl" ? 'left' : 'right' }}: auto !important;
-        }
-
-        .text-dark, h1, h2, h3, h4, h5, h6, .table thead th {
-            color: #303030 !important;
-        }
-
-        .text-body {
-            color: #7F8185 !important;
-        }
-
-        h1 {
-            font-weight: 700 !important;
-        }
-
-        h2, h3, h4, h5, h6 {
-            font-weight: 600 !important;
-        }
-
-        strong, .fw-bold {
-            font-weight: {{$lang == 'bd' ?'700':'bold' }};
-        }
-
-        .table thead th, .fw-semibold {
-            font-weight: 600 !important;
-        }
-
-        .fw-medium {
-            font-weight: 500 !important;
-        }
-
-        .fw-normal {
-            font-weight: 400 !important;
-        }
-
-        .fs-20 {
-            font-size: 20px !important;
-        }
-
-        h4, .fs-11 {
-            font-size: 11px !important;
-        }
-
-        h5, .table thead th, .fs-10 {
-            font-size: 10px !important;
-        }
-
-        .fs-9 {
-            font-size: 9px !important;
-        }
-
-        h6, p, td {
-            font-size: 9px !important;
-        }
-
-        .text-nowrap {
-            white-space: nowrap;
-        }
-
-        .border-dashed-top {
-            border-top: 1px dashed #D7DAE0;
-            display: block;
+        /* Orange Separator Line */
+        .color-bar {
+            height: 4px;
+            background-color: #FF5A36;
+            margin-bottom: 20px;
             width: 100%;
-            margin-left: 8px;
-            margin-right: 8px;
         }
 
-        .border {
-            border: 1px solid #D7DAE0;
+        /* Centered Titles */
+        .invoice-title-sec {
+            text-align: center;
+            margin-bottom: 20px;
         }
 
-        .border-bottom {
-            border-bottom: 1px solid #D7DAE0;
-        }
-
-        .border-left {
-            border-left: 1px solid #D7DAE0;
-        }
-
-        .border-right {
-            border-right: 1px solid #D7DAE0;
-        }
-
-        .rounded {
-            border-radius: 5px !important;
-        }
-
-        .m-0 {
-            margin: 0;
-        }
-
-        .m-1 {
-            margin: 4px;
-        }
-
-        .m-2 {
-            margin: 8px;
-        }
-
-        .m-3 {
-            margin: 16px;
-        }
-
-        .m-4 {
-            margin: 24px;
-        }
-
-        .mt-0 {
-            margin-top: 0;
-        }
-
-        .mt-1 {
-            margin-top: 4px;
-        }
-
-        .mt-2 {
-            margin-top: 8px;
-        }
-
-        .mt-3 {
-            margin-top: 16px;
-        }
-
-        .mt-4 {
-            margin-top: 24px;
-        }
-
-        .mb-0 {
-            margin-bottom: 0;
-        }
-
-        .mb-1 {
+        .invoice-title-ar {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000000;
             margin-bottom: 4px;
         }
 
-        .mb-2 {
-            margin-bottom: 8px;
+        .invoice-title-en {
+            font-size: 13px;
+            font-weight: bold;
+            color: #000000;
+            letter-spacing: 1px;
         }
 
-        .mb-3 {
-            margin-bottom: 16px;
-        }
-
-        .mb-4 {
-            margin-bottom: 24px;
-        }
-
-        .mb-30 {
-            margin-bottom: 30px;
-        }
-
-        .p-0 {
-            padding: 0;
-        }
-
-        .p-1 {
-            padding: 4px;
-        }
-
-        .p-2 {
-            padding: 8px;
-        }
-
-        .p-3 {
-            padding: 16px;
-        }
-
-        .p-4 {
-            padding: 24px;
-        }
-
-        .pt-0 {
-            padding-top: 0;
-        }
-
-        .pt-1 {
-            padding-top: 4px;
-        }
-
-        .pt-2 {
-            padding-top: 8px;
-        }
-
-        .pt-3 {
-            padding-top: 16px;
-        }
-
-        .pt-4 {
-            padding-top: 24px;
-        }
-
-        .pb-0 {
-            padding-bottom: 0;
-        }
-
-        .pb-1 {
-            padding-bottom: 4px;
-        }
-
-        .pb-2 {
-            padding-bottom: 8px;
-        }
-
-        .pb-3 {
-            padding-bottom: 16px;
-        }
-
-        .pb-4 {
-            padding-bottom: 24px;
-        }
-
-        .px-0 {
-            padding-left: 0;
-            padding-right: 0;
-        }
-
-        .px-1 {
-            padding-left: 4px;
-            padding-right: 4px;
-        }
-
-        .px-2 {
-            padding-left: 8px;
-            padding-right: 8px;
-        }
-
-        .px-3 {
-            padding-left: 16px;
-            padding-right: 16px;
-        }
-
-        .w-100 {
-            width: 100% !important;
-        }
-
-        .table {
+        /* Bill Cards side by side */
+        .bill-cards-table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: auto;
+            margin-bottom: 20px;
         }
 
-        .table thead th {
-            background-color: #F9FAFC;
+        .bill-card-td {
+            width: 48%;
+            background-color: #F8F9FA;
+            border-radius: 6px;
+            padding: 12px;
+            vertical-align: top;
         }
 
-        .vertical-align-top {
-            vertical-align: top
+        .bill-card-inner-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .text-success {
-            color: #04BB7B !important;
+        .card-title-en {
+            color: #FF5A36;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: left;
         }
 
-        .text-danger {
-            color: #FF4040 !important;
+        .card-title-ar {
+            color: #FF5A36;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: right;
         }
 
-        .note {
-            background-color: rgba(60, 118, 241, 0.05);
+        .card-row td {
+            padding: 4px 0;
+            font-size: 9px;
+            vertical-align: top;
+        }
+
+        .card-label-en {
+            color: #7F8185;
+            text-align: left;
+            width: 25%;
+        }
+
+        .card-value {
             color: #303030;
-            padding: 5px;
-            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            width: 50%;
+            padding: 0 4px;
         }
 
-        td, th {
-            white-space: normal;
-            word-break: break-word;
+        .card-label-ar {
+            color: #7F8185;
+            text-align: right;
+            width: 25%;
         }
 
+        /* Product Table */
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .product-table th {
+            background-color: #1A365D;
+            color: #FFFFFF;
+            padding: 8px 6px;
+            font-size: 8px;
+            font-weight: bold;
+            border: 1px solid #1A365D;
+        }
+
+        .product-table th div {
+            color: #FFFFFF;
+        }
+
+        .product-table td {
+            padding: 8px 6px;
+            font-size: 9px;
+            border-bottom: 1px solid #EAEAEA;
+            vertical-align: middle;
+        }
+
+        /* Bottom Section: Totals & QR Code */
+        .bottom-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .totals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .totals-row td {
+            padding: 5px 0;
+            font-size: 9px;
+        }
+
+        .totals-label-en {
+            color: #303030;
+            text-align: left;
+            width: 25%;
+        }
+
+        .totals-value {
+            color: #000000;
+            font-weight: bold;
+            text-align: center;
+            width: 50%;
+        }
+
+        .totals-label-ar {
+            color: #303030;
+            text-align: right;
+            width: 25%;
+        }
 
         @media print {
             body {
-                font-size: 9px !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
 
-            .table {
+            .main-content {
                 width: 100%;
-                border-collapse: collapse;
-                table-layout: fixed;
             }
-
-            tr {
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-
-            thead {
-                display: table-header-group;
-            }
-
-            tbody {
-                display: table-row-group;
-            }
-
-            td,
-            th {
-                white-space: normal;
-                word-wrap: break-word;
-                font-size: 9px !important;
-                line-height: 1.4 !important;
-            }
-
-            table th {
-                font-size: 10px !important;
-            }
-
-            table td {
-                font-size: 9px !important;
-            }
-
-            .invoice-end-note {
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-
         }
     </style>
 </head>
 <body>
-<?php
-$orderTotalPriceSummary = \App\Utils\OrderManager::getOrderTotalPriceSummary(order: $order);
-?>
+
 <div class="main-content">
-    <table class="table">
-        <tbody>
+    <!-- Header Block -->
+    <table class="header-table">
         <tr>
-            <td class="text-left p-2">
-                <h1 class="fs-20 mb-2">{{ translate('INVOICE') }}</h1>
-            </td>
-            <td class="text-right p-2">
-                @if(isset($invoiceSettings['invoice_logo_status']) && $invoiceSettings['invoice_logo_status'] == 1)
-                    @if(isset($invoiceSettings['invoice_logo_type']) && $invoiceSettings['invoice_logo_type'] == 'default')
-                        <img height="30"
-                             src="{{ getStorageImages(path: getWebConfig(name: 'company_web_logo_png'), type:'backend-logo') }}"
-                             alt="" class="logo">
-                    @elseif(isset($invoiceSettings['invoice_logo_type']) && $invoiceSettings['invoice_logo_type'] == 'custom' && isset($invoiceSettings['image']))
-                        <img height="30"
-                             src="{{ getStorageImages(path: imagePathProcessing(imageData:  $invoiceSettings['image'], path:'company'), type: 'backend-logo') }}"
-                             alt="" class="logo">
-                    @endif
-                @endif
-            </td>
-        </tr>
-        <tr>
-            <td class="text-left px-2">
-                <table>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <p>{{ translate('Invoice_Date') }} : <span
-                                    class="text-dark fw-semibold">{{date('M d ,Y',strtotime($order['created_at']))}}</span>
-                            </p>
-                        </td>
-                        @if($order['seller_is']!='admin' && isset($order['seller']) && $order['seller']->gst != null)
-                            <td>
-                                <p>{{ translate('GST') }} : <span
-                                        class="text-dark fw-semibold">{{ $order['seller']->gst }}</span></p>
-                            </td>
-                        @endif
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-            <td class="text-right px-2">
-                <p class="text-dark p-0">{{getWebConfig('shop_address') }}</p>
-                @if(isset($invoiceSettings['business_identity_status']) && $invoiceSettings['business_identity_status'])
-                    <p class="text-dark p-0">
-                        <span class="fw-semibold">{{ $invoiceSettings['business_identity'] }}</span>
-                        : {{ $invoiceSettings['business_identity_value'] }}
-                    </p>
-                @endif
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <table class="table mb-3">
-        <tbody>
-        <tr>
-            <td colspan="3" class="p-2"></td>
-        </tr>
-        <tr>
-            <td colspan="3" class="border-dashed-top px-2"></td>
-        </tr>
-        <tr>
-            <td colspan="3" class="p-1"></td>
-        </tr>
-        <tr>
-            <td class="text-left" colspan="2">
-                <table>
-                    <tbody>
-                    <tr>
-                        <td class="px-2 pt-1 pb-1">{{ translate('Order_Id') }}</td>
-                        <td class="px-2 pt-1 pb-1">: <span class="text-dark">#{{ $order->id }}</span></td>
-                    </tr>
-                    <tr>
-                        <td class="px-2 pt-1 pb-1">{{ translate('Status') }}</td>
-                        <td class="px-2 pt-1 pb-1">: <span class="text-dark"> {{ ucfirst(str_replace('_',' ', $order->order_status)) }}</span></td>
-                    </tr>
-                    <tr>
-                        <td class="px-2 pt-1 pb-1">{{ translate('Date') }}</td>
-                        <td class="px-2 pt-1 pb-1">: <span
-                                class="text-dark">{{date('M d, Y',strtotime($order['created_at']))}}</span></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-            <td class="text-right">
-                <table class="table text-right">
-                    <tbody>
-                    <tr>
-                        <td class="px-2 pt-1 pb-1 text-right">
-                            <p>{{ translate('Invoice_of') }} {{' ( '.$currencyCode.' )'}}</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="px-2 pt-1 pb-1 text-right">
-                            <h5 class="fs-11">
-                                <strong>{{ webCurrencyConverter(amount: $orderTotalPriceSummary['totalAmount']) }}</strong>
-                            </h5>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3" class="p-1"></td>
-        </tr>
-        <tr>
-            <td colspan="3" class="border-dashed-top p-2"></td>
-        </tr>
-
-        <tr>
-            <td colspan="3">
-                <table class="table">
-                    <tbody>
-                    <tr>
-                        <td class="vertical-align-top">
-                            <table>
-                                <tbody>
-                                <tr>
-                                    <td class="px-2" colspan="3">
-                                        <h5>{{ translate('Payment_info') }}</h5>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="px-2 pt-1 pb-1">{{ translate('Method') }}</td>
-                                    <td class="pt-1 pb-1">:</td>
-                                    <td class="px-2 pt-1 pb-1"><span
-                                            class="text-dark">{{ str_replace('_',' ',$order->payment_method) }}</span>
-                                    </td>
-                                </tr>
-                                @if(!empty($order->transaction_ref))
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('reference_ID') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-dark">{{ $order->transaction_ref }}</span></td>
-                                    </tr>
-                                @endif
-                                @if($order->offlinePayments)
-                                    @foreach ($order->offlinePayments?->payment_info as $key=>$item)
-                                        @if (isset($item) && $key != 'method_id')
-                                            <tr>
-                                                <td class="px-2 pt-1 pb-1">{{ str_replace('_',' ',$key) }}</td>
-                                                <td class="pt-1 pb-1">:</td>
-                                                <td class="px-2 pt-1 pb-1"><span class="text-dark">{{ $item }}</span>
-                                                </td>
-                                            </tr>
-                                        @endif
-                                    @endforeach
-                                @endif
-                                @if($order['edited_status'] == 1 && ($order?->latestEditHistory?->order_due_payment_status == "paid" || $order?->latestEditHistory?->order_due_payment_status == "cash_on_delivery"))
-                                    <tr>
-                                        <td colspan="3" class="px-2 pt-1 pb-1">
-                                            <strong> {{ translate('Another_Payment_Info') }} </strong>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Status') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-success">{{ translate($order?->latestEditHistory?->order_due_payment_status) }}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Method') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-dark">{{str_replace('_',' ',$order?->latestEditHistory?->order_due_payment_method)}}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Due_amount') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-dark">{{ webCurrencyConverter(amount: $order?->latestEditHistory?->order_due_amount) }}</span>
-                                        </td>
-                                    </tr>
-                                @elseif($order->edited_status == 1 && $order?->latestEditHistory?->order_return_payment_status == "returned")
-                                    <tr>
-                                        <td colspan="3" class="px-2 pt-1 pb-1">
-                                            <strong>{{ translate('Amount_to_be_returned') }} </strong>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('After_editing_your_product_list_you_will_return_') }} {{ webCurrencyConverter(amount: $order?->latestEditHistory?->order_return_amount)  }}</td>
-                                    </tr>
-                                @endif
-                                </tbody>
-                            </table>
-                        </td>
-                        <td class="vertical-align-top border-{{$direction === "rtl" ? 'right' : 'left'}}">
-                            <table>
-                                <tbody>
-                                @php($billingAddress = $order->billing_address_data)
-                                @if(!empty((array) $billingAddress))
-                                    <tr>
-                                        <td class="px-2" colspan="3">
-                                            <h5>{{ translate('Billing_address') }} <span class="fw-normal">({{ translate($billingAddress->address_type ?? '') }})</span>
-                                            </h5>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Name') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-danger">{{ $billingAddress->contact_person_name ?? '' }}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Phone') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-dark">{{ $billingAddress->phone ?? '' }}</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1 text-nowrap">{{ translate('City_/_Zip') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-dark">{{ $billingAddress->city ?? '' }} {{ $billingAddress->zip ?? '' }}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Address') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-dark">{{ $billingAddress->address ?? '' }}</span></td>
-                                    </tr>
-                                @endif
-                                </tbody>
-                            </table>
-                        </td>
-                        <td class="vertical-align-top border-{{$direction === "rtl" ? 'right' : 'left'}}">
-                            <table>
-                                <tbody>
-                                @php($shipping = $order->shipping_address_data)
-                                @if(!empty((array) $shipping))
-                                    <tr>
-                                        <td class="px-2" colspan="3">
-                                            <h5>{{ translate('Shipping_address') }} <span class="fw-normal">({{ translate($shipping->address_type ?? '') }})</span>
-                                            </h5>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Name') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-danger">{{ $shipping->contact_person_name ?? '' }}</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Phone') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span class="text-dark">{{ $shipping->phone ?? '' }}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1 text-nowrap">{{ translate('City_/_Zip') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-dark">{{ $shipping->city ?? '' }} {{ $shipping->zip ?? '' }}</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1">{{ translate('Address') }}</td>
-                                        <td class="pt-1 pb-1">:</td>
-                                        <td class="px-2 pt-1 pb-1"><span
-                                                class="text-dark">{{ $shipping->address ?? '' }}</span></td>
-                                    </tr>
-                                @else
-                                    <tr>
-                                        <td class="px-2" colspan="3">
-                                            <h5>{{ translate('Customer_Info') }}</h5>
-                                        </td>
-                                    </tr>
-                                    @if($order->is_guest)
-                                        <tr>
-                                            <td class="px-2 pt-1 pb-1">{{ translate('Name') }}</td>
-                                            <td class="pt-1 pb-1">:</td>
-                                            <td class="px-2 pt-1 pb-1"><span
-                                                    class="text-danger">{{translate('guest_User')}}</span></td>
-                                        </tr>
-                                    @else
-                                        <tr>
-                                            <td class="px-2 pt-1 pb-1">{{ translate('Name') }}</td>
-                                            <td class="pt-1 pb-1">:</td>
-                                            <td class="px-2 pt-1 pb-1"><span
-                                                    class="text-danger">{{ $order->customer !=null? $order->customer['f_name'].' '.$order->customer['l_name']:translate('name_not_found') }}</span>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                    @if (isset($order->customer) && $order->customer['id']!=0)
-                                        <tr>
-                                            <td class="px-2 pt-1 pb-1">{{ translate('Email') }}</td>
-                                            <td class="pt-1 pb-1">:</td>
-                                            <td class="px-2 pt-1 pb-1"><span
-                                                    class="text-dark">{{$order->customer !=null? $order->customer['email']: translate('email_not_found')}}</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="px-2 pt-1 pb-1">{{ translate('Phone') }}</td>
-                                            <td class="pt-1 pb-1">:</td>
-                                            <td class="px-2 pt-1 pb-1"><span
-                                                    class="text-dark">{{$order->customer !=null? $order->customer['phone']: translate('phone_not_found')}}</span>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @endif
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div class="border rounded">
-        <table class="table">
-            <thead>
-            <tr>
-                <th class="p-2 text-left">{{ translate('Item_Description') }}</th>
-                <th class="p-2 text-center">{{ translate('Qty') }}</th>
-                <th class="p-2 text-right">{{ translate('Unit_Price') }}</th>
-                <th class="p-2 text-right">{{ translate('Total') }}</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($order->details as $key=>$details)
-                @php($productDetails = $details?->product ?? json_decode($details->product_details))
-                <tr>
-                    <td class="px-2 pt-1 pb-1">
-                        <h6 class="m-0">{{$productDetails->name}}</h6>
-                        @if($details['variant'])
-                            <p class="m-0">{{ translate('variation')}} : {{$details['variant']}}</p>
-                        @endif
-                    </td>
-                    <td class="px-2 pt-1 pb-1 text-center">{{$details->qty}}</td>
-                    <td class="px-2 pt-1 pb-1 text-right">{{ webCurrencyConverter(amount: $details['price']) }}</td>
-                    <td class="px-2 pt-1 pb-1 text-right">{{ webCurrencyConverter(amount: $details['price'] * $details['qty']) }}</td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-        <table class="table">
-            <tbody>
-            <tr>
-                <td colspan="4" class="p-2"></td>
-            </tr>
-            <tr>
-                <td colspan="4" class="border-dashed-top p-2"></td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <table class="table">
-                        <tbody>
+            @if($direction === 'rtl')
+                <td style="width: 50%; text-align: left;">
+                    <table style="width: auto; margin-right: auto; border-collapse: collapse;">
                         <tr>
-                            <td class="text-right">
-                                <table class="ml-auto">
-                                    <tbody>
-                                    @if($order['edited_status'] == 1)
-                                        <tr>
-                                            <td colspan="2" class="note text-left mb-3">#{{ translate('Note') }}
-                                                : {{ translate('Total_bill_has_been_updated_after_the_edits') }}.
-                                            </td>
-                                        </tr>
-                                    @endif
-                                    @if($order['payment_method'] == 'cash_on_delivery' && $order['bring_change_amount'] > 0)
-                                        <tr>
-                                            <td colspan="2" class="note text-left mb-3">
-                                                <span>* {{ translate('please_ensure_the_deliveryman_has') }} </span>
-                                                <span
-                                                    class="fw-semibold">{{ $order['bring_change_amount'] }} {{ $order['bring_change_amount_currency'] ?? '' }}</span>
-                                                <span> {{ translate('in_change_ready_for_the_customer') }}</span>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1 text-left">{{ translate('Total_Item_Price') }}</td>
-                                        <td class="px-2 pt-1 pb-1 text-right">
-                                            <span
-                                                class="text-dark">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['itemPrice']) }}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1 text-left">{{ translate('Item_Discount') }}</td>
-                                        <td class="px-2 pt-1 pb-1 text-right">
-                                            <span
-                                                class="text-dark">-{{ webCurrencyConverter(amount: $orderTotalPriceSummary['itemDiscount']) }}</span>
-                                        </td>
-                                    </tr>
-                                    @if ($order->order_type != 'default_type')
-                                        <tr>
-                                            <td class="px-2 pt-1 pb-1 text-left">{{ translate('extra_Discount') }}</td>
-                                            <td class="px-2 pt-1 pb-1 text-right">
-                                                <span
-                                                    class="text-dark">-{{ webCurrencyConverter(amount: $orderTotalPriceSummary['extraDiscount']) }}</span>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1 text-left">{{ translate('Subtotal') }}</td>
-                                        <td class="px-2 pt-1 pb-1 text-right">
-                                            <span
-                                                class="text-dark">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['subTotal']) }}</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1 text-left">{{ translate('Coupon_discount') }}</td>
-                                        <td class="px-2 pt-1 pb-1 text-right">
-                                            <span
-                                                class="text-dark">-{{ webCurrencyConverter(amount: $orderTotalPriceSummary['couponDiscount']) }}</span>
-                                        </td>
-                                    </tr>
-                                    @if($orderTotalPriceSummary['referAndEarnDiscount'] > 0)
-                                        <tr>
-                                            <td class="px-2 pt-1 pb-1 text-left">{{ translate('referral_discount') }}</td>
-                                            <td class="px-2 pt-1 pb-1 text-right">
-                                                <span
-                                                    class="text-dark">-{{ webCurrencyConverter(amount: $orderTotalPriceSummary['referAndEarnDiscount']) }}</span>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                    <tr>
-                                        <td class="px-2 pt-1 pb-1 text-left">{{ translate('Tax_fee') }}</td>
-                                        <td class="px-2 pt-1 pb-1 text-right">
-                                            <span
-                                                class="text-dark">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['taxTotal']) }}</span>
-                                        </td>
-                                    </tr>
-                                    @if($order->order_type == 'default_type' && $order?->is_shipping_free != 1)
-                                        <tr>
-                                            <td class="px-2 pt-1 pb-1 text-left">{{ translate('Shipping_fee') }}</td>
-                                            <td class="px-2 pt-1 pb-1 text-right">
-                                                <span
-                                                    class="text-dark">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['shippingTotal']) }}</span>
-                                            </td>
-                                        </tr>
-                                    @endif
-                                    <tr>
-                                        <td colspan="2" class="border-bottom px-2 pb-2"></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2" class="text-right">
-                                            <table class="ml-auto w-100">
-                                                <tbody>
-                                                <tr>
-                                                    <td class="px-2 pt-1 pb-1 text-left">
-                                                        <h5 class="m-0">{{ translate('Total') }}
-                                                            <span class="fs-10 fw-medium">
-                                                                                    {{ $orderTotalPriceSummary['tax_model'] == 'include' ? '('.translate('Tax_:_Inc.').')' : '' }}
-                                                                                </span>
-                                                        </h5>
-                                                    </td>
-                                                    <td class="px-2 pt-1 pb-1 text-right">
-                                                        <h5 class="m-0">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['totalAmount']) }}</h5>
-                                                    </td>
-                                                </tr>
-                                                @if ($order->order_type == 'POS' || $order->order_type == 'pos')
-                                                    <tr>
-                                                        <td class="px-2 pt-1 pb-1 text-left">
-                                                            <p class="m-0 text-dark">{{ translate('Paid_Amount') }}</p>
-                                                        </td>
-                                                        <td class="px-2 pt-1 pb-1 text-right">
-                                                            <p class="m-0 text-dark">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['paidAmount']) }}</p>
-                                                        </td>
-                                                    </tr>
-                                                @endif
-                                                @if($order['edited_status'] == 1 && $order?->latestEditHistory)
-
-                                                    @if($order?->latestEditHistory?->order_due_amount > 0)
-                                                        @if($order?->latestEditHistory?->order_due_payment_status == 'paid')
-                                                            <tr>
-                                                                <td class="px-2 pt-1 pb-1 text-left">
-                                                                    <h5 class="m-0">
-                                                                        {{ translate('Paid_Amount') }}
-                                                                    </h5>
-                                                                </td>
-                                                                <td class="px-2 pt-1 pb-1 text-right">
-                                                                    <h5 class="m-0">
-                                                                        {{ webCurrencyConverter(
-                                                                            amount: $order?->latestEditHistory?->order_amount - $order?->latestEditHistory?->order_due_amount
-                                                                        ) }}
-                                                                    </h5>
-                                                                </td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td class="px-2 pt-1 pb-1 text-left">
-                                                                    <h5 class="m-0">
-                                                                        {{ translate('Due_Amount_Paid_By') }}
-                                                                        <span>
-                                                                        ({{ ucwords(str_replace('_',' ',$order?->latestEditHistory?->order_due_payment_method)) }})
-                                                                    </span>
-                                                                    </h5>
-                                                                </td>
-                                                                <td class="px-2 pt-1 pb-1 text-right">
-                                                                    <h5 class="m-0">
-                                                                        {{ webCurrencyConverter(
-                                                                            amount: $order?->latestEditHistory?->order_due_amount
-                                                                        ) }}
-                                                                    </h5>
-                                                                </td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td class="px-2 pt-1 pb-1 text-left">
-                                                                    <h5 class="m-0">
-                                                                        {{ translate('Total_Paid_Amount') }}
-                                                                    </h5>
-                                                                </td>
-                                                                <td class="px-2 pt-1 pb-1 text-right">
-                                                                    <h5 class="m-0">
-                                                                        {{ webCurrencyConverter(
-                                                                            amount: $order?->latestEditHistory?->order_amount
-                                                                        ) }}
-                                                                    </h5>
-                                                                </td>
-                                                            </tr>
-                                                        @else
-                                                            <tr>
-                                                                <td class="px-2 pt-1 pb-1 text-left">
-                                                                    <h5 class="m-0">
-                                                                        {{ translate('Due_Amount') }}
-                                                                        <span class="text-danger">
-                                                                            ({{ translate($order?->latestEditHistory?->order_due_payment_status) }})
-                                                                        </span>
-                                                                    </h5>
-                                                                </td>
-                                                                <td class="px-2 pt-1 pb-1 text-right">
-                                                                    <h5 class="m-0">
-                                                                        {{ webCurrencyConverter(
-                                                                            amount: $order?->latestEditHistory?->order_due_amount
-                                                                        ) }}
-                                                                    </h5>
-                                                                </td>
-                                                            </tr>
-                                                        @endif
-                                                    @endif
-
-                                                    @if($order?->latestEditHistory?->order_return_amount > 0)
-                                                        @if($order?->latestEditHistory?->order_return_payment_status == 'returned')
-                                                            <tr>
-                                                                <td class="px-2 pt-1 pb-1 text-left">
-                                                                    <h5 class="m-0">
-                                                                        {{ translate('Paid_Amount') }}
-                                                                    </h5>
-                                                                </td>
-                                                                <td class="px-2 pt-1 pb-1 text-right">
-                                                                    <h5 class="m-0">
-                                                                        {{ webCurrencyConverter(
-                                                                            amount: $order?->latestEditHistory?->order_amount + $order?->latestEditHistory?->order_return_amount
-                                                                        ) }}
-                                                                    </h5>
-                                                                </td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td class="px-2 pt-1 pb-1 text-left">
-                                                                    <h5 class="m-0">
-                                                                        {{ translate('Returned_By') }}
-                                                                        <span>
-                                                                            ({{ ucwords(str_replace('_',' ',$order?->latestEditHistory?->order_return_payment_method)) }})
-                                                                        </span>
-                                                                    </h5>
-                                                                </td>
-                                                                <td class="px-2 pt-1 pb-1 text-right">
-                                                                    <h5 class="m-0">
-                                                                        {{ webCurrencyConverter(
-                                                                            amount: $order?->latestEditHistory?->order_return_amount
-                                                                        ) }}
-                                                                    </h5>
-                                                                </td>
-                                                            </tr>
-                                                        @else
-                                                            <tr>
-                                                                <td class="px-2 pt-1 pb-1 text-left">
-                                                                    <h5 class="m-0">
-                                                                        {{ translate('Amount_To_Return') }}
-                                                                        <span class="text-danger">
-                                                                        ({{ translate($order?->latestEditHistory?->order_return_payment_status) }})
-                                                                    </span>
-                                                                    </h5>
-                                                                </td>
-                                                                <td class="px-2 pt-1 pb-1 text-right">
-                                                                    <h5 class="m-0">
-                                                                        {{ webCurrencyConverter(
-                                                                            amount: $order?->latestEditHistory?->order_return_amount
-                                                                        ) }}
-                                                                    </h5>
-                                                                </td>
-                                                            </tr>
-                                                        @endif
-                                                    @endif
-                                                @endif
-
-                                                @if ($order->order_type == 'POS' || $order->order_type == 'pos')
-                                                    <tr>
-                                                        <td class="px-2 pt-1 pb-1 text-left">
-                                                            <h5 class="m-0">{{ translate('change_amount') }}</h5>
-                                                        </td>
-                                                        <td class="px-2 pt-1 pb-1 text-right">
-                                                            <h5 class="m-0">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['changeAmount']) }}</h5>
-                                                        </td>
-                                                    </tr>
-                                                @endif
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </td>
+                            <td style="padding-right: 8px; text-align: right; font-size: 9px; color: #7F8185;">تاريخ الفاتورة</td>
+                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ date('Y-m-d', strtotime($order['created_at'])) }}</td>
+                            <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Invoice Date</td>
                         </tr>
-                        </tbody>
+                        <tr>
+                            <td style="padding-right: 8px; text-align: right; font-size: 9px; color: #7F8185;">رقم الطلب</td>
+                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ $order->id }}</td>
+                            <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Order No.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-right: 8px; text-align: right; font-size: 9px; color: #7F8185;">طريقة الدفع</td>
+                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center; color: #FF5A36;">
+                                {{ str_replace('_', ' ', $order->payment_method) }}
+                            </td>
+                            <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Payment</td>
+                        </tr>
                     </table>
                 </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="invoice-end-note">
-        <table class="table mt-3">
-            <tbody>
-            <tr>
-                <td class="border-dashed-top p-2"></td>
-            </tr>
-            <tr>
-                <td class="text-center">
-                    <h5 class="fw-normal m-0">{{ translate('Thanks_for_the_purchase') }}</h5>
+                <!-- Right (RTL): Logo -->
+                <td style="width: 50%; text-align: right;">
+                    <!-- Static test logo placeholder. Pointing to custom placeholder style -->
+                    <img height="45" src="https://placehold.co/180x50/png?text=OXYGEN" alt="OXYGEN Logo" style="object-fit: contain;">
                 </td>
-            </tr>
-            @if(isset($invoiceSettings['terms_and_condition']))
-                <tr>
-                    <td colspan="2" class="p-2"></td>
-                </tr>
-                <tr>
-                    <td class="border-dashed-top p-2"></td>
-                </tr>
-                <tr>
-                    <td class="px-2 pt-2">
-                        <h5 class="m-0">{{ translate('terms_&_Conditions') }}</h5>
-                        <p class="m-0">{{$invoiceSettings['terms_and_condition']}}</p>
-                    </td>
-                </tr>
+            @else
+                <!-- Left (LTR): Logo -->
+                <td style="width: 50%; text-align: left;">
+                    <img height="45" src="https://placehold.co/180x50/png?text=OXYGEN" alt="OXYGEN Logo" style="object-fit: contain;">
+                </td>
+                <!-- Right (LTR): Info Table -->
+                <td style="width: 50%; text-align: right;">
+                    <table style="width: auto; margin-left: auto; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding-right: 8px; text-align: left; font-size: 9px; color: #7F8185;">Invoice Date</td>
+                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ date('Y-m-d', strtotime($order['created_at'])) }}</td>
+                            <td style="padding-left: 8px; text-align: right; font-size: 9px; color: #7F8185;">تاريخ الفاتورة</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-right: 8px; text-align: left; font-size: 9px; color: #7F8185;">Order No.</td>
+                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ $order->id }}</td>
+                            <td style="padding-left: 8px; text-align: right; font-size: 9px; color: #7F8185;">رقم الطلب</td>
+                        </tr>
+                        <tr>
+                            <td style="padding-right: 8px; text-align: left; font-size: 9px; color: #7F8185;">Payment</td>
+                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center; color: #FF5A36;">
+                                {{ str_replace('_', ' ', $order->payment_method) }}
+                            </td>
+                            <td style="padding-left: 8px; text-align: right; font-size: 9px; color: #7F8185;">طريقة الدفع</td>
+                        </tr>
+                    </table>
+                </td>
             @endif
-            </tbody>
-        </table>
+        </tr>
+    </table>
+
+    <!-- Orange Separation Line -->
+    <div class="color-bar"></div>
+
+    <!-- Centered Invoice Title -->
+    <div class="invoice-title-sec">
+        <div class="invoice-title-ar">فاتورة ضريبية مبسطة</div>
+        <div class="invoice-title-en">TAX INVOICE</div>
     </div>
+
+    <!-- Bill Cards: side by side -->
+    <table class="bill-cards-table">
+        <tr>
+            <!-- Bill From Card -->
+            <td class="bill-card-td">
+                <table class="bill-card-inner-table">
+                    <tr>
+                        <td class="card-title-en">Bill From</td>
+                        <td class="card-title-ar">الفاتورة من</td>
+                    </tr>
+                    <tr><td colspan="2" style="height: 6px;"></td></tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Name</td>
+                        <td class="card-value">
+                            @if($order->seller_is != 'admin' && isset($order->seller) && isset($order->seller->shop))
+                                {{ $order->seller->shop->name }}
+                            @else
+                                {{ $companyName }}
+                            @endif
+                        </td>
+                        <td class="card-label-ar">الاسم</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Address</td>
+                        <td class="card-value">
+                            @if($order->seller_is != 'admin' && isset($order->seller) && isset($order->seller->shop))
+                                {{ $order->seller->shop->address ?? getWebConfig('shop_address') }}
+                            @else
+                                {{ getWebConfig('shop_address') }}
+                            @endif
+                        </td>
+                        <td class="card-label-ar">العنوان</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Governorate</td>
+                        <td class="card-value">الرياض</td>
+                        <td class="card-label-ar">المحافظة</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">VAT No.</td>
+                        <td class="card-value">
+                            @if($order->seller_is != 'admin' && isset($order->seller) && $order->seller->gst != null)
+                                {{ $order->seller->gst }}
+                            @else
+                                301157358600003
+                            @endif
+                        </td>
+                        <td class="card-label-ar">الرقم الضريبي</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Email</td>
+                        <td class="card-value">
+                            @if($order->seller_is != 'admin' && isset($order->seller))
+                                {{ $order->seller->email ?? $companyEmail }}
+                            @else
+                                {{ $companyEmail }}
+                            @endif
+                        </td>
+                        <td class="card-label-ar">البريد الإلكتروني</td>
+                    </tr>
+                </table>
+            </td>
+
+            <!-- Spacer column -->
+            <td style="width: 4%;"></td>
+
+            <!-- Bill To Card -->
+            @php($billingAddress = $order->billing_address_data)
+            @php($shippingAddress = $order->shipping_address_data)
+            <td class="bill-card-td">
+                <table class="bill-card-inner-table">
+                    <tr>
+                        <td class="card-title-en">Bill To</td>
+                        <td class="card-title-ar">الفاتورة إلى</td>
+                    </tr>
+                    <tr><td colspan="2" style="height: 6px;"></td></tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Name</td>
+                        <td class="card-value">
+                            @if(!empty((array)$billingAddress))
+                                {{ $billingAddress->contact_person_name ?? '' }}
+                            @elseif(!empty((array)$shippingAddress))
+                                {{ $shippingAddress->contact_person_name ?? '' }}
+                            @else
+                                {{ $order->customer != null ? $order->customer['f_name'].' '.$order->customer['l_name'] : translate('guest_User') }}
+                            @endif
+                        </td>
+                        <td class="card-label-ar">الاسم</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Address</td>
+                        <td class="card-value">
+                            @if(!empty((array)$billingAddress))
+                                {{ $billingAddress->address ?? '' }}
+                            @elseif(!empty((array)$shippingAddress))
+                                {{ $shippingAddress->address ?? '' }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td class="card-label-ar">العنوان</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Governorate</td>
+                        <td class="card-value">
+                            @if(!empty((array)$billingAddress))
+                                {{ $billingAddress->city ?? '' }}
+                            @elseif(!empty((array)$shippingAddress))
+                                {{ $shippingAddress->city ?? '' }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td class="card-label-ar">المحافظة</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Email</td>
+                        <td class="card-value">
+                            {{ $order->customer != null ? $order->customer['email'] : translate('email_not_found') }}
+                        </td>
+                        <td class="card-label-ar">البريد الإلكتروني</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Phone</td>
+                        <td class="card-value">
+                            @if(!empty((array)$billingAddress))
+                                {{ $billingAddress->phone ?? '' }}
+                            @elseif(!empty((array)$shippingAddress))
+                                {{ $shippingAddress->phone ?? '' }}
+                            @else
+                                {{ $order->customer != null ? $order->customer['phone'] : translate('phone_not_found') }}
+                            @endif
+                        </td>
+                        <td class="card-label-ar">رقم الهاتف</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Product Items Table -->
+    <table class="product-table">
+        <thead>
+        <tr>
+            @if($direction === 'rtl')
+                <th style="text-align: right; width: 42%;">
+                    <div>Product Name</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">إسم المنتج</div>
+                </th>
+                <th style="text-align: center; width: 8%;">
+                    <div>Quantity</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">الكمية</div>
+                </th>
+                <th style="text-align: center; width: 14%;">
+                    <div>Price Excl TAX</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر بدون ضريبة</div>
+                </th>
+                <th style="text-align: center; width: 10%;">
+                    <div>TAX Rate</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">نسبة الضريبة</div>
+                </th>
+                <th style="text-align: center; width: 12%;">
+                    <div>TAX Price</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">سعر الضريبة</div>
+                </th>
+                <th style="text-align: left; width: 14%;">
+                    <div>Price Incl TAX</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر شامل الضريبة</div>
+                </th>
+            @else
+                <th style="text-align: left; width: 14%;">
+                    <div>Price Incl TAX</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر شامل الضريبة</div>
+                </th>
+                <th style="text-align: center; width: 12%;">
+                    <div>TAX Price</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">سعر الضريبة</div>
+                </th>
+                <th style="text-align: center; width: 10%;">
+                    <div>TAX Rate</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">نسبة الضريبة</div>
+                </th>
+                <th style="text-align: center; width: 14%;">
+                    <div>Price Excl TAX</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر بدون ضريبة</div>
+                </th>
+                <th style="text-align: center; width: 8%;">
+                    <div>Quantity</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">الكمية</div>
+                </th>
+                <th style="text-align: right; width: 42%;">
+                    <div>Product Name</div>
+                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">إسم المنتج</div>
+                </th>
+            @endif
+        </tr>
+        </thead>
+        <tbody>
+        @foreach($order->details as $key=>$details)
+            @php($productDetails = $details?->product ?? json_decode($details->product_details))
+            @php($tax_rate = $productDetails->tax ?? 15)
+            <tr>
+                @if($direction === 'rtl')
+                    <td style="text-align: right;">
+                        <span style="font-weight: bold; color: #303030;">{{ $productDetails->name }}</span>
+                        @if($details['variant'])
+                            <div style="font-size: 8px; color: #7F8185; margin-top: 2px;">{{ translate('variation') }} : {{ $details['variant'] }}</div>
+                        @endif
+                        <div style="font-size: 8px; color: #7F8185; margin-top: 1px;">رمز المنتج: {{ $productDetails->code ?? 'PROD-'.$details->product_id }}</div>
+                    </td>
+                    <td style="text-align: center; color: #303030;">{{ $details->qty }}</td>
+                    <td style="text-align: center; color: #303030;">
+                        {{ webCurrencyConverter(amount: ($details['price'] / (1 + ($tax_rate / 100))) * $details['qty']) }}
+                    </td>
+                    <td style="text-align: center; color: #303030;">% {{ $tax_rate }}</td>
+                    <td style="text-align: center; color: #303030;">{{ webCurrencyConverter(amount: $details['tax']) }}</td>
+                    <td style="text-align: left; color: #303030; font-weight: bold;">
+                        {{ webCurrencyConverter(amount: $details['price'] * $details['qty']) }}
+                    </td>
+                @else
+                    <td style="text-align: left; color: #303030; font-weight: bold;">
+                        {{ webCurrencyConverter(amount: $details['price'] * $details['qty']) }}
+                    </td>
+                    <td style="text-align: center; color: #303030;">{{ webCurrencyConverter(amount: $details['tax']) }}</td>
+                    <td style="text-align: center; color: #303030;">% {{ $tax_rate }}</td>
+                    <td style="text-align: center; color: #303030;">
+                        {{ webCurrencyConverter(amount: ($details['price'] / (1 + ($tax_rate / 100))) * $details['qty']) }}
+                    </td>
+                    <td style="text-align: center; color: #303030;">{{ $details->qty }}</td>
+                    <td style="text-align: right;">
+                        <span style="font-weight: bold; color: #303030;">{{ $productDetails->name }}</span>
+                        @if($details['variant'])
+                            <div style="font-size: 8px; color: #7F8185; margin-top: 2px;">{{ translate('variation') }} : {{ $details['variant'] }}</div>
+                        @endif
+                        <div style="font-size: 8px; color: #7F8185; margin-top: 1px;">Product Sku: {{ $productDetails->code ?? 'PROD-'.$details->product_id }}</div>
+                    </td>
+                @endif
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+
+    <!-- Totals and QR Code Section -->
+    <table class="bottom-table">
+        <tr>
+            @if($direction === 'rtl')
+                <!-- QR Code on the Left -->
+                <td style="width: 40%; text-align: left; vertical-align: middle;">
+                    <div style="display: inline-block; border: 1px solid #EAEAEA; padding: 6px; border-radius: 6px; background-color: #FFFFFF;">
+                        <!-- Using qrserver test/dynamic QR URL, customizable -->
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('admin.orders.details', ['id' => $order->id])) }}" style="width: 80px; height: 80px; display: block;" alt="Order QR Code"/>
+                    </div>
+                </td>
+                <!-- Totals on the Right -->
+                <td style="width: 60%; vertical-align: top;">
+                    <table class="totals-table">
+                        <tr class="totals-row">
+                            <td class="totals-label-en">Subtotal</td>
+                            <td class="totals-value">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['itemPrice']) }}</td>
+                            <td class="totals-label-ar">المجموع</td>
+                        </tr>
+                        @php($total_discount = $orderTotalPriceSummary['extraDiscount'] + $orderTotalPriceSummary['couponDiscount'] + $orderTotalPriceSummary['referAndEarnDiscount'] + $orderTotalPriceSummary['itemDiscount'])
+                        @if($total_discount > 0)
+                            <tr class="totals-row">
+                                <td class="totals-label-en">Discount</td>
+                                <td class="totals-value" style="color: #FF5A36;">-{{ webCurrencyConverter(amount: $total_discount) }}</td>
+                                <td class="totals-label-ar">خصم</td>
+                            </tr>
+                        @endif
+                        <tr class="totals-row">
+                            <td class="totals-label-en">Shipping</td>
+                            <td class="totals-value">
+                                @if($order->order_type == 'default_type' && $order?->is_shipping_free != 1)
+                                    {{ webCurrencyConverter(amount: $orderTotalPriceSummary['shippingTotal']) }}
+                                @else
+                                    شحن مجاني
+                                @endif
+                            </td>
+                            <td class="totals-label-ar">الشحن</td>
+                        </tr>
+                        <tr class="totals-row">
+                            <td class="totals-label-en">Payment method</td>
+                            <td class="totals-value" style="color: #FF5A36;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
+                            <td class="totals-label-ar">وسيلة الدفع</td>
+                        </tr>
+                        <tr class="totals-row" style="border-top: 1px solid #D7DAE0; font-size: 10px;">
+                            <td class="totals-label-en" style="font-weight: bold; padding-top: 8px;">Total</td>
+                            <td class="totals-value" style="font-weight: bold; font-size: 11px; padding-top: 8px;">
+                                <div>{{ webCurrencyConverter(amount: $orderTotalPriceSummary['totalAmount']) }}</div>
+                                <div style="font-size: 8px; font-weight: normal; color: #7F8185; margin-top: 2px;">
+                                    (يتضمن {{ webCurrencyConverter(amount: $orderTotalPriceSummary['taxTotal']) }} ضريبة القيمة المضافة)
+                                </div>
+                            </td>
+                            <td class="totals-label-ar" style="font-weight: bold; padding-top: 8px;">الإجمالي</td>
+                        </tr>
+                    </table>
+                </td>
+            @else
+                <!-- Totals on the Left -->
+                <td style="width: 60%; vertical-align: top;">
+                    <table class="totals-table">
+                        <tr class="totals-row">
+                            <td class="totals-label-en">Subtotal</td>
+                            <td class="totals-value">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['itemPrice']) }}</td>
+                            <td class="totals-label-ar">المجموع</td>
+                        </tr>
+                        @php($total_discount = $orderTotalPriceSummary['extraDiscount'] + $orderTotalPriceSummary['couponDiscount'] + $orderTotalPriceSummary['referAndEarnDiscount'] + $orderTotalPriceSummary['itemDiscount'])
+                        @if($total_discount > 0)
+                            <tr class="totals-row">
+                                <td class="totals-label-en">Discount</td>
+                                <td class="totals-value" style="color: #FF5A36;">-{{ webCurrencyConverter(amount: $total_discount) }}</td>
+                                <td class="totals-label-ar">خصم</td>
+                            </tr>
+                        @endif
+                        <tr class="totals-row">
+                            <td class="totals-label-en">Shipping</td>
+                            <td class="totals-value">
+                                @if($order->order_type == 'default_type' && $order?->is_shipping_free != 1)
+                                    {{ webCurrencyConverter(amount: $orderTotalPriceSummary['shippingTotal']) }}
+                                @else
+                                    شحن مجاني / Free
+                                @endif
+                            </td>
+                            <td class="totals-label-ar">الشحن</td>
+                        </tr>
+                        <tr class="totals-row">
+                            <td class="totals-label-en">Payment method</td>
+                            <td class="totals-value" style="color: #FF5A36;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
+                            <td class="totals-label-ar">وسيلة الدفع</td>
+                        </tr>
+                        <tr class="totals-row" style="border-top: 1px solid #D7DAE0; font-size: 10px;">
+                            <td class="totals-label-en" style="font-weight: bold; padding-top: 8px;">Total</td>
+                            <td class="totals-value" style="font-weight: bold; font-size: 11px; padding-top: 8px;">
+                                <div>{{ webCurrencyConverter(amount: $orderTotalPriceSummary['totalAmount']) }}</div>
+                                <div style="font-size: 8px; font-weight: normal; color: #7F8185; margin-top: 2px;">
+                                    (يتضمن {{ webCurrencyConverter(amount: $orderTotalPriceSummary['taxTotal']) }} ضريبة القيمة المضافة)
+                                </div>
+                            </td>
+                            <td class="totals-label-ar" style="font-weight: bold; padding-top: 8px;">الإجمالي</td>
+                        </tr>
+                    </table>
+                </td>
+                <!-- QR Code on the Right -->
+                <td style="width: 40%; text-align: right; vertical-align: middle;">
+                    <div style="display: inline-block; border: 1px solid #EAEAEA; padding: 6px; border-radius: 6px; background-color: #FFFFFF;">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('admin.orders.details', ['id' => $order->id])) }}" style="width: 80px; height: 80px; display: block;" alt="Order QR Code"/>
+                    </div>
+                </td>
+            @endif
+        </tr>
+    </table>
 </div>
+
 </body>
 </html>

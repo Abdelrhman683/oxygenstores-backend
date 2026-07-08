@@ -4954,13 +4954,7 @@ justify-content: center;
     }
     .premium-product-title {
         font-size: 13px;
-        line-height: 1.4;
-        height: 42px;
-        -webkit-line-clamp: 2;
-        line-clamp: 2;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        height: 40px;
     }
 }
 
@@ -5072,7 +5066,7 @@ justify-content: center;
 
 .best-selling-section .premium-product-title,
 .top-rated-section .premium-product-title {
-    height: 42px;
+    height: 40px;
 }
 
 @media (max-width: 767px) {
