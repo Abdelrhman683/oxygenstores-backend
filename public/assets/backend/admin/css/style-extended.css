@@ -5721,8 +5721,8 @@ input[type=tel] {
 .pd-img-wrap .swiper-slide img {
   inline-size: 100%;
   block-size: auto;
-  -o-object-fit: cover;
-  object-fit: cover;
+  -o-object-fit: contain;
+  object-fit: contain;
   display: block;
   aspect-ratio: 1;
   border-radius: inherit;
