@@ -75,7 +75,7 @@ html {
     font-display: swap;
 }
 
-[dir="rtl"], [dir="rtl"] body, [dir="rtl"] p, [dir="rtl"] a, [dir="rtl"] span, [dir="rtl"] button, [dir="rtl"] input, [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6, [dir="rtl"] div, [dir="rtl"] select, [dir="rtl"] textarea {
+[dir="rtl"], [dir="rtl"] body, [dir="rtl"] p, [dir="rtl"] a, [dir="rtl"] span, [dir="rtl"] button, [dir="rtl"] input, [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6, [dir="rtl"] div, [dir="rtl"] select, [dir="rtl"] textarea , [dir="rtl"] textarea {
     font-family: 'PingARLT', 'Cairo', 'Tajawal', sans-serif !important;
 }
 
