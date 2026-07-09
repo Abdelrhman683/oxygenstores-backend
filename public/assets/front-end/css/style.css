@@ -733,10 +733,9 @@ a {
     /* aspect-ratio: 1; */
       aspect-ratio: 4 / 3;
     overflow: hidden;
-    background-color: var(--white-clr);
-    box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
+    /* background-color: var(--white-clr);
+    box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px; */
     margin-bottom: 2px;
-    /* border: 1px solid #e5e5e5; */
 }
 
 .__brand-item:hover img {
