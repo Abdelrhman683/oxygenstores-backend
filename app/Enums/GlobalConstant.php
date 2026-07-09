@@ -561,6 +561,8 @@ enum GlobalConstant
         ['key' => 'payfast', 'value' => 'Pay Fast'],
         ['key' => 'worldpay', 'value' => 'World Pay'],
         ['key' => 'sixcash', 'value' => 'Six Cash'],
+        ['key' => 'tabby', 'value' => 'Tabby'],
+        ['key' => 'tamara', 'value' => 'Tamara'],
     ];
 
     //currencies
@@ -1175,7 +1177,9 @@ enum GlobalConstant
         'paytabs',
         'liqpay',
         'mercadopago',
-        'bkash'
+        'bkash',
+        'tabby',
+        'tamara'
     ];
 
     const DEFAULT_SMS_GATEWAYS = [
@@ -1185,6 +1189,7 @@ enum GlobalConstant
         'msg91',
         'releans',
         'alphanet_sms',
+        'taqnyat',
     ];
 
     const TIMEZONE_ARRAY = [

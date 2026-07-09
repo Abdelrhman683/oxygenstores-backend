@@ -74,6 +74,8 @@ trait Payment
             'cashfree' => 'payment/cashfree/pay',
             'instamojo' => 'payment/instamojo/pay',
             'mercadopago_pix' => 'payment/mercadopago_pix/pay',
+            'tabby' => 'payment/tabby/pay',
+            'tamara' => 'payment/tamara/pay',
         ];
         if (array_key_exists($payment->payment_method, $routes)) {
             return url("{$routes[$payment->payment_method]}/?payment_id={$payment->id}");

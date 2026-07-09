@@ -458,6 +458,21 @@ trait PaymentGatewayTrait
                 "CDF" => "Congolese franc",
                 "USD" => "United States Dollar"
             ],
+            "tabby" => [
+                "SAR" => "Saudi Riyal",
+                "AED" => "United Arab Emirates Dirham",
+                "KWD" => "Kuwaiti Dinar",
+                "BHD" => "Bahraini Dinar",
+                "QAR" => "Qatari Riyal",
+                "EGP" => "Egyptian Pound",
+            ],
+            "tamara" => [
+                "SAR" => "Saudi Riyal",
+                "AED" => "United Arab Emirates Dirham",
+                "KWD" => "Kuwaiti Dinar",
+                "BHD" => "Bahraini Dinar",
+                "QAR" => "Qatari Riyal",
+            ],
         ];
 
         if ($key) {

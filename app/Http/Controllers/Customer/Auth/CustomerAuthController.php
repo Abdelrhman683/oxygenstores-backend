@@ -707,4 +707,156 @@ class CustomerAuthController extends Controller
             return redirect()->route('customer.auth.login.update-info', ['identity' => base64_encode($responseData['phoneNumber'])]);
         }
     }
+
+    public function checkoutSendOTP(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|min:6|max:20'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => translate('Please enter a valid phone number')
+            ]);
+        }
+
+        $phoneNumber = $request['phone'];
+        $OTPIntervalTime = getWebConfig(name: 'otp_resend_time') ?? 60;
+        $OTPVerificationData = $this->phoneOrEmailVerificationRepo->getFirstWhere(params: ['phone_or_email' => $phoneNumber]);
+
+        if (isset($OTPVerificationData) && Carbon::parse($OTPVerificationData['created_at'])->DiffInSeconds() < $OTPIntervalTime) {
+            $time = $OTPIntervalTime - Carbon::parse($OTPVerificationData['created_at'])->DiffInSeconds();
+            return response()->json([
+                'status' => 'error',
+                'message' => translate('please_try_again_after_') . $time . ' ' . translate('seconds')
+            ]);
+        }
+
+        $token = $this->customerAuthService->getCustomerVerificationToken();
+        $firebaseOTPVerification = getWebConfig(name: 'firebase_otp_verification') ?? [];
+        $errorMsg = translate('OTP_sending_failed');
+
+        if ($firebaseOTPVerification && $firebaseOTPVerification['status']) {
+            $firebaseResponse = $this->firebaseService->sendOtp($phoneNumber);
+            $response = 'error';
+            if ($firebaseResponse['status'] == 'success') {
+                $token = $firebaseResponse['sessionInfo'];
+                $response = $firebaseResponse['status'];
+            } else {
+                $errorMsg = translate(ucfirst(strtolower($firebaseResponse['errors'])));
+            }
+        } else {
+            $response = $this->customerAuthService->sendCustomerPhoneVerificationToken($phoneNumber, $token);
+            $response = $response['response'] ?? 'error';
+            if (env('APP_MODE') == 'dev') {
+                $response = 'success';
+            }
+        }
+
+        if ($response == 'success') {
+            $this->phoneOrEmailVerificationRepo->updateOrCreate(params: ['phone_or_email' => $phoneNumber], value: [
+                'phone_or_email' => $phoneNumber,
+                'token' => $token,
+                'created_at' => now(),
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'message' => translate('OTP sent successfully')
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => $errorMsg
+        ]);
+    }
+
+    public function checkoutVerifyOTP(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|min:6|max:20',
+            'token' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => translate('Invalid phone number or OTP code')
+            ]);
+        }
+
+        $phone = $request['phone'];
+        $token = $request['token'];
+        $identity = $phone;
+
+        $firebaseOTPVerification = getWebConfig(name: 'firebase_otp_verification') ?? [];
+        $tempBlockTime = getWebConfig(name: 'temporary_block_time') ?? 600; // seconds
+        $verificationData = $this->phoneOrEmailVerificationRepo->getFirstWhere(params: ['phone_or_email' => $identity]);
+        $OTPVerificationData = $this->phoneOrEmailVerificationRepo->getFirstWhere(params: ['phone_or_email' => $identity, 'token' => $token]);
+
+        if (!$verificationData) {
+            return response()->json([
+                'status' => 'error',
+                'message' => translate('OTP expired or not found. Please request a new one.')
+            ]);
+        }
+
+        $tokenVerifyStatus = false;
+        if ($firebaseOTPVerification && $firebaseOTPVerification['status']) {
+            $firebaseVerify = $this->firebaseService->verifyOtp($verificationData['token'], $verificationData['phone_or_email'], $token);
+            $tokenVerifyStatus = (bool)($firebaseVerify['status'] == 'success');
+        } else {
+            $tokenVerifyStatus = (bool)$OTPVerificationData;
+        }
+
+        if ($tokenVerifyStatus) {
+            $this->phoneOrEmailVerificationRepo->delete(params: ['phone_or_email' => $identity]);
+
+            // Register or Login user
+            $user = \App\Models\User::where(['phone' => $phone])->first();
+            if (!$user) {
+                // Register a new customer
+                $name = $request['name'] ?? 'Guest_' . rand(1000, 9999);
+                $names = explode(' ', $name, 2);
+                $f_name = $names[0];
+                $l_name = $names[1] ?? '';
+
+                $email = $request['email'] ?? $phone . '@oxygen.com';
+                $checkEmail = \App\Models\User::where(['email' => $email])->first();
+                if ($checkEmail) {
+                    $email = 'user_' . rand(1000, 9999) . '_' . $email;
+                }
+
+                $user = \App\Models\User::create([
+                    'name' => $name,
+                    'f_name' => $f_name,
+                    'l_name' => $l_name,
+                    'phone' => $phone,
+                    'email' => $email,
+                    'is_active' => 1,
+                    'is_phone_verified' => 1,
+                    'password' => bcrypt(rand(100000, 999999)),
+                    'referral_code' => Helpers::generate_referer_code(),
+                ]);
+            } else {
+                $user->is_phone_verified = 1;
+                $user->save();
+            }
+
+            auth('customer')->login($user);
+            CustomerManager::updateCustomerSessionData(userId: auth('customer')->id());
+            CartManager::cartListSessionToDatabase();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => translate('Logged in successfully')
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => translate('OTP is not matched')
+        ]);
+    }
 }

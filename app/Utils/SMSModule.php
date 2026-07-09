@@ -47,6 +47,11 @@ class SMSModule
             return self::alphanet_sms($receiver, $otp);
         }
 
+        $config = self::get_settings('taqnyat');
+        if (isset($config) && $config['status'] == 1) {
+            return self::taqnyat($receiver, $otp);
+        }
+
         return 'not_found';
     }
 
@@ -231,6 +236,54 @@ class SMSModule
                 $response = 'success';
             } else {
                 $response = 'error';
+            }
+        }
+        return $response;
+    }
+
+    public static function taqnyat($receiver, $otp): string
+    {
+        $config = self::get_settings('taqnyat');
+        $response = 'error';
+        if (isset($config) && $config['status'] == 1) {
+            // Taqnyat requires international format without + (e.g. 9665xxxxxxxx)
+            $receiver = ltrim(str_replace('+', '', $receiver), '0');
+            $message = str_replace('#OTP#', $otp, $config['otp_template']);
+            $bearer_token = $config['bearer_token'];
+            $sender = $config['sender'];
+
+            $data = [
+                'sender'     => $sender,
+                'recipients' => [$receiver],
+                'body'       => $message,
+            ];
+
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL            => 'https://api.taqnyat.sa/sms/send',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING       => '',
+                CURLOPT_MAXREDIRS      => 10,
+                CURLOPT_TIMEOUT        => 30,
+                CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST  => 'POST',
+                CURLOPT_POSTFIELDS     => json_encode($data),
+                CURLOPT_HTTPHEADER     => [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer ' . $bearer_token,
+                ],
+            ]);
+
+            $result = curl_exec($curl);
+            $err    = curl_error($curl);
+            curl_close($curl);
+
+            if (!$err) {
+                $decoded = json_decode($result, true);
+                // Taqnyat returns statusCode 201 on success
+                if (isset($decoded['statusCode']) && $decoded['statusCode'] == 201) {
+                    $response = 'success';
+                }
             }
         }
         return $response;

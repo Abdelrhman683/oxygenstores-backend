@@ -23,6 +23,8 @@ use App\Http\Controllers\Payment_Methods\RazorPayController;
 use App\Http\Controllers\Payment_Methods\SenangPayController;
 use App\Http\Controllers\Payment_Methods\SslCommerzPaymentController;
 use App\Http\Controllers\Payment_Methods\StripePaymentController;
+use App\Http\Controllers\Payment_Methods\TabbyPaymentController;
+use App\Http\Controllers\Payment_Methods\TamaraPaymentController;
 use App\Http\Controllers\Web\CartController;
 use App\Http\Controllers\Web\ChattingController;
 use App\Http\Controllers\Web\CouponController;
@@ -317,6 +319,8 @@ Route::group(['namespace' => 'Customer', 'prefix' => 'customer', 'as' => 'custom
             Route::get('login/update-info', 'updateInfo')->name('login.update-info');
             Route::post('login/update-info', 'updateInfoSubmit');
             Route::post('login/resend-otp-code', 'resendOTPCode')->name('resend-otp-code');
+            Route::post('checkout-send-otp', 'checkoutSendOTP')->name('checkout-send-otp');
+            Route::post('checkout-verify-otp', 'checkoutVerifyOTP')->name('checkout-verify-otp');
         });
 
         Route::controller(LoginController::class)->group(function () {
@@ -492,6 +496,18 @@ if (!$isGatewayPublished) {
             Route::any('pay', [PaytabsController::class, 'payment'])->name('pay');
             Route::any('callback', [PaytabsController::class, 'callback'])->name('callback');
             Route::any('response', [PaytabsController::class, 'response'])->name('response');
+        });
+
+        //TABBY
+        Route::group(['prefix' => 'tabby', 'as' => 'tabby.'], function () {
+            Route::any('pay', [TabbyPaymentController::class, 'payment'])->name('pay');
+            Route::any('callback', [TabbyPaymentController::class, 'callback'])->name('callback');
+        });
+
+        //TAMARA
+        Route::group(['prefix' => 'tamara', 'as' => 'tamara.'], function () {
+            Route::any('pay', [TamaraPaymentController::class, 'payment'])->name('pay');
+            Route::any('callback', [TamaraPaymentController::class, 'callback'])->name('callback');
         });
     });
 }

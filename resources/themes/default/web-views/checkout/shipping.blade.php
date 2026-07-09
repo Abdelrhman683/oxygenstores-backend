@@ -122,6 +122,25 @@
                                                                     <span class="text-danger">*</span>
                                                                 </label>
                                                                 <input type="tel" class="form-control" id="phone" {{ $shippingAddresses->count()==0?'required':'' }} name="phone">
+                                                                @if(!auth('customer')->check() && isset($web_config['customer_login_options']['otp_login']) && $web_config['customer_login_options']['otp_login'])
+                                                                    <div class="mt-2" id="checkout-otp-container">
+                                                                        <button type="button" class="btn btn-sm btn-outline-primary" id="btn-checkout-send-otp">
+                                                                            {{ translate('Verify Phone via OTP / Login') }}
+                                                                        </button>
+                                                                        
+                                                                        <div class="checkout-otp-verify-section d-none mt-2">
+                                                                            <div class="input-group">
+                                                                                <input type="text" class="form-control form-control-sm" id="checkout_otp_code" placeholder="{{ translate('Enter OTP') }}">
+                                                                                <div class="input-group-append">
+                                                                                    <button type="button" class="btn btn-sm btn-primary" id="btn-checkout-verify-otp">
+                                                                                        {{ translate('Verify & Login') }}
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
+                                                                            <span class="text-success fs-12 mt-1 d-block" id="checkout-otp-status-message"></span>
+                                                                        </div>
+                                                                    </div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                         @if(!auth('customer')->check())
@@ -570,6 +589,79 @@
             } else {
                 $('.is_check_create_account_password_group').fadeOut();
             }
+        });
+
+        $('#btn-checkout-send-otp').on('click', function() {
+            var phone = $('#phone').val();
+            if(!phone) {
+                toastr.error('{{ translate("Please enter phone number") }}');
+                return;
+            }
+            
+            $('#btn-checkout-send-otp').prop('disabled', true).text('{{ translate("Sending...") }}');
+            
+            $.ajax({
+                url: '{{ route("customer.auth.checkout-send-otp") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    phone: phone
+                },
+                success: function(response) {
+                    if(response.status === 'success') {
+                        toastr.success(response.message);
+                        $('.checkout-otp-verify-section').removeClass('d-none');
+                        $('#btn-checkout-send-otp').addClass('d-none');
+                        $('#checkout-otp-status-message').text('{{ translate("OTP code sent successfully to") }} ' + phone);
+                    } else {
+                        toastr.error(response.message);
+                        $('#btn-checkout-send-otp').prop('disabled', false).text('{{ translate("Verify Phone via OTP / Login") }}');
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error('{{ translate("Something went wrong, please try again") }}');
+                    $('#btn-checkout-send-otp').prop('disabled', false).text('{{ translate("Verify Phone via OTP / Login") }}');
+                }
+            });
+        });
+
+        $('#btn-checkout-verify-otp').on('click', function() {
+            var phone = $('#phone').val();
+            var code = $('#checkout_otp_code').val();
+            var name = $('#name').val();
+            var email = $('#email').val();
+            
+            if(!code) {
+                toastr.error('{{ translate("Please enter OTP code") }}');
+                return;
+            }
+            
+            $('#btn-checkout-verify-otp').prop('disabled', true).text('{{ translate("Verifying...") }}');
+            
+            $.ajax({
+                url: '{{ route("customer.auth.checkout-verify-otp") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    phone: phone,
+                    token: code,
+                    name: name,
+                    email: email
+                },
+                success: function(response) {
+                    if(response.status === 'success') {
+                        toastr.success(response.message);
+                        location.reload();
+                    } else {
+                        toastr.error(response.message);
+                        $('#btn-checkout-verify-otp').prop('disabled', false).text('{{ translate("Verify & Login") }}');
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error('{{ translate("Something went wrong, please try again") }}');
+                    $('#btn-checkout-verify-otp').prop('disabled', false).text('{{ translate("Verify & Login") }}');
+                }
+            });
         });
     </script>
 
