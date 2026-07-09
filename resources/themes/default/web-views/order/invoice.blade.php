@@ -1,7 +1,7 @@
 @php
     use Illuminate\Support\Facades\Session;
     $currencyCode = getCurrencyCode(type: 'default');
-    $direction = Session::get('direction') ?? 'rtl';
+    $direction = 'rtl';
     $lang = getDefaultLanguage();
     $orderTotalPriceSummary = \App\Utils\OrderManager::getOrderTotalPriceSummary(order: $order);
     $companyName = $companyName ?? getWebConfig(name: 'company_name');
@@ -9,8 +9,8 @@
     $companyPhone = $companyPhone ?? getWebConfig(name: 'company_phone');
     $shopCity = getWebConfig(name: 'shop_city') ?? '';
 @endphp
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ $direction }}"
-      style="text-align: {{ $direction === 'rtl' ? 'right' : 'left' }};"
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl"
+      style="text-align: right;"
       xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
@@ -18,7 +18,7 @@
     <meta http-equiv="Content-Type" content="text/html;"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
+       @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
 
 @font-face {
     font-family: 'PingARLT';
@@ -68,16 +68,14 @@
     font-display: swap;
 }
 
-[dir="rtl"], [dir="rtl"] body, [dir="rtl"] p, [dir="rtl"] a, [dir="rtl"] span, [dir="rtl"] button, [dir="rtl"] input, [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6, [dir="rtl"] div, [dir="rtl"] select, [dir="rtl"] textarea , [dir="rtl"] textarea {
+*, body, p, a, span, button, input, h1, h2, h3, h4, h5, h6, div, select, textarea {
     font-family: 'PingARLT', 'Cairo', 'Tajawal', sans-serif !important;
 }
-
 
         * {
             margin: 0;
             padding: 0;
             line-height: 1.5;
-            font-family: "DejaVu Sans", sans-serif;
             color: #303030;
         }
 
@@ -147,6 +145,7 @@
         .bill-card-inner-table {
             width: 100%;
             border-collapse: collapse;
+            direction: ltr !important;
         }
 
         .card-title-en {
@@ -219,6 +218,7 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            direction: ltr !important;
         }
 
         .totals-table {
@@ -267,53 +267,28 @@
     <!-- Header -->
     <table class="header-table">
         <tr>
-            @if($direction === 'rtl')
-                <td style="width: 50%; text-align: left;">
-                    <table style="width: auto; margin-right: auto; border-collapse: collapse;">
-                        <tr>
-                            <td style="padding-right: 8px; text-align: right; font-size: 9px; color: #7F8185;">تاريخ الفاتورة</td>
-                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ date('Y-m-d', strtotime($order['created_at'])) }}</td>
-                            <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Invoice Date</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-right: 8px; text-align: right; font-size: 9px; color: #7F8185;">رقم الطلب</td>
-                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ $order->id }}</td>
-                            <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Order No.</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-right: 8px; text-align: right; font-size: 9px; color: #7F8185;">طريقة الدفع</td>
-                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center; color: #FF5A36;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
-                            <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Payment</td>
-                        </tr>
-                    </table>
-                </td>
-                <td style="width: 50%; text-align: right;">
-                    <img height="45" src="https://placehold.co/180x50/png?text=OXYGEN" alt="OXYGEN Logo" style="object-fit: contain;">
-                </td>
-            @else
-                <td style="width: 50%; text-align: left;">
-                    <img height="45" src="https://placehold.co/180x50/png?text=OXYGEN" alt="OXYGEN Logo" style="object-fit: contain;">
-                </td>
-                <td style="width: 50%; text-align: right;">
-                    <table style="width: auto; margin-left: auto; border-collapse: collapse;">
-                        <tr>
-                            <td style="padding-right: 8px; text-align: left; font-size: 9px; color: #7F8185;">Invoice Date</td>
-                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ date('Y-m-d', strtotime($order['created_at'])) }}</td>
-                            <td style="padding-left: 8px; text-align: right; font-size: 9px; color: #7F8185;">تاريخ الفاتورة</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-right: 8px; text-align: left; font-size: 9px; color: #7F8185;">Order No.</td>
-                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ $order->id }}</td>
-                            <td style="padding-left: 8px; text-align: right; font-size: 9px; color: #7F8185;">رقم الطلب</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-right: 8px; text-align: left; font-size: 9px; color: #7F8185;">Payment</td>
-                            <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center; color: #FF5A36;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
-                            <td style="padding-left: 8px; text-align: right; font-size: 9px; color: #7F8185;">طريقة الدفع</td>
-                        </tr>
-                    </table>
-                </td>
-            @endif
+            <td>
+                <table>
+                    <tr>
+                        <td style="font-size: 9px; color: #7F8185;">تاريخ الفاتورة</td>
+                        <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ date('Y-m-d', strtotime($order['created_at'])) }}</td>
+                        <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Invoice Date</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 9px; color: #7F8185;">رقم الطلب</td>
+                        <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ $order->id }}</td>
+                        <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Order No.</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 9px; color: #7F8185;">طريقة الدفع</td>
+                        <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
+                        <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Paymet</td>
+                    </tr>
+                </table>
+            </td>
+            <td style="text-align: left;">
+                <img height="45" src="{{ asset('assets/front-end/img/logo.png') }}" alt="OXYGEN Logo" style="object-fit: contain;" onerror="this.src='https://placehold.co/180x50/png?text=OXYGEN'">
+            </td>
         </tr>
     </table>
 
@@ -329,10 +304,12 @@
     <!-- Bill Cards -->
     <table class="bill-cards-table">
         <tr>
+            <!-- Bill From -->
             <td class="bill-card-td">
                 <table class="bill-card-inner-table">
                     <tr>
                         <td class="card-title-en">Bill From</td>
+                        <td class="card-title-ar"></td>
                         <td class="card-title-ar">الفاتورة من</td>
                     </tr>
                     <tr><td colspan="2" style="height: 6px;"></td></tr>
@@ -345,7 +322,7 @@
                                 {{ $companyName }}
                             @endif
                         </td>
-                        <td class="card-label-ar">الاسم</td>
+                        <td class="card-label-ar">اسم</td>
                     </tr>
                     <tr class="card-row">
                         <td class="card-label-en">Address</td>
@@ -357,6 +334,11 @@
                             @endif
                         </td>
                         <td class="card-label-ar">العنوان</td>
+                    </tr>
+                    <tr class="card-row">
+                        <td class="card-label-en">Governorate</td>
+                        <td class="card-value">{{ $shopCity }}</td>
+                        <td class="card-label-ar">المحافظة</td>
                     </tr>
                     <tr class="card-row">
                         <td class="card-label-en">VAT No.</td>
@@ -385,12 +367,14 @@
 
             <td style="width: 4%;"></td>
 
+            <!-- Bill To -->
             @php($billingAddress = $order->billing_address_data)
             @php($shippingAddress = $order->shipping_address_data)
             <td class="bill-card-td">
                 <table class="bill-card-inner-table">
                     <tr>
                         <td class="card-title-en">Bill To</td>
+                        <td class="card-title-ar"></td>
                         <td class="card-title-ar">الفاتورة إلى</td>
                     </tr>
                     <tr><td colspan="2" style="height: 6px;"></td></tr>
@@ -405,7 +389,7 @@
                                 {{ $order->customer != null ? $order->customer['f_name'].' '.$order->customer['l_name'] : translate('guest_User') }}
                             @endif
                         </td>
-                        <td class="card-label-ar">الاسم</td>
+                        <td class="card-label-ar">اسم</td>
                     </tr>
                     <tr class="card-row">
                         <td class="card-label-en">Address</td>
@@ -434,6 +418,13 @@
                         <td class="card-label-ar">المحافظة</td>
                     </tr>
                     <tr class="card-row">
+                        <td class="card-label-en">Email</td>
+                        <td class="card-value">
+                            {{ $order->customer != null ? $order->customer['email'] : translate('email_not_found') }}
+                        </td>
+                        <td class="card-label-ar">البريد الإلكتروني</td>
+                    </tr>
+                    <tr class="card-row">
                         <td class="card-label-en">Phone</td>
                         <td class="card-value">
                             @if(!empty((array)$billingAddress))
@@ -444,75 +435,41 @@
                                 {{ $order->customer != null ? $order->customer['phone'] : translate('phone_not_found') }}
                             @endif
                         </td>
-                        <td class="card-label-ar">الهاتف</td>
-                    </tr>
-                    <tr class="card-row">
-                        <td class="card-label-en">Email</td>
-                        <td class="card-value">
-                            {{ $order->customer != null ? $order->customer['email'] : translate('email_not_found') }}
-                        </td>
-                        <td class="card-label-ar">البريد الإلكتروني</td>
+                        <td class="card-label-ar">رقم الهاتف</td>
                     </tr>
                 </table>
             </td>
         </tr>
     </table>
 
-    <!-- Products Table -->
+    <!-- Products Table - RTL fixed: Product Name (right) → Qty → Price Excl TAX → TAX Rate → TAX Price → Price Incl TAX (left) -->
     <table class="product-table">
         <thead>
         <tr>
-            @if($direction === 'rtl')
-                <th style="text-align: right; width: 42%;">
-                    <div>Product Name</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">إسم المنتج</div>
-                </th>
-                <th style="text-align: center; width: 8%;">
-                    <div>Qty</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">الكمية</div>
-                </th>
-                <th style="text-align: center; width: 14%;">
-                    <div>Price Excl TAX</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر بدون ضريبة</div>
-                </th>
-                <th style="text-align: center; width: 10%;">
-                    <div>TAX Rate</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">نسبة الضريبة</div>
-                </th>
-                <th style="text-align: center; width: 12%;">
-                    <div>TAX Price</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">سعر الضريبة</div>
-                </th>
-                <th style="text-align: left; width: 14%;">
-                    <div>Price Incl TAX</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر شامل الضريبة</div>
-                </th>
-            @else
-                <th style="text-align: left; width: 14%;">
-                    <div>Price Incl TAX</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر شامل الضريبة</div>
-                </th>
-                <th style="text-align: center; width: 12%;">
-                    <div>TAX Price</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">سعر الضريبة</div>
-                </th>
-                <th style="text-align: center; width: 10%;">
-                    <div>TAX Rate</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">نسبة الضريبة</div>
-                </th>
-                <th style="text-align: center; width: 14%;">
-                    <div>Price Excl TAX</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر بدون ضريبة</div>
-                </th>
-                <th style="text-align: center; width: 8%;">
-                    <div>Qty</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">الكمية</div>
-                </th>
-                <th style="text-align: right; width: 42%;">
-                    <div>Product Name</div>
-                    <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">إسم المنتج</div>
-                </th>
-            @endif
+            <th style="text-align: right; width: 40%;">
+                <div>Product Name</div>
+                <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">إسم المنتج</div>
+            </th>
+            <th style="text-align: center; width: 8%;">
+                <div>Quantity</div>
+                <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">الكمية</div>
+            </th>
+            <th style="text-align: center; width: 14%;">
+                <div>Price Excl TAX</div>
+                <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر بدون ضريبة</div>
+            </th>
+            <th style="text-align: center; width: 10%;">
+                <div>TAX Rate</div>
+                <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">نسبة الضريبة</div>
+            </th>
+            <th style="text-align: center; width: 12%;">
+                <div>TAX Price</div>
+                <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">سعر الضريبة</div>
+            </th>
+            <th style="text-align: left; width: 16%;">
+                <div>Price Incl TAX</div>
+                <div style="font-size: 7px; font-weight: normal; margin-top: 1px;">السعر شامل الضريبة</div>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -520,140 +477,74 @@
             @php($productDetails = $details?->product ?? json_decode($details->product_details))
             @php($tax_rate = $productDetails->tax ?? 15)
             <tr>
-                @if($direction === 'rtl')
-                    <td style="text-align: right;">
-                        <span style="font-weight: bold;">{{ $productDetails->name }}</span>
-                        @if($details['variant'])
-                            <div style="font-size: 8px; color: #7F8185; margin-top: 2px;">{{ translate('variation') }} : {{ $details['variant'] }}</div>
-                        @endif
-                        @if(isset($productDetails->code) && $productDetails->code)
-                            <div style="font-size: 8px; color: #7F8185; margin-top: 1px;">{{ translate('product_code') }}: {{ $productDetails->code }}</div>
-                        @endif
-                    </td>
-                    <td style="text-align: center;">{{ $details->qty }}</td>
-                    <td style="text-align: center;">{{ webCurrencyConverter(amount: ($details['price'] / (1 + ($tax_rate / 100))) * $details['qty']) }}</td>
-                    <td style="text-align: center;">%{{ $tax_rate }}</td>
-                    <td style="text-align: center;">{{ webCurrencyConverter(amount: $details['tax']) }}</td>
-                    <td style="text-align: left; font-weight: bold;">{{ webCurrencyConverter(amount: $details['price'] * $details['qty']) }}</td>
-                @else
-                    <td style="text-align: left; font-weight: bold;">{{ webCurrencyConverter(amount: $details['price'] * $details['qty']) }}</td>
-                    <td style="text-align: center;">{{ webCurrencyConverter(amount: $details['tax']) }}</td>
-                    <td style="text-align: center;">%{{ $tax_rate }}</td>
-                    <td style="text-align: center;">{{ webCurrencyConverter(amount: ($details['price'] / (1 + ($tax_rate / 100))) * $details['qty']) }}</td>
-                    <td style="text-align: center;">{{ $details->qty }}</td>
-                    <td style="text-align: right;">
-                        <span style="font-weight: bold;">{{ $productDetails->name }}</span>
-                        @if($details['variant'])
-                            <div style="font-size: 8px; color: #7F8185; margin-top: 2px;">{{ translate('variation') }} : {{ $details['variant'] }}</div>
-                        @endif
-                        @if(isset($productDetails->code) && $productDetails->code)
-                            <div style="font-size: 8px; color: #7F8185; margin-top: 1px;">{{ translate('product_code') }}: {{ $productDetails->code }}</div>
-                        @endif
-                    </td>
-                @endif
+                <td style="text-align: right;">
+                    <span style="font-weight: bold;">{{ $productDetails->name }}</span>
+                    @if($details['variant'])
+                        <div style="font-size: 8px; color: #7F8185; margin-top: 2px;">{{ translate('variation') }} : {{ $details['variant'] }}</div>
+                    @endif
+                    @if(isset($productDetails->code) && $productDetails->code)
+                        <div style="font-size: 8px; color: #7F8185; margin-top: 1px;">{{ translate('product_code') }}: {{ $productDetails->code }}</div>
+                    @endif
+                </td>
+                <td style="text-align: center;">{{ $details->qty }}</td>
+                <td style="text-align: center;">{{ webCurrencyConverter(amount: ($details['price'] / (1 + ($tax_rate / 100))) * $details['qty']) }}</td>
+                <td style="text-align: center;">%{{ $tax_rate }}</td>
+                <td style="text-align: center;">{{ webCurrencyConverter(amount: $details['tax']) }}</td>
+                <td style="text-align: left; font-weight: bold;">{{ webCurrencyConverter(amount: $details['price'] * $details['qty']) }}</td>
             </tr>
         @endforeach
         </tbody>
     </table>
 
-    <!-- Totals + QR -->
+    <!-- Totals + QR — RTL: totals on left side, QR on right side -->
     <table class="bottom-table">
         <tr>
-            @if($direction === 'rtl')
-                <td style="width: 40%; text-align: left; vertical-align: middle;">
-                    <div style="display: inline-block; border: 1px solid #EAEAEA; padding: 6px; border-radius: 6px;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(url('/account-order/details/'.$order->id)) }}" style="width: 80px; height: 80px; display: block;" alt="QR Code"/>
-                    </div>
-                </td>
-                <td style="width: 60%; vertical-align: top;">
-                    <table class="totals-table">
+            <td style="width: 60%; vertical-align: top;">
+                <table class="totals-table">
+                    <tr class="totals-row">
+                        <td class="totals-label-en">Subtotal</td>
+                        <td class="totals-value">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['itemPrice']) }}</td>
+                        <td class="totals-label-ar">المجموع</td>
+                    </tr>
+                    @php($total_discount = $orderTotalPriceSummary['extraDiscount'] + $orderTotalPriceSummary['couponDiscount'] + $orderTotalPriceSummary['referAndEarnDiscount'] + $orderTotalPriceSummary['itemDiscount'])
+                    @if($total_discount > 0)
                         <tr class="totals-row">
-                            <td class="totals-label-en">Subtotal</td>
-                            <td class="totals-value">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['itemPrice']) }}</td>
-                            <td class="totals-label-ar">المجموع</td>
+                            <td class="totals-label-en">Discount</td>
+                            <td class="totals-value" style="color: #FF5A36;">-{{ webCurrencyConverter(amount: $total_discount) }}</td>
+                            <td class="totals-label-ar">خصم</td>
                         </tr>
-                        @php($total_discount = $orderTotalPriceSummary['extraDiscount'] + $orderTotalPriceSummary['couponDiscount'] + $orderTotalPriceSummary['referAndEarnDiscount'] + $orderTotalPriceSummary['itemDiscount'])
-                        @if($total_discount > 0)
-                            <tr class="totals-row">
-                                <td class="totals-label-en">Discount</td>
-                                <td class="totals-value" style="color: #FF5A36;">-{{ webCurrencyConverter(amount: $total_discount) }}</td>
-                                <td class="totals-label-ar">خصم</td>
-                            </tr>
-                        @endif
-                        <tr class="totals-row">
-                            <td class="totals-label-en">Shipping</td>
-                            <td class="totals-value">
-                                @if($order?->is_shipping_free == 1)
-                                    شحن مجاني
-                                @else
-                                    {{ webCurrencyConverter(amount: $orderTotalPriceSummary['shippingTotal']) }}
-                                @endif
-                            </td>
-                            <td class="totals-label-ar">الشحن</td>
-                        </tr>
-                        <tr class="totals-row">
-                            <td class="totals-label-en">Payment</td>
-                            <td class="totals-value" style="color: #FF5A36;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
-                            <td class="totals-label-ar">وسيلة الدفع</td>
-                        </tr>
-                        <tr class="totals-row" style="border-top: 1px solid #D7DAE0;">
-                            <td class="totals-label-en" style="font-weight: bold; padding-top: 8px;">Total</td>
-                            <td class="totals-value" style="font-size: 11px; padding-top: 8px;">
-                                <div>{{ webCurrencyConverter(amount: $orderTotalPriceSummary['totalAmount']) }}</div>
-                                <div style="font-size: 8px; font-weight: normal; color: #7F8185; margin-top: 2px;">(يتضمن {{ webCurrencyConverter(amount: $orderTotalPriceSummary['taxTotal']) }} ضريبة القيمة المضافة)</div>
-                            </td>
-                            <td class="totals-label-ar" style="font-weight: bold; padding-top: 8px;">الإجمالي</td>
-                        </tr>
-                    </table>
-                </td>
-            @else
-                <td style="width: 60%; vertical-align: top;">
-                    <table class="totals-table">
-                        <tr class="totals-row">
-                            <td class="totals-label-en">Subtotal</td>
-                            <td class="totals-value">{{ webCurrencyConverter(amount: $orderTotalPriceSummary['itemPrice']) }}</td>
-                            <td class="totals-label-ar">المجموع</td>
-                        </tr>
-                        @php($total_discount = $orderTotalPriceSummary['extraDiscount'] + $orderTotalPriceSummary['couponDiscount'] + $orderTotalPriceSummary['referAndEarnDiscount'] + $orderTotalPriceSummary['itemDiscount'])
-                        @if($total_discount > 0)
-                            <tr class="totals-row">
-                                <td class="totals-label-en">Discount</td>
-                                <td class="totals-value" style="color: #FF5A36;">-{{ webCurrencyConverter(amount: $total_discount) }}</td>
-                                <td class="totals-label-ar">خصم</td>
-                            </tr>
-                        @endif
-                        <tr class="totals-row">
-                            <td class="totals-label-en">Shipping</td>
-                            <td class="totals-value">
-                                @if($order?->is_shipping_free == 1)
-                                    Free
-                                @else
-                                    {{ webCurrencyConverter(amount: $orderTotalPriceSummary['shippingTotal']) }}
-                                @endif
-                            </td>
-                            <td class="totals-label-ar">الشحن</td>
-                        </tr>
-                        <tr class="totals-row">
-                            <td class="totals-label-en">Payment</td>
-                            <td class="totals-value" style="color: #FF5A36;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
-                            <td class="totals-label-ar">وسيلة الدفع</td>
-                        </tr>
-                        <tr class="totals-row" style="border-top: 1px solid #D7DAE0;">
-                            <td class="totals-label-en" style="font-weight: bold; padding-top: 8px;">Total</td>
-                            <td class="totals-value" style="font-size: 11px; padding-top: 8px;">
-                                <div>{{ webCurrencyConverter(amount: $orderTotalPriceSummary['totalAmount']) }}</div>
-                                <div style="font-size: 8px; font-weight: normal; color: #7F8185; margin-top: 2px;">(Incl. {{ webCurrencyConverter(amount: $orderTotalPriceSummary['taxTotal']) }} VAT)</div>
-                            </td>
-                            <td class="totals-label-ar" style="font-weight: bold; padding-top: 8px;">الإجمالي</td>
-                        </tr>
-                    </table>
-                </td>
-                <td style="width: 40%; text-align: right; vertical-align: middle;">
-                    <div style="display: inline-block; border: 1px solid #EAEAEA; padding: 6px; border-radius: 6px;">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(url('/account-order/details/'.$order->id)) }}" style="width: 80px; height: 80px; display: block;" alt="QR Code"/>
-                    </div>
-                </td>
-            @endif
+                    @endif
+                    <tr class="totals-row">
+                        <td class="totals-label-en">Shipping</td>
+                        <td class="totals-value">
+                            @if($order?->is_shipping_free == 1)
+                                شحن مجاني
+                            @else
+                                {{ webCurrencyConverter(amount: $orderTotalPriceSummary['shippingTotal']) }}
+                            @endif
+                        </td>
+                        <td class="totals-label-ar">الشحن</td>
+                    </tr>
+                    <tr class="totals-row">
+                        <td class="totals-label-en">Payment method</td>
+                        <td class="totals-value" style="color: #FF5A36;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
+                        <td class="totals-label-ar">وسيلة الدفع</td>
+                    </tr>
+                    <tr class="totals-row" style="border-top: 1px solid #D7DAE0;">
+                        <td class="totals-label-en" style="font-weight: bold; padding-top: 8px;">Total</td>
+                        <td class="totals-value" style="font-size: 11px; padding-top: 8px;">
+                            <div>{{ webCurrencyConverter(amount: $orderTotalPriceSummary['totalAmount']) }}</div>
+                            <div style="font-size: 8px; font-weight: normal; color: #7F8185; margin-top: 2px;">(يتضمن {{ webCurrencyConverter(amount: $orderTotalPriceSummary['taxTotal']) }} ضريبة القيمة المضافة)</div>
+                        </td>
+                        <td class="totals-label-ar" style="font-weight: bold; padding-top: 8px;">الإجمالي</td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 40%; text-align: right; vertical-align: middle;">
+                <div style="display: inline-block; border: 1px solid #EAEAEA; padding: 6px; border-radius: 6px;">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(url('/account-order/details/'.$order->id)) }}" style="width: 80px; height: 80px; display: block;" alt="QR Code"/>
+                </div>
+            </td>
         </tr>
     </table>
 
