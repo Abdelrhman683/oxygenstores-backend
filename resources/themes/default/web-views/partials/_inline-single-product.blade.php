@@ -1,4 +1,6 @@
-@php($overallRating = getOverallRating($product?->reviews))
+@php
+    $overallRating = getOverallRating($product?->reviews);
+@endphp
 
 <div class="product-single-hover style--card h-100">
     <div class="overflow-hidden position-relative">

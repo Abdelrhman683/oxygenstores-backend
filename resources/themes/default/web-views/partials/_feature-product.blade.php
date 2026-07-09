@@ -1,5 +1,7 @@
 @if(isset($product))
-    @php($overallRating = getOverallRating($product?->reviews))
+    @php
+        $overallRating = getOverallRating($product?->reviews);
+    @endphp
     <div class="product-single-hover shadow-none rtl">
         @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
             <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">

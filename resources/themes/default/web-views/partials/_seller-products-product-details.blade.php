@@ -1,5 +1,7 @@
 @if(isset($product))
-@php($overallRating = getOverallRating($product?->reviews))
+@php
+    $overallRating = getOverallRating($product?->reviews);
+@endphp
 <div class="flash_deal_product rtl cursor-pointer mb-2 get-view-by-onclick"
     data-link="{{ route('product',$product->slug) }}">
     @if($product->discount > 0)

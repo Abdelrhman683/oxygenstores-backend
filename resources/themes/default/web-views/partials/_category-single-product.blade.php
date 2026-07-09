@@ -1,6 +1,8 @@
 @if(isset($product))
-    @php($overallRating = getOverallRating($product?->reviews))
-    @php($wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $product->id)->count() : (session()->has('wish_list') && in_array($product->id, session('wish_list')) ? 1 : 0))
+    @php
+        $overallRating = getOverallRating($product?->reviews);
+        $wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $product->id)->count() : (session()->has('wish_list') && in_array($product->id, session('wish_list')) ? 1 : 0);
+    @endphp
 
     <div class="premium-card h-100">
         <div class="premium-product-media">
