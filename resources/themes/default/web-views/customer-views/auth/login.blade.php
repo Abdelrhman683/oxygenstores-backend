@@ -243,40 +243,47 @@
                     <h1 class="login-title">تسجيل الدخول</h1>
                     <p class="login-subtitle">مرحبا بعودتك! سجل الدخول إلى حسابك.</p>
 
-                    <form autocomplete="off" class="login-form mt-4" action="{{ route('customer.auth.login') }}" method="post" id="customer-login-form">
+                    <form autocomplete="off" class="login-form mt-4 customer-centralize-login-form" action="{{ route('customer.auth.login') }}" method="post" id="customer-login-form">
                         @csrf
                         <input type="hidden" name="keep_customer_login_redirect_url" value="{{ $keepCustomerLoginRedirectUrl ?? old('keep_customer_login_redirect_url', url()->previous()) }}">
-                        <input type="hidden" name="login_type" value="manual-login">
+                        <input type="hidden" name="login_type" class="auth-login-type-input" value="manual-login">
 
-                         <div class="form-group mb-3">
-                             <label class="form-label">إسم المستخدم او البريد الإلكتروني او رقم الهاتف *</label>
-                             <input class="form-control" type="text" name="user_identity" value="{{ old('user_identity') }}" placeholder="+966*********" required>
-                         </div>
+                        <div class="manual-login-items">
+                             <div class="form-group mb-3">
+                                 <label class="form-label">إسم المستخدم او البريد الإلكتروني او رقم الهاتف *</label>
+                                 <input class="form-control auth-email-input" type="text" name="user_identity" value="{{ old('user_identity') }}" placeholder="+966*********" required>
+                             </div>
 
-                        <!-- <div class="custom-control custom-checkbox mb-2">
-                            <input type="checkbox" class="custom-control-input" id="use-password" checked>
-                            <label class="custom-control-label" for="use-password">إستعمال كلمة المرور</label>
-                        </div> -->
+                            <div class="form-group mb-3 password-toggle" style="display: block;">
+                                <input class="form-control auth-password-input" name="password" type="password" id="si-password" placeholder="كلمة المرور" required>
+                            </div>
 
-                        <div class="form-group mb-3 password-toggle" style="display: block;">
-                            <input class="form-control" name="password" type="password" id="si-password" placeholder="كلمة المرور" required>
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="d-flex align-items-center" style="gap: 8px;">
+                                    <input type="checkbox" name="remember" id="remember-me" {{ old('remember') ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--web-primary); cursor: pointer;">
+                                    <label class="m-0" for="remember-me" style="cursor: pointer; color: var(--web-primary);">تذكرني</label>
+                                </div>
+                                <a class="forgot-password-link" href="{{ route('customer.auth.recover-password') }}">فقدت كلمة المرور الخاصة بك؟</a>
+                            </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="d-flex align-items-center" style="gap: 8px;">
-                                <input type="checkbox" name="remember" id="remember-me" {{ old('remember') ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--web-primary); cursor: pointer;">
-                                <label class="m-0" for="remember-me" style="cursor: pointer; color: var(--web-primary);">تذكرني</label>
-                            </div>
-                            <a class="forgot-password-link" href="{{ route('customer.auth.recover-password') }}">فقدت كلمة المرور الخاصة بك؟</a>
+                        <div class="otp-login-items d-none mb-4">
+                            @include('web-views.customer-views.auth.partials._phone')
                         </div>
 
                         @include('web-views.customer-views.auth.partials._recaptcha')
 
-                        <button class="btn btn-primary btn-login" type="submit">تسجيل الدخول</button>
+                        <div class="manual-login-items">
+                            <button class="btn btn-primary btn-login" type="submit">تسجيل الدخول</button>
+                        </div>
+
+                        <div class="otp-login-items d-none">
+                            <button class="btn btn-primary btn-login" type="submit">{{ translate('Get_OTP') }}</button>
+                        </div>
 
                         <a href="{{ route('customer.auth.sign-up') }}" class="signup-link">ليس لديك حساب ؟ <span>انشاء حساب</span></a>
 
-                        @if ($customerSocialLogin || ($customerOTPLogin && $customerManualLogin))
+                        @if (($customerSocialLogin && $web_config['social_login_text']) || ($customerOTPLogin && $customerManualLogin))
                             <div class="or-divider my-4">
                                 <span>{{ translate('Or_Sign_in_with') }}</span>
                             </div>
@@ -295,6 +302,9 @@
                                 @if ($customerOTPLogin && $customerManualLogin)
                                     <a class="social-login-item otp-login-btn" href="javascript:">
                                         <img width="24" src="{{ theme_asset(path: 'public/assets/front-end/img/icons/otp-login-icon.svg') }}" alt="">
+                                    </a>
+                                    <a class="social-login-item manual-login-btn d-none" href="javascript:">
+                                        <i class="fa fa-user" style="font-size: 20px; color: var(--web-primary); display: flex; align-items: center; justify-content: center; height: 100%;"></i>
                                     </a>
                                 @endif
                             </div>

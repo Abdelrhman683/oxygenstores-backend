@@ -183,24 +183,14 @@
                                                                 <input type="text" class="form-control" name="city" id="city" {{$shippingAddresses->count()==0?'required':''}}>
                                                             </div>
                                                         </div>
-                                                        <div class="col-6">
-                                                            <div class="form-group">
-                                                                <label>{{ translate('zip_code')}}
-                                                                    <span class="text-danger">*</span></label>
-                                                                @if($zip_restrict_status == 1)
-                                                                    <select name="zip" class="form-control selectpicker" data-live-search="true" id="select2-zip-container" required>
-                                                                        @forelse($zip_codes as $code)
-                                                                            <option value="{{ $code->zipcode }}">{{ $code->zipcode }}</option>
-                                                                        @empty
-                                                                            <option value="">{{ translate('no_zip_to_deliver') }}</option>
-                                                                        @endforelse
-                                                                    </select>
-                                                                @else
-                                                                    <input type="text" class="form-control"
-                                                                           name="zip" id="zip" {{$shippingAddresses->count()==0?'required':''}}>
-                                                                @endif
-                                                            </div>
-                                                        </div>
+                                                        <div class="col-6" style="display: none !important;">
+                                                             <div class="form-group">
+                                                                 <label>{{ translate('zip_code')}}
+                                                                     <span class="text-danger">*</span></label>
+                                                                 <input type="text" class="form-control"
+                                                                        name="zip" id="zip" value="11111" required>
+                                                             </div>
+                                                         </div>
                                                         <div class="col-12">
                                                             <div class="form-group mb-1">
                                                                 <label>{{ translate('address')}}<span class="text-danger">*</span></label>
@@ -407,22 +397,14 @@
                                                                            name="billing_city" {{$billingAddresses->count()==0?'required':''}}>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-6">
-                                                                <div class="form-group">
-                                                                    <label>{{ translate('zip_code')}}
-                                                                        <span class="text-danger">*</span></label>
-                                                                    @if($zip_restrict_status)
-                                                                        <select name="billing_zip" class="form-control selectpicker" data-live-search="true" id="billing_zip">
-                                                                            @foreach($zip_codes as $code)
-                                                                                <option value="{{ $code->zipcode }}">{{ $code->zipcode }}</option>
-                                                                            @endforeach
-                                                                        </select>
-                                                                    @else
-                                                                        <input type="text" class="form-control" id="billing_zip"
-                                                                               name="billing_zip" {{ $billingAddresses->count()==0 ? 'required' : '' }}>
-                                                                    @endif
-                                                                </div>
-                                                            </div>
+                                                             <div class="col-6" style="display: none !important;">
+                                                                 <div class="form-group">
+                                                                     <label>{{ translate('zip_code')}}
+                                                                         <span class="text-danger">*</span></label>
+                                                                     <input type="text" class="form-control" id="billing_zip"
+                                                                            name="billing_zip" value="11111" required>
+                                                                 </div>
+                                                             </div>
                                                         </div>
 
                                                         <div class="form-group mb-1">

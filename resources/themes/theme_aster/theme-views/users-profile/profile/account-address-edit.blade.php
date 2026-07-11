@@ -92,22 +92,11 @@
                                                        placeholder="{{ translate('Ex') }}: {{ translate('Dhaka') }}">
                                             </div>
 
-                                            <div class="form-group">
-                                                <label class="text-capitalize"
-                                                       for="zip-code">{{translate('zip_code')}}</label>
-                                                @if($zip_restrict_status)
-                                                    <select name="zip" class="form-control select2 select-picker"
-                                                            data-live-search="true" id="" required>
-                                                        @foreach($delivery_zipcodes as $zip)
-                                                            <option
-                                                                value="{{ $zip->zipcode }}" {{ $zip->zipcode == $shippingAddress->zip? 'selected' : ''}}>{{ $zip->zipcode }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                @else
-                                                    <input class="form-control" type="text" id="zip_code" name="zip"
-                                                           value="{{ $shippingAddress->zip }}" required  placeholder="{{ translate('Ex') }}: {{ '1216' }}">
-                                                @endif
-                                            </div>
+                                            <div class="form-group" style="display: none !important;">
+                                                 <label class="text-capitalize"
+                                                        for="zip-code">{{translate('zip_code')}}</label>
+                                                 <input class="form-control" type="text" id="zip_code" name="zip" value="11111" required>
+                                             </div>
                                         </div>
                                         <div class="col-md-6 mt-5 mt-md-0">
                                             <div class="d-flex justify-content-end mb-5">

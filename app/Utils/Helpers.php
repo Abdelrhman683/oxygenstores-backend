@@ -345,7 +345,10 @@ class Helpers
 
     public static function tax_calculation($product, $price, $tax, $tax_type)
     {
-        return ($price / 100) * $tax;
+        if ($price > 0 && $tax > 0) {
+            return ($price * $tax) / (100 + $tax);
+        }
+        return 0;
     }
 
     public static function getProductDiscount($product, $price): float

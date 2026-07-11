@@ -67,5 +67,11 @@ class PageController extends Controller
         return view(VIEW_FILE_NAMES['showrooms']);
     }
 
+    public function getOurStoresView(): View
+    {
+        $robotsMetaContentData = $this->robotsMetaContentRepo->getFirstWhere(params: ['page_name' => 'default']);
+        return view(VIEW_FILE_NAMES['our_stores'], compact('robotsMetaContentData'));
+    }
+
 }
 

@@ -64,6 +64,9 @@
             color: {{ $web_config['primary_color'] }} !important;
             --bs-btn-border-color: {{ $web_config['primary_color'] }} !important;
         }
+        .default-captcha-container, .generate-firebase-auth-recaptcha, .dynamic-default-and-recaptcha-section {
+            display: none !important;
+        }
     </style>
 
     {!! getSystemDynamicPartials(type: 'analytics_script') !!}

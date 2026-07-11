@@ -89,6 +89,9 @@
             display: none;
             /* Hide the tooltip */
         }
+        .default-captcha-container, .generate-firebase-auth-recaptcha, .dynamic-default-and-recaptcha-section {
+            display: none !important;
+        }
     </style>
 
     <link rel="stylesheet" href="{{theme_asset(path: 'public/assets/front-end/css/custom.css')}}">

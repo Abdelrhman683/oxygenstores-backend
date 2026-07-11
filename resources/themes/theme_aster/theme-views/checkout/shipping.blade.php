@@ -221,29 +221,14 @@
                                                                        class="form-control" {{$shipping_addresses->count()==0?'required':''}}>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6">
-                                                            <div class="form-group mb-4">
-                                                                <label for="city"
-                                                                       class="text-capitalize">{{ translate('zip_code') }} <span class="text-danger">*</span></label>
-                                                                @if($zip_restrict_status == 1)
-                                                                    <select name="zip" id="zip"
-                                                                            class="form-control select2 select_picker"
-                                                                            data-live-search="true" required>
-                                                                        @forelse($zip_codes as $code)
-                                                                            <option
-                                                                                value="{{ $code->zipcode }}">{{ $code->zipcode }}</option>
-                                                                        @empty
-                                                                            <option
-                                                                                value="">{{ translate('no_zip_to_deliver') }}</option>
-                                                                        @endforelse
-                                                                    </select>
-                                                                @else
-                                                                    <input type="text" class="form-control" id="zip"
-                                                                           name="zip"
-                                                                           placeholder="{{ translate('ex') }}: {{translate('1216')}}" {{$shipping_addresses->count()==0?'required':''}}>
-                                                                @endif
-                                                            </div>
-                                                        </div>
+                                                         <div class="col-sm-6" style="display: none !important;">
+                                                             <div class="form-group mb-4">
+                                                                 <label for="zip"
+                                                                        class="text-capitalize">{{ translate('zip_code') }} <span class="text-danger">*</span></label>
+                                                                 <input type="text" class="form-control" id="zip"
+                                                                        name="zip" value="11111" required>
+                                                             </div>
+                                                         </div>
                                                         <div class="col-sm-12">
                                                             <div class="form-group mb-4">
                                                                 <div class="d-flex gap-2 align-items-center justify-content-between mb-2">
@@ -568,29 +553,14 @@
                                                                        class="form-control" {{$billing_addresses->count()==0?'required':''}}>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6">
-                                                            <div class="form-group mb-4">
-                                                                <label
-                                                                    for="billing-zip">{{ translate('Zip_Code') }} <span class="text-danger">*</span></label>
-                                                                @if($zip_restrict_status == 1)
-                                                                    <select name="billing_zip" id="billing-zip"
-                                                                            class="form-control select2 select_picker"
-                                                                            data-live-search="true" required>
-                                                                        @forelse($zip_codes as $code)
-                                                                            <option
-                                                                                value="{{ $code->zipcode }}">{{ $code->zipcode }}</option>
-                                                                        @empty
-                                                                            <option
-                                                                                value="">{{ translate('no_zip_to_deliver') }}</option>
-                                                                        @endforelse
-                                                                    </select>
-                                                                @else
-                                                                    <input type="text" class="form-control"
-                                                                        id="billing-zip" name="billing_zip"
-                                                                        placeholder="{{ translate('ex') }}: {{translate('1216')}}" {{$billing_addresses->count()==0?'required':''}}>
-                                                                @endif
-                                                            </div>
-                                                        </div>
+                                                         <div class="col-sm-6" style="display: none !important;">
+                                                             <div class="form-group mb-4">
+                                                                 <label
+                                                                     for="billing-zip">{{ translate('Zip_Code') }} <span class="text-danger">*</span></label>
+                                                                 <input type="text" class="form-control"
+                                                                     id="billing-zip" name="billing_zip" value="11111" required>
+                                                             </div>
+                                                         </div>
                                                         <div class="col-sm-12">
                                                             <div class="form-group mb-4">
                                                                 <div class="d-flex gap-2 align-items-center justify-content-between mb-2">
