@@ -2198,5 +2198,116 @@ function initCartDropdown() {
 
 $(document).ready(function () {
     initCartDropdown();
+
+    $(document).on("mouseenter click focus", ".otp-form", function() {
+        if (!$(this).data('events-cleared')) {
+            $(this).find(".otp-field").off("input keyup keydown paste");
+            $(this).data('events-cleared', true);
+        }
+    });
+
+    $(document).on("click focus", ".otp-form .otp-field", function (e) {
+        let otp_fields = $(this).closest(".otp-form").find(".otp-field");
+        let emptyIndex = -1;
+        otp_fields.each(function (index) {
+            if ($(this).val() === "") {
+                emptyIndex = index;
+                return false;
+            }
+        });
+
+        let currentIndex = otp_fields.index(this);
+
+        if (emptyIndex !== -1 && currentIndex > emptyIndex) {
+            otp_fields.eq(emptyIndex).focus();
+        } else {
+            $(this).select();
+        }
+    });
+
+    $(document).on("input", ".otp-form .otp-field", function (e) {
+        let otp_fields = $(this).closest(".otp-form").find(".otp-field");
+        let otp_value_field = $(this).closest(".otp-form").find(".otp-value");
+        let opt_value = "";
+        
+        let val = $(this).val();
+        $(this).val(val.replace(/[^0-9]/g, ""));
+        
+        $(this).toggleClass("filled", $(this).val() !== "");
+        
+        otp_fields.each(function () {
+            let field_value = $(this).val();
+            if (field_value != "") opt_value += field_value;
+        });
+        otp_value_field.val(opt_value);
+        
+        if ($(this).val() !== "") {
+            $(this).next('.otp-field').focus();
+        }
+    });
+
+    $(document).on("keydown", ".otp-form .otp-field", function (e) {
+        let key = e.keyCode || e.charCode;
+        let isRTL = $("html").attr("dir") === "rtl" || $("body").css("direction") === "rtl";
+        
+        if (key == 8) { // Backspace
+            if ($(this).val() === "") {
+                let prev = $(this).prev('.otp-field');
+                prev.focus().val('').removeClass("filled");
+                prev.nextAll('.otp-field').val('').removeClass("filled");
+                prev.trigger('input');
+            } else {
+                $(this).val('').removeClass("filled");
+                $(this).nextAll('.otp-field').val('').removeClass("filled");
+                $(this).trigger('input');
+            }
+            e.preventDefault();
+        } 
+        else if (key == 37) { // Left arrow
+            if (isRTL) {
+                $(this).next('.otp-field').focus();
+            } else {
+                $(this).prev('.otp-field').focus();
+            }
+            e.preventDefault();
+        }
+        else if (key == 39) { // Right arrow
+            if (isRTL) {
+                $(this).prev('.otp-field').focus();
+            } else {
+                $(this).next('.otp-field').focus();
+            }
+            e.preventDefault();
+        }
+        else if (key == 46 || key == 40 || key == 38) { // Delete, down, up
+            e.preventDefault();
+        }
+    });
+
+    $(document).on("paste", ".otp-form .otp-field", function (e) {
+        let otp_fields = $(this).closest(".otp-form").find(".otp-field");
+        let paste_data = e.originalEvent.clipboardData.getData("text");
+        let paste_data_splitted = paste_data.replace(/[^0-9]/g, "").split("");
+        
+        $.each(paste_data_splitted, function (index, value) {
+            let field = otp_fields.eq(index);
+            field.val(value).addClass("filled");
+        });
+        otp_fields.trigger("input");
+        
+        let emptyIndex = -1;
+        otp_fields.each(function (index) {
+            if ($(this).val() === "") {
+                emptyIndex = index;
+                return false;
+            }
+        });
+        if(emptyIndex !== -1) {
+            otp_fields.eq(emptyIndex).focus();
+        } else {
+            otp_fields.last().focus();
+        }
+        e.preventDefault();
+    });
 });
 

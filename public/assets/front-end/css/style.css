@@ -8342,6 +8342,8 @@ span.badge-accent:hover {
     border-bottom: 0.0625rem solid #1455ac;
     text-align: center;
     background-color: transparent;
+    opacity: 0.5;
+    transition: all 0.3s ease;
 }
 
 @media (min-width: 768px) {
@@ -8357,8 +8359,15 @@ span.badge-accent:hover {
 }
 
 .otp-form .otp-field:focus {
+    border-color: var(--web-primary) !important;
+    opacity: 1;
+}
+
+.otp-form .otp-field.filled {
+    opacity: 1;
     border-color: #262d34;
 }
+
 .forget-password-otp .otp-field {
     width: 0 !important;
     height: 48px;
