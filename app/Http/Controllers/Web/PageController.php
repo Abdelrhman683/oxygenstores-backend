@@ -62,4 +62,10 @@ class PageController extends Controller
         return view(VIEW_FILE_NAMES['faq'], compact('helps', 'pageTitleBanner', 'robotsMetaContentData'));
     }
 
+    public function getShowroomsView(): View
+    {
+        return view(VIEW_FILE_NAMES['showrooms']);
+    }
+
 }
+

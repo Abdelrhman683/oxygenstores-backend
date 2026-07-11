@@ -53,6 +53,7 @@ return [
     'shop_view_page' => 'theme-views.seller-views.shopview',
     'faq' => 'theme-views.pages.help-topics',
     'business_page' => 'theme-views.pages.business_page',
+    'showrooms' => 'theme-views.pages.showrooms',
     'recover_password' => 'theme-views.customer-views.auth.recover-password',
     'otp_verification' => 'theme-views.customer-views.auth.verify-otp',
     'reset_password' => 'theme-views.customer-views.auth.reset-password',

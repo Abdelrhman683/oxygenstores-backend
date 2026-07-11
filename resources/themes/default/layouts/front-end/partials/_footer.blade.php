@@ -212,7 +212,7 @@
                             </li>
                             <li class="d-flex align-items-center gap-3 mt-3">
                                 <i class="fa fa-map-marker fs-18 text-yellow" style="font-size: 1.25rem !important;"></i>
-                                <a href="#" class="text-white text-decoration-underline fw-bold hover-yellow fs-15">يمكنك الإطلاع على معارضنا</a>
+                                <a href="{{ route('showrooms') }}" class="text-white text-decoration-underline fw-bold hover-yellow fs-15">يمكنك الإطلاع على معارضنا</a>
                             </li>
                         </ul>
                     </div>
@@ -221,7 +221,6 @@
         </div>
 
 
-        {{-- Bottom Copyright Bar with Yellow Background --}}
         <div class="py-3" style="background-color: var(--bg-yellow) !important; color: var(--bg-blue) !important; font-weight: bold; border-top: 1px solid rgba(0,0,0,0.05);">
             <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
                 <div class="fs-14 text-center text-md-start">

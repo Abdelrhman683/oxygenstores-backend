@@ -137,6 +137,7 @@ Route::group(['namespace' => 'Web', 'middleware' => ['maintenance_mode', 'guestC
         Route::get('business-page/{slug}', 'getPageView')->name('business-page.view');
         Route::get('contacts', 'getContactView')->name('contacts');
         Route::get('helpTopic', 'getHelpTopicView')->name('helpTopic');
+        Route::get('showrooms', 'getShowroomsView')->name('showrooms');
     });
 
     Route::controller(ProductDetailsController::class)->group(function () {

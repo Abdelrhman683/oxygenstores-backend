@@ -56,6 +56,7 @@ return [
     'shop_view_page' => 'web-views.seller-view.shopview',
     'faq' => 'web-views.pages.help-topics',
     'business_page' => 'web-views.pages.business_page',
+    'showrooms' => 'web-views.pages.showrooms',
     'recover_password' => 'web-views.customer-views.auth.recover-password',
     'otp_verification' => 'web-views.customer-views.auth.verify-otp',
     'reset_password' => 'web-views.customer-views.auth.reset-password',

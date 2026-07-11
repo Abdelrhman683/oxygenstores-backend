@@ -189,6 +189,10 @@
                                             <a href="{{ route('frontend.blog.index') }}">{{ translate('blogs') }}</a>
                                         </li>
                                     @endif
+                                    <li class="d-flex align-items-center gap-3 mt-1">
+                                        <i class="fa fa-map-marker fs-18 text-yellow" style="font-size: 1.25rem !important;"></i>
+                                        <a href="{{ route('showrooms') }}" class="text-white text-decoration-underline fw-bold hover-yellow fs-15">يمكنك الإطلاع على معارضنا</a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
