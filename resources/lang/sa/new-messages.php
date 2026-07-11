@@ -7015,4 +7015,5 @@ return [
 	"Pay_via_online" => "Pay via online",
 	"Proceed" => "Proceed",
 	"product_code" => "Product code",
+	"البريد_الإلكتروني_مستخدم_بالفعل" => "البريد الإلكتروني مستخدم بالفعل",
 ];

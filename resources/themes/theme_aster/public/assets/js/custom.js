@@ -2199,6 +2199,13 @@ function initCartDropdown() {
 $(document).ready(function () {
     initCartDropdown();
 
+    setTimeout(() => {
+        let firstOtp = $(".otp-form:visible .otp-field").first();
+        if (firstOtp.length) {
+            firstOtp.trigger("click");
+        }
+    }, 500);
+
     $(document).on("mouseenter click focus", ".otp-form", function() {
         if (!$(this).data('events-cleared')) {
             $(this).find(".otp-field").off("input keyup keydown paste");
