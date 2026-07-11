@@ -15,7 +15,8 @@ trait VatTaxConfiguration
             'country_code' => null,
             'tax_payer' => 'vendor',
             'is_default' => true,
-            'is_active' => 0,
+            'is_active' => 1,
+            'is_included' => true, // Always tax-inclusive: product price entered includes tax
             'created_at' => now(),
             'updated_at' => now(),
         ]);

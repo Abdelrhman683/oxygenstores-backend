@@ -73,4 +73,5 @@ return [
     'frontend_blog_details_view' => 'theme-views.blogs.details',
     'frontend_popular_blogs_view' => 'theme-views.blogs.index-popular',
     'blog_seo_meta_content_partials' => 'theme-views.partials._blogSEOMetaContentData',
+    'our_stores' => 'theme-views.pages.our_stores',
 ];

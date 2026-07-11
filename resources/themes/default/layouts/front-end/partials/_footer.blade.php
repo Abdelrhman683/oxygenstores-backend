@@ -212,7 +212,7 @@
                             </li>
                             <li class="d-flex align-items-center gap-3 mt-3">
                                 <i class="fa fa-map-marker fs-18 text-yellow" style="font-size: 1.25rem !important;"></i>
-                                <a href="#" class="text-white text-decoration-underline fw-bold hover-yellow fs-15">يمكنك الإطلاع على معارضنا</a>
+                                <a href="{{ route('our_stores') }}" class="text-white text-decoration-underline fw-bold hover-yellow fs-15">يمكنك الإطلاع على معارضنا</a>
                             </li>
                         </ul>
                     </div>

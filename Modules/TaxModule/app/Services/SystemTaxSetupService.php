@@ -14,7 +14,7 @@ class SystemTaxSetupService
         return [
             'tax_type' => $request['tax_type'] ?? 'order_wise',
             'tax_ids' => $request['tax_ids'],
-            'is_included' => $request['tax_status'] == 'include' ? 1 : 0,
+            'is_included' => 1, // Always tax-inclusive: product price entered includes tax
             'country_code' => self::getCountryType() !== 'single' ? $request['country_code'] ?? null : null,
         ];
     }

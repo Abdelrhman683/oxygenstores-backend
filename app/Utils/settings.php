@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Cache;
 if (!function_exists('getWebConfig')) {
     function getWebConfig($name): string|object|array|null
     {
+        if ($name === 'recaptcha') {
+            return [
+                'status' => 0,
+                'site_key' => '',
+                'secret_key' => '',
+            ];
+        }
         $config = null;
         if (in_array($name, getWebConfigCacheKeys()) && Cache::has($name)) {
             $config = Cache::get($name);

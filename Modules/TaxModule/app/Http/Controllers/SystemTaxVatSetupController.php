@@ -111,6 +111,7 @@ class SystemTaxVatSetupController extends Controller
             $systemTaxVat->tax_type = $request['tax_type'] ?? 'order_wise';
         }
         $systemTaxVat->is_active = !$systemTaxVat->is_active;
+        $systemTaxVat->is_included = true; // Always tax-inclusive: product price entered includes tax
         $systemTaxVat->save();
 
         if ($request->ajax()) {

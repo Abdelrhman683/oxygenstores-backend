@@ -85,22 +85,12 @@
                                             <input class="form-control" type="text" id="address-city" name="city"
                                                    required>
                                         </div>
-                                        <div class="form-group col-md-6">
+                                        <div class="form-group col-md-6" style="display: none !important;">
                                             <label for="zip">
                                                 {{translate('zip_code')}}
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            @if($zip_restrict_status)
-                                                <select name="zip" id="" class="form-control selectpicker"
-                                                        data-live-search="true">
-                                                    @foreach($zip_codes as $code)
-                                                        <option
-                                                            value="{{ $code->zipcode }}">{{ $code->zipcode }}</option>
-                                                    @endforeach
-                                                </select>
-                                            @else
-                                                <input class="form-control" type="text" id="zip" name="zip" required>
-                                            @endif
+                                            <input class="form-control" type="text" id="zip" name="zip" value="11111" required>
                                         </div>
                                     </div>
                                     <div class="form-row">
