@@ -3,8 +3,8 @@
         <div class="card-body p-0">
             <div class="row d-flex justify-content-between align-items-center mx-1 mb-3">
                 <div class="d-flex gap-1 align-items-center">
-                    <img loading="lazy"  class="size-30" src="{{theme_asset(path: "public/assets/front-end/png/best-sellings.png")}}"
-                         alt="">
+                    <!-- <img loading="lazy"  class="size-30" src="{{theme_asset(path: "public/assets/front-end/png/best-sellings.png")}}"
+                         alt=""> -->
                     <h2 class="header_section_title">{{ translate('best_sellings')}}</h2>
                 </div>
                 <div>
