@@ -13,7 +13,6 @@
             <div class="col-md-12 text-center">
                 <div class="p-5 border rounded bg-white shadow-sm">
                     <i class="fa fa-map-marker text-muted mb-3" style="font-size: 3rem;"></i>
-                    <h3 class="text-muted">{{ translate('showrooms_will_be_listed_here') ?? 'سيتم إدراج معارضنا هنا قريباً' }}</h3>
                 </div>
             </div>
         </div>

@@ -14,7 +14,6 @@
                     
                     <div class="text-center py-5">
                         <i class="bi bi-geo-alt-fill text-muted mb-3" style="font-size: 3rem;"></i>
-                        <h4 class="text-muted">{{ translate('showrooms_will_be_listed_here') ?? 'سيتم إدراج معارضنا هنا قريباً' }}</h4>
                     </div>
                 </div>
             </div>
