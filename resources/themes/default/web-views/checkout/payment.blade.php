@@ -43,12 +43,8 @@
 
 <div class="ox_checkout_payment_method">
 
-    {{-- ===== Static Checkout Summary Sections ===== --}}
-  
-
     <div class="ox-checkout-summary px-3 px-md-0 mb-3">
 
-        {{-- Card 1: الفاتورة & الشحن --}}
         <div class="ox-summary-card">
             <div class="ox-summary-card-header">
                 <div class="ox-summary-card-title">
@@ -71,7 +67,6 @@
                 <a href="#" class="ox-edit-link" id="ox-toggle-address-btn" onclick="oxToggleAddressForm(event)">تعديل العنوان</a>
             </div>
 
-            {{-- Static Edit Address Form --}}
             <div class="ox-edit-address-form" id="ox-edit-address-form">
                 <div class="ox-form-row">
                     <div class="ox-form-group">
@@ -113,10 +108,8 @@
                     <button type="button">تأكيد رقم الهاتف وحفظ العنوان</button>
                 </div>
             </div>
-            {{-- End Static Edit Address Form --}}
         </div>
 
-        {{-- Card 2: مراجعة المنتجات --}}
         <div class="ox-summary-card">
             <div class="ox-summary-card-header">
                 <div class="ox-summary-card-title">
@@ -139,7 +132,6 @@
             </div>
         </div>
 
-        {{-- Card 3: طريقة الدفع --}}
         <div class="ox-summary-card">
             <div class="ox-summary-card-header">
                 <div class="ox-summary-card-title">
@@ -154,23 +146,19 @@
             </div>
 
             <div class="ox-payment-options">
-                {{-- Visa / Mada --}}
                 <div class="ox-payment-option">
                     <img src="{{ theme_asset(path: 'public/assets/front-end/img/card-payment.png') }}" alt="Visa">
                 </div>
-                {{-- حوالة مصرفية --}}
                 <div class="ox-payment-option active">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                         <path d="M0 3l8-2 8 2v1H0V3zm0 2h16v1H0V5zm1 2h14v7H1V7zm2 1v5h2V8H3zm4 0v5h2V8H7zm4 0v5h2V8h-2z"/>
                     </svg>
-                    حوالة مصرفية
                 </div>
                 <div class="ox-payment-option" style="min-width: 100%; display: block; border: none; padding: 0;">
                     <tamara-widget type="tamara-summary" amount="3099" uuid="5f3df4db-995d-4aa6-b0ac-5708d379f06e"></tamara-widget>
                 </div>
             </div>
 
-            {{-- معلومات إضافية --}}
             <div class="ox-additional-info">
                 <h6>معلومات إضافية</h6>
                 <p class="sub">ملاحظات الطلب (اختياري)</p>

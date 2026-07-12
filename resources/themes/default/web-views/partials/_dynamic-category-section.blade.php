@@ -1,9 +1,4 @@
-{{--
-    المتغيرات المطلوبة:
-    $sectionTitle      : عنوان القسم
-    $sectionProducts   : Collection من المنتجات
-    $sectionClass      : (اختياري) CSS class إضافي للـ section
---}}
+
 @php $sectionClass = $sectionClass ?? ''; @endphp
 
 @if(isset($sectionProducts) && $sectionProducts->count() > 0)

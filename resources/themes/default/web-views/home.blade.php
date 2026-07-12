@@ -132,9 +132,7 @@
             <div class="container rtl custom_pd ">
                 <div class="row g-3 mx-max-md-0">
 
-                    @if ($bestSellProduct->count() >0)
-                        @include('web-views.partials._best-selling')
-                    @endif
+          
 
                     @if ($topRatedProducts->count() >0)
                         @include('web-views.partials._top-rated')
@@ -171,18 +169,6 @@
         @endif
         @include('web-views.partials._banner-grid')
 
-<section class="custom-banner-section custom_pd">
-    <div class="promo-wide-banner">
-        <a href="{{ route('products') }}" class="d-block">
-            <img
-                loading="lazy"
-                src="{{ theme_asset('public/assets/front-end/img/promo_ban.webp') }}"
-                alt="Promotional Banner"
-                class="promo-wide-banner__img"
-            >
-        </a>
-    </div>
-</section>
 
 @include('web-views.partials._dynamic-category-section', [
     'sectionTitle'    => 'الأكثر مبيعا',
