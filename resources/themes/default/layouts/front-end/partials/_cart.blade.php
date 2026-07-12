@@ -212,11 +212,11 @@
 
                  
                 </div>
-<div class="d-flex align-items-center justify-content-center gap-2">
-       <a class="btn  font-weight-normal rounded-10 py-2 text-capitalize btn_cust_cart" href="{{route('shop-cart') }}" style="color: #000!important; font-weight: bold !important;">
+<div class="d-flex align-items-center  gap-2" style="justify-content: space-evenly;">
+       <a class="  font-weight-normal  text-capitalize btn_cust_cart" href="{{route('shop-cart') }}" style="color: #000!important; font-weight: bold !important;">
                         {{ translate('expand_cart') }}
                     </a>
-                        <a class="btn  font-weight-normal rounded-10 py-2 text-capitalize btn_cust_cart" style="color: #000!important; font-weight: bold!important;"
+                        <a class="  font-weight-normal  text-capitalize btn_cust_cart" style="color: #000!important; font-weight: bold!important;"
                    href="{{route('checkout-details') }}">
                     {{ translate('proceed_to_checkout') }}
                 </a>

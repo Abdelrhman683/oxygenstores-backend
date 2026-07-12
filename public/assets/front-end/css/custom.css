@@ -6043,6 +6043,8 @@ padding: 10px;
 .btn_cust_cart {
     background-color: var(--bg-yellow) !important;
     color: #000 !important;
+       padding: 5px 15px !important;
+    border-radius: 3px;
 }
 .dotted-line {
     border: none;
