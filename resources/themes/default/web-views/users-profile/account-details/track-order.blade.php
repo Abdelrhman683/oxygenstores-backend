@@ -122,8 +122,11 @@
                         ?>
 
                         <div class="order-track_wrapper d-md-flex d-none justify-content-between gap-3">
-                            <ul class="list-inline w-100 order_track-list max-w-380px">
-                                @foreach($firstColumn as $statusKey => $statusData)
+                            <?php
+                            $allStatuses = $firstColumn->merge($secondColumn);
+                            ?>
+                            <ul class="list-inline w-100 order_track-list horizontal-stepper">
+                                @foreach ($allStatuses as $statusKey => $statusData)
                                     <?php $isTerminalStatus = in_array($statusKey, $terminalStatuses); ?>
                                     <li class="position-relative z-1 {{ $statusData['status'] ? ($statusKey === 'order_placed' ? 'order-active-placed' : 'order-step-next') : '' }}">
                                         <div class="d-flex align-items-center gap-2 justify-content-between">
@@ -139,40 +142,6 @@
                                                         <span class="title-semidark fs-14 m-0">
                                                         {{ $statusData['date_time']->format('h:i A, d M Y') }}
                                                     </span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            @if ($statusData['status'])
-                                                <div class="checked-status">
-                                                    <img width="20" height="20"
-                                                         src="{{ theme_asset('public/assets/front-end/img/icons/' . ($isTerminalStatus ? 'cross.png' : 'checked-circle.png')) }}"
-                                                         alt="{{ translate('check') }}">
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ul>
-
-                            <div class="border-left"></div>
-
-                            <ul class="list-inline w-100 order_track-list max-w-380px">
-                                @foreach($secondColumn as $statusKey => $statusData)
-                                    @php $isTerminalStatus = in_array($statusKey, $terminalStatuses); @endphp
-                                    <li class="position-relative z-1 {{ $statusData['status'] ? 'order-step-next' : '' }}">
-                                        <div class="d-flex align-items-center gap-2 justify-content-between">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="icon-svg bg-soft-5 w-50px h-50px min-w-50px rounded-10 d-center">
-                                                    {!! $statusSVGs[$statusKey] ?? '' !!}
-                                                </div>
-                                                <div class="media-body">
-                                                    <h6 class="fs-16 text-dark text-nowrap mb-0 text-capitalize">
-                                                        {{ translate($statusData['label']) }}
-                                                    </h6>
-                                                    @if($statusData['date_time'])
-                                                        <span class="title-semidark fs-14 m-0">
-                                                    {{ $statusData['date_time']->format('h:i A, d M Y') }}
-                                                </span>
                                                     @endif
 
                                                     @if($statusKey === 'order_is_on_the_way' && $statusData['status'] && !$trackOrderArray['is_digital_order'])
@@ -195,7 +164,7 @@
                                                 </div>
                                             </div>
                                             @if ($statusData['status'])
-                                                <div  class="checked-status {{ $isTerminalStatus ? 'opacity-0' : '' }}">
+                                                <div class="checked-status {{ $isTerminalStatus ? 'opacity-0' : '' }}">
                                                     <img width="20" height="20"
                                                          src="{{ theme_asset('public/assets/front-end/img/icons/' . ($isTerminalStatus ? 'cross.png' : 'checked-circle.png')) }}"
                                                          alt="{{ translate('check') }}">

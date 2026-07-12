@@ -474,8 +474,11 @@
 
                 <div class="mx-auto mw-1000">
                     <div class="order-track_wrapper d-md-flex d-none justify-content-between gap-3">
-                        <ul class="list-inline w-100 order_track-list max-w-380px">
-                            @foreach($firstColumn as $statusKey => $statusData)
+                        <?php
+                        $allStatuses = $firstColumn->merge($secondColumn);
+                        ?>
+                        <ul class="list-inline w-100 order_track-list horizontal-stepper">
+                            @foreach ($allStatuses as $statusKey => $statusData)
                                     <?php
                                     $isTerminalStatus = in_array($statusKey, $terminalStatuses);
                                     ?>
@@ -486,86 +489,38 @@
                                                 class="icon-svg bg-soft-5 w-50px h-50px min-w-50px rounded-10 d-center">
                                                 {!! $statusSVGs[$statusKey] !!}
                                             </div>
+
                                             <div class="media-body">
                                                 <h6 class="fs-16 text-dark text-nowrap mb-0 text-capitalize">
                                                     {{ translate($statusData['label']) }}
                                                 </h6>
-                                                @if($statusData['date_time'])
+
+                                                @if ($statusData['date_time'])
                                                     <span class="title-semidark fs-14 m-0">
                                                     {{ $statusData['date_time']->format('h:i A, d M Y') }}
                                                 </span>
                                                 @endif
 
-                                                @if($isTerminalStatus && $statusData['status'])
-                                                    <span class="web-text-primary d-block fs-14 m-0">
-                                                        @if($statusKey === 'order_canceled')
-                                                            {{ translate('Order has been canceled') }}
-                                                        @elseif($statusKey === 'order_returned')
-                                                            {{ translate('Order has been returned') }}
-                                                        @elseif($statusKey === 'order_failed')
-                                                            {{ translate('Order processing failed') }}
-                                                        @endif
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        @if(!$isTerminalStatus || !$statusData['status'])
-                                            <div class="checked-status opacity-0">
-                                                <img width="20" height="20"
-                                                     src="{{ theme_asset('public/assets/front-end/img/icons/' . ($isTerminalStatus ? 'cross.png' : 'checked-circle.png')) }}"
-                                                     alt="{{ translate('check') }}">
-                                            </div>
-                                        @endif
-                                    </div>
-                                </li>
-                            @endforeach
-                        </ul>
-
-                        <div class="border-left"></div>
-
-                        <ul class="list-inline w-100 order_track-list max-w-380px">
-                            @foreach($secondColumn as $statusKey => $statusData)
-                                    <?php
-                                    $isTerminalStatus = in_array($statusKey, $terminalStatuses);
-                                    ?>
-                                <li class="position-relative z-1 {{ $statusData['status'] ? 'order-step-next' : '' }}">
-                                    <div class="d-flex align-items-center gap-2 justify-content-between">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div
-                                                class="icon-svg bg-soft-5 w-50px h-50px min-w-50px rounded-10 d-center">
-                                                {!! $statusSVGs[$statusKey] !!}
-                                            </div>
-                                            <div class="media-body">
-                                                <h6 class="fs-16 text-dark text-nowrap mb-0 text-capitalize">
-                                                    {{ translate($statusData['label']) }}
-                                                </h6>
-                                                @if($statusData['date_time'])
-                                                    <span class="title-semidark fs-14 m-0">
-                                                {{ $statusData['date_time']->format('h:i A, d M Y') }}
-                                            </span>
-                                                @endif
-
-                                                @if($statusKey === 'order_is_on_the_way' && $statusData['status'] && !$trackOrderArray['is_digital_order'])
+                                                @if ($statusKey === 'order_is_on_the_way' && $statusData['status'] && !$trackOrderArray['is_digital_order'])
                                                     <span class="title-semidark d-block fs-14 m-0">
                                                     {{ translate('Your deliveryman is coming') }}
                                                 </span>
                                                 @endif
 
-                                                @if($isTerminalStatus && $statusData['status'])
+                                                @if ($isTerminalStatus && $statusData['status'])
                                                     <span class="web-text-primary d-block fs-14 m-0">
-                                                    @if($statusKey === 'order_canceled')
-                                                            {{ translate('Order Has been canceled') }}
-                                                        @elseif($statusKey === 'order_returned')
+                                                @if ($statusKey === 'order_canceled')
+                                                            {{ translate('Order has been canceled') }}
+                                                        @elseif ($statusKey === 'order_returned')
                                                             {{ translate('Order has been returned') }}
-                                                        @elseif($statusKey === 'order_failed')
+                                                        @elseif ($statusKey === 'order_failed')
                                                             {{ translate('Order processing failed') }}
                                                         @endif
-                                                     </span>
+                                                </span>
                                                 @endif
                                             </div>
                                         </div>
-                                        @if($statusData['status'])
+                                        @if ($statusData['status'])
                                             <div class="checked-status opacity-0">
                                                 <img width="20" height="20"
                                                      src="{{ theme_asset('public/assets/front-end/img/icons/' . ($isTerminalStatus ? 'cross.png' : 'checked-circle.png')) }}"
