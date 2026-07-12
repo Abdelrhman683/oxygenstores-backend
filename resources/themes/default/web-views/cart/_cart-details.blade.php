@@ -721,7 +721,35 @@ $admin_shipping = \App\Models\ShippingType::where('seller_id', 0)->first();
             </div>
         @endif
 
+<div class="col-12 mb-3">
+    <div class="ox-ac-note-box">
 
+    <div class="ox-ac-note-title">
+        تنويه هام في حالة شراء مكيف من متجرنا الإلكتروني:
+    </div>
+
+    <div class="ox-ac-note-item">
+        <span class="ox-ac-note-label">فك المكيف:</span>
+        <span class="ox-ac-note-value">100 ريال</span>
+    </div>
+
+    <div class="ox-ac-note-item">
+        <span class="ox-ac-note-label">متر نحاس زائد:</span>
+        <span class="ox-ac-note-value">85 ريال</span>
+    </div>
+
+    <div class="ox-ac-note-item">
+        <span class="ox-ac-note-label">أقصى ارتفاع لتركيب الوحدة الخارجية (الكمبروس):</span>
+        <span class="ox-ac-note-value">3 متر</span>
+    </div>
+
+    <div class="ox-ac-note-footer">
+        الأسعار المذكورة أعلاه رسوم إضافية غير مشمولة في سعر المنتج الأساسي،
+        للرجاء التواصل معنا للاستفسار أو تعديل الطلب.
+    </div>
+
+</div>
+</div>
         <div class="px-3 px-md-0 mt-3 mt-md-0">
             <form method="get">
                 <div class="mb-lg-3">
