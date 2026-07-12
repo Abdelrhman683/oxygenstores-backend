@@ -770,6 +770,28 @@ class Helpers
         }
         return $shop;
     }
+
+    public static function getZatcaQrCodeValue($sellerName, $vatNumber, $timestamp, $totalAmount, $vatAmount): string
+    {
+        $sellerName = trim((string) $sellerName);
+        $vatNumber = trim((string) $vatNumber);
+        
+        // Format timestamp to ISO 8601 (e.g. YYYY-MM-DDTHH:mm:ssZ)
+        $formattedTimestamp = date('Y-m-d\TH:i:s\Z', strtotime($timestamp));
+        
+        // Format amounts to 2 decimal places as strings
+        $formattedTotalAmount = number_format((float) $totalAmount, 2, '.', '');
+        $formattedVatAmount = number_format((float) $vatAmount, 2, '.', '');
+
+        // TLV Encoding
+        $tlv = chr(1) . chr(strlen($sellerName)) . $sellerName
+             . chr(2) . chr(strlen($vatNumber)) . $vatNumber
+             . chr(3) . chr(strlen($formattedTimestamp)) . $formattedTimestamp
+             . chr(4) . chr(strlen($formattedTotalAmount)) . $formattedTotalAmount
+             . chr(5) . chr(strlen($formattedVatAmount)) . $formattedVatAmount;
+
+        return base64_encode($tlv);
+    }
 }
 
 
