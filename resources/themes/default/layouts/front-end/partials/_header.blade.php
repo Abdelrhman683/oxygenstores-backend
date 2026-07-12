@@ -145,21 +145,21 @@
                         <span class="d-none d-lg-block">الفرع (<span id="current-branch-name">{{ session('selected_city_name') ?? ($currentBranch?->name ?? 'اختر الفرع') }}</span>)</span>
                     </div>
                     <span class="separator-line d-none d-md-inline-block">|</span>
-                    <a href="{{route('wishlists')}}" class="action-item d-none d-md-inline-flex">
+                    <a href="{{route('wishlists')}}" class="action-item action_item_heart d-none d-lg-inline-flex">
                         <i class="fa fa-heart-o"></i>
                         <span class="d-none d-lg-block">المفضلة</span>
                     </a>
                     <span class="separator-line d-none d-md-inline-block">|</span>
-                    <a href="{{route('products')}}" class="action-item d-none d-md-inline-flex">
+                    <a href="{{route('products')}}" class="action-item  d-none d-md-inline-flex">
                         <i class="fa fa-shopping-bag"></i>
                         <span class="d-none d-lg-block">المتجر</span>
                     </a>
                     <span class="separator-line d-none d-md-inline-block">|</span>
                     @if(auth('customer')->check())
-                        <div class="dropdown  user_drop">
+                        <div class="dropdown  user_drop d-flex">
                             <a class="action-item dropdown-toggle cursor-pointer" data-toggle="dropdown">
                                 <i class="fa fa-user-circle"></i>
-                                <span class="d-none d-md-inline-block">{{ Str::limit(auth('customer')->user()->f_name, 10) }}</span>
+                                <span class="d-none d-lg-inline-block">{{ Str::limit(auth('customer')->user()->f_name, 10) }}</span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-{{Session::get('direction') === "rtl" ? 'left' : 'right'}}">
                                 <a class="dropdown-item" href="{{route('account-oder')}}"> {{ translate('my_Order')}} </a>
