@@ -2271,19 +2271,11 @@ $(document).ready(function () {
             e.preventDefault();
         } 
         else if (key == 37) { // Left arrow
-            if (isRTL) {
-                $(this).next('.otp-field').focus();
-            } else {
-                $(this).prev('.otp-field').focus();
-            }
+            $(this).prev('.otp-field').focus();
             e.preventDefault();
         }
         else if (key == 39) { // Right arrow
-            if (isRTL) {
-                $(this).prev('.otp-field').focus();
-            } else {
-                $(this).next('.otp-field').focus();
-            }
+            $(this).next('.otp-field').focus();
             e.preventDefault();
         }
         else if (key == 46 || key == 40 || key == 38) { // Delete, down, up

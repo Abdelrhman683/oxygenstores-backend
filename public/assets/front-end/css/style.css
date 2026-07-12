@@ -8375,6 +8375,11 @@ span.badge-accent:hover {
     border: 1px solid #e5e5e5;
     border-radius: 5px;
 }
+.otp-form .forget-password-otp,
+.otp-form .d-flex.gap-2,
+.otp-form .d-flex.gap-sm-3 {
+    direction: ltr !important;
+}
 /* End OTP Fields CSS */
 
 .other-store-logo {

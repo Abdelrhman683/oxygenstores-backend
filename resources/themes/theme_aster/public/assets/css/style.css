@@ -1614,6 +1614,11 @@ a .product__old-price {
     opacity: 1;
     border-color: var(--title-color);
 }
+.otp-form .forget-password-otp,
+.otp-form .d-flex.gap-2,
+.otp-form .d-flex.gap-sm-3 {
+    direction: ltr !important;
+}
 
 @media only screen and (max-width: 991px) {
     .filter-toggle-aside {
