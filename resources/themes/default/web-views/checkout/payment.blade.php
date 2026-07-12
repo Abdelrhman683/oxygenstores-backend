@@ -15,7 +15,7 @@
                     <div class="px-3 px-md-0">
                         @include('web-views.partials._checkout-steps', ['step' => 3])
                     </div>
-                    <div class="card mt-3">
+                    <div class=" mt-3">
                         <div class="card-body p-0">
 
                             @if (!$activeMinimumMethods)
@@ -29,7 +29,7 @@
                                 </div>
                             @else
                                 @if (($cashOnDeliveryBtnShow && $cash_on_delivery['status']) || (auth('customer')->check() && $wallet_status == 1))
-                                    <div class="gap-2 bg-light py-3 px-3">
+                                    <div class="gap-2 py-3 px-3">
                                         <div class="d-flex justify-content-between">
                                             <h5 class="mb-0 text-nowrap">{{ translate('payment_method') }}</h5>
                                             <a href="{{ route('checkout-details') }}"
@@ -40,6 +40,149 @@
                                         </div>
                                     </div>
                                 @endif
+
+<div class="ox_checkout_payment_method">
+
+    {{-- ===== Static Checkout Summary Sections ===== --}}
+  
+
+    <div class="ox-checkout-summary px-3 px-md-0 mb-3">
+
+        {{-- Card 1: الفاتورة & الشحن --}}
+        <div class="ox-summary-card">
+            <div class="ox-summary-card-header">
+                <div class="ox-summary-card-title">
+                    <div class="ox-check-icon" id="ox-address-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span class="icon-num">1</span>
+                    </div>
+                    الفاتورة &amp; الشحن
+                </div>
+                
+                <div class="ox-address-block" id="ox-address-block">
+                    <div><span class="label">الإسم:</span> مؤسسة ذرة أكسجين التجارية</div>
+                    <div><span class="label">العنوان:</span> address 1 SA</div>
+                    <div><span class="label">المدينة:</span> الرياض</div>
+                    <div><span class="label">رقم الهاتف:</span> <span class="phone" dir="ltr">+966 536652244</span></div>
+                </div>
+
+                <a href="#" class="ox-edit-link" id="ox-toggle-address-btn" onclick="oxToggleAddressForm(event)">تعديل العنوان</a>
+            </div>
+
+            {{-- Static Edit Address Form --}}
+            <div class="ox-edit-address-form" id="ox-edit-address-form">
+                <div class="ox-form-row">
+                    <div class="ox-form-group">
+                        <label>الاسم الأول <span class="req">*</span></label>
+                        <input type="text" value="مؤسسة ذرة أكسجين" placeholder="الاسم الأول">
+                    </div>
+                    <div class="ox-form-group">
+                        <label>الاسم الأخير <span class="req">*</span></label>
+                        <input type="text" value="التجارية" placeholder="الاسم الأخير">
+                    </div>
+                </div>
+                <div class="ox-form-row">
+                    <div class="ox-form-group">
+                        <label>المنطقة <span class="req">*</span></label>
+                        <select>
+                            <option selected>الرياض</option>
+                            <option>جدة</option>
+                            <option>مكة المكرمة</option>
+                            <option>المدينة المنورة</option>
+                            <option>الدمام</option>
+                        </select>
+                    </div>
+                    <div class="ox-form-group">
+                        <label>الشارع والحي <span class="req">*</span></label>
+                        <input type="text" value="address 1" placeholder="الشارع والحي">
+                    </div>
+                </div>
+                <div class="ox-form-row">
+                    <div class="ox-form-group">
+                        <label>رقم الهاتف <span class="req">*</span></label>
+                        <input type="tel" value="966536652244+" placeholder="رقم الهاتف" dir="ltr">
+                    </div>
+                    <div class="ox-form-group">
+                        <label>البريد الإلكتروني <span class="req">*</span></label>
+                        <input type="email" value="admin@oxygenstores.com.sa" placeholder="البريد الإلكتروني" dir="ltr">
+                    </div>
+                </div>
+                <div class="ox-save-btn">
+                    <button type="button">تأكيد رقم الهاتف وحفظ العنوان</button>
+                </div>
+            </div>
+            {{-- End Static Edit Address Form --}}
+        </div>
+
+        {{-- Card 2: مراجعة المنتجات --}}
+        <div class="ox-summary-card">
+            <div class="ox-summary-card-header">
+                <div class="ox-summary-card-title">
+                    <div class="ox-check-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    مراجعة المنتجات
+                </div>
+                
+                <div class="d-flex align-items-center flex-column gap-3">
+                    <span class="ox-products-count">( 1 منتج )</span>
+                    <img class="ox-product-thumb"
+                         src="{{ theme_asset(path: 'public/assets/front-end/img/placeholder.png') }}"
+                         alt="product thumbnail">
+                </div>
+
+                <a href="#" class="ox-edit-link">مراجعة المنتجات</a>
+            </div>
+        </div>
+
+        {{-- Card 3: طريقة الدفع --}}
+        <div class="ox-summary-card">
+            <div class="ox-summary-card-header">
+                <div class="ox-summary-card-title">
+                    <div class="ox-check-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    طريقة الدفع
+                </div>
+                <a href="#" class="ox-edit-link">تغيير</a>
+            </div>
+
+            <div class="ox-payment-options">
+                {{-- Visa / Mada --}}
+                <div class="ox-payment-option">
+                    <img src="{{ theme_asset(path: 'public/assets/front-end/img/card-payment.png') }}" alt="Visa">
+                </div>
+                {{-- حوالة مصرفية --}}
+                <div class="ox-payment-option active">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M0 3l8-2 8 2v1H0V3zm0 2h16v1H0V5zm1 2h14v7H1V7zm2 1v5h2V8H3zm4 0v5h2V8H7zm4 0v5h2V8h-2z"/>
+                    </svg>
+                    حوالة مصرفية
+                </div>
+                <div class="ox-payment-option" style="min-width: 100%; display: block; border: none; padding: 0;">
+                    <tamara-widget type="tamara-summary" amount="3099" uuid="5f3df4db-995d-4aa6-b0ac-5708d379f06e"></tamara-widget>
+                </div>
+            </div>
+
+            {{-- معلومات إضافية --}}
+            <div class="ox-additional-info">
+                <h6>معلومات إضافية</h6>
+                <p class="sub">ملاحظات الطلب (اختياري)</p>
+                <textarea placeholder="ملاحظات حول الطلب، مثال: ملاحظة خاصة بتسليم الطلب."></textarea>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
 
                                 <div class="p-20">
                                     @if (
@@ -366,5 +509,31 @@
 @endsection
 
 @push('script')
+    <script defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
+
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/payment.js') }}"></script>
+    <script>
+        function oxToggleAddressForm(e) {
+            e.preventDefault();
+            const formObj = document.getElementById('ox-edit-address-form');
+            const addressBlock = document.getElementById('ox-address-block');
+            const iconObj = document.getElementById('ox-address-icon');
+            
+            if (formObj) {
+                formObj.classList.toggle('open');
+            }
+            if (iconObj) {
+                iconObj.classList.toggle('editing');
+            }
+            if (addressBlock) {
+                if (formObj && formObj.classList.contains('open')) {
+                    addressBlock.style.display = 'none';
+                    addressBlock.classList.remove('fade-in');
+                } else {
+                    addressBlock.style.display = 'block';
+                    addressBlock.classList.add('fade-in');
+                }
+            }
+        }
+    </script>
 @endpush
