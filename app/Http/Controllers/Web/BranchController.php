@@ -18,6 +18,7 @@ class BranchController extends Controller
     {
         $request->validate([
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'city_name' => ['nullable', 'string'],
         ]);
 
         $branchId = (int) $request->branch_id;
@@ -42,6 +43,9 @@ class BranchController extends Controller
             }
         }
 
+        if ($request->has('city_name')) {
+            session(['selected_city_name' => $request->city_name]);
+        }
 
         session(['branch_selected' => true]);
 
@@ -51,6 +55,7 @@ class BranchController extends Controller
             'success'     => true,
             'branch_id'   => $branchId,
             'branch_name' => $branch?->name,
+            'city_name'   => $request->city_name,
         ]);
     }
 }

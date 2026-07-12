@@ -64,7 +64,8 @@ class PageController extends Controller
 
     public function getShowroomsView(): View
     {
-        return view(VIEW_FILE_NAMES['showrooms']);
+        $showrooms = \DB::table('showrooms')->orderBy('id')->get();
+        return view(VIEW_FILE_NAMES['showrooms'], compact('showrooms'));
     }
 
     public function getOurStoresView(): View

@@ -9,13 +9,15 @@ class DatabaseSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
-    {
+         require_once __DIR__ . '/CitiesTableSeeder.php';
+         require_once __DIR__ . '/ShowroomsTableSeeder.php';
          $this->call([
              AdminRoleTable::class,
              AdminTable::class,
              SellerTableSeeder::class,
-             BranchTableSeeder::class
+             BranchTableSeeder::class,
+             CitiesTableSeeder::class,
+             ShowroomsTableSeeder::class,
          ]);
     }
 }

@@ -142,7 +142,7 @@
                     @endphp
                     <div class="action-item d-none d-md-inline-flex cursor-pointer" data-toggle="modal" data-target="#branchModal" style="cursor: pointer;" id="branch-selector-btn">
                         <i class="fa fa-map-marker"></i>
-                        <span class="d-none d-lg-block">الفرع (<span id="current-branch-name">{{ $currentBranch?->name ?? 'اختر الفرع' }}</span>)</span>
+                        <span class="d-none d-lg-block">الفرع (<span id="current-branch-name">{{ session('selected_city_name') ?? ($currentBranch?->name ?? 'اختر الفرع') }}</span>)</span>
                     </div>
                     <span class="separator-line d-none d-md-inline-block">|</span>
                     <a href="{{route('wishlists')}}" class="action-item d-none d-md-inline-flex">
@@ -339,15 +339,48 @@
 
             <div class="regions-grid">
                 @php
-                    $allBranches = \App\Models\Branch::orderBy('name')->get();
+                    $cities = \DB::table('cities')->orderBy('name')->get();
+                    $branchShipto = \DB::table('branchmeta')->where('meta_key', 'branch_shipto')->get();
+                    $cityToBranchMap = [];
+                    foreach ($branchShipto as $meta) {
+                        $shipto = json_decode($meta->meta_value, true);
+                        if (is_array($shipto)) {
+                            foreach ($shipto as $cityId => $data) {
+                                $cityToBranchMap[$cityId] = $meta->branch_id;
+                            }
+                        }
+                    }
                 @endphp
-                @foreach($allBranches as $branch)
-                    <button type="button"
-                            class="region-card {{ $currentBranchId == $branch->id ? 'active' : '' }}"
-                            data-branch-id="{{ $branch->id }}"
-                            data-branch-name="{{ $branch->name }}">
-                        {{ $branch->name }}
-                    </button>
+                @foreach($cities as $city)
+                    @php
+                        $branchId = $cityToBranchMap[$city->term_id] ?? null;
+                        
+                        $isActive = false;
+                        if (session()->has('selected_city_name')) {
+                            $isActive = (session('selected_city_name') == $city->name);
+                        } else {
+                            $branchMainCities = [
+                                14 => 'الرياض',
+                                19 => 'بريدة',
+                                21 => 'الدمام',
+                                22 => 'جدة',
+                                20 => 'المدينة المنورة',
+                                24 => 'أبها',
+                                18 => 'حائل',
+                                23 => 'الباحة',
+                                26 => 'جازان'
+                            ];
+                            $isActive = ($currentBranchId == $branchId && isset($branchMainCities[$branchId]) && $branchMainCities[$branchId] == $city->name);
+                        }
+                    @endphp
+                    @if($branchId)
+                        <button type="button"
+                                class="region-card {{ $isActive ? 'active' : '' }}"
+                                data-branch-id="{{ $branchId }}"
+                                data-branch-name="{{ $city->name }}">
+                            {{ $city->name }}
+                        </button>
+                    @endif
                 @endforeach
             </div>
 
@@ -371,8 +404,8 @@
             let tempSelectedBranchId   = null;
             let tempSelectedBranchName = null;
 
-            // Auto-open modal if they haven't explicitly selected/dismissed the branch selection yet
-            @if(!session()->has('branch_selected'))
+            // Auto-open modal if they haven't explicitly selected/dismissed the branch selection yet OR if no branch is stored
+            @if(!session()->has('branch_selected') || !getSelectedBranchId())
                 $('#branchModal').modal({ backdrop: 'static', keyboard: false });
                 $('#branchModal').modal('show');
             @endif
@@ -423,7 +456,8 @@
                     method: 'POST',
                     data: {
                         _token: '{{ csrf_token() }}',
-                        branch_id: tempSelectedBranchId
+                        branch_id: tempSelectedBranchId,
+                        city_name: tempSelectedBranchName
                     },
                     success: function(res) {
                         if (res.success) {

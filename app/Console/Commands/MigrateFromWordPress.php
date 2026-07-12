@@ -15,7 +15,7 @@ class MigrateFromWordPress extends Command
      * @var string
      */
     protected $signature = 'wp:migrate
-                            {--step= : Run a specific step only (categories|sellers|customers|products|orders|branches)}
+                            {--step= : Run a specific step only (categories|sellers|customers|products|orders|branches|cities)}
                             {--dry-run : Preview the data without inserting}
                             {--limit=0 : Limit number of records per step (0 = all)}
                             {--skip-existing : Skip records that already exist}
@@ -41,6 +41,7 @@ class MigrateFromWordPress extends Command
         'brands' => ['brands'],
         'sellers' => ['shops', 'sellers'],
         'branches' => ['branchmeta', 'branch_product', 'branches'],
+        'cities' => ['cities'],
         'customers' => ['users'],
         'products' => ['product_stocks', 'order_details', 'branch_product', 'products'],
         'orders' => ['order_details', 'orders'],
@@ -91,6 +92,7 @@ class MigrateFromWordPress extends Command
             $this->runStep('brands');
             $this->runStep('sellers');
             $this->runStep('branches');
+            $this->runStep('cities');
             $this->runStep('customers');
             $this->runStep('products');
             $this->runStep('orders');
@@ -125,6 +127,7 @@ class MigrateFromWordPress extends Command
             'sellers',
             'brands',
             'categories',
+            'cities',
         ];
 
         $this->warn('⚠️  --fresh: Truncating existing data...');
@@ -199,6 +202,7 @@ class MigrateFromWordPress extends Command
             'brands' => $this->migrateBrands(),
             'sellers' => $this->migrateSellers(),
             'branches' => $this->migrateBranches(),
+            'cities' => $this->migrateCities(),
             'customers' => $this->migrateCustomers(),
             'products' => $this->migrateProducts(),
             'orders' => $this->migrateOrders(),
@@ -633,6 +637,53 @@ class MigrateFromWordPress extends Command
         $bar->finish();
         $this->info('');
         $this->info("   ✅ Branches: {$inserted} inserted, {$skipped} skipped.");
+    }
+
+    // =========================================================================
+    // STEP 3.5: CITIES (Custom shipping/delivery terms from WordPress)
+    // =========================================================================
+
+    private function migrateCities(): void
+    {
+        $this->info('');
+        $this->info('🏙️  Step 3.5: Migrating Cities...');
+
+        if ($this->dryRun) {
+            $this->info('   [Dry Run] Fetching cities from WordPress');
+            return;
+        }
+
+        // Get all shipping cities from WordPress
+        $wpCities = DB::connection('mysql_wordpress')
+            ->table('wp_cl_custom_fees_terms')
+            ->get();
+
+        if ($wpCities->isEmpty()) {
+            $this->warn('   ⚠️ No cities found in WordPress (wp_cl_custom_fees_terms).');
+            return;
+        }
+
+        $inserted = 0;
+        $bar = $this->output->createProgressBar(count($wpCities));
+        $bar->start();
+
+        foreach ($wpCities as $wpCity) {
+            DB::table('cities')->updateOrInsert(
+                ['term_id' => $wpCity->term_id],
+                [
+                    'id' => $wpCity->id,
+                    'name' => $wpCity->term_name,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+            $bar->advance();
+            $inserted++;
+        }
+
+        $bar->finish();
+        $this->info('');
+        $this->info("   ✅ Cities: {$inserted} migrated successfully.");
     }
 
     // =========================================================================
