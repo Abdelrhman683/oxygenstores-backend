@@ -177,7 +177,7 @@
         </div>
         @php($company_reliability = getWebConfig(name: 'company_reliability'))
         @if ($company_reliability != null)
-        <div class="light-box p--20 mt-20">
+        <!-- <div class="light-box p--20 mt-20">
             <div class="">
                 <h5 class="fs-14 fw-semibold text-dark mb-2">
                     {{ translate('Why_shop_with_us ?') }}
@@ -194,7 +194,7 @@
                     @endforeach
                 </div>
             </div>
-        </div>
+        </div> -->
         @endif
 
         <div class="pt-4">
