@@ -24,7 +24,6 @@ class CategoryManager
     public static function products($category_id, $request = null, $dataLimit = null)
     {
         $user = Helpers::getCustomerInformation($request);
-        $id = '"' . $category_id . '"';
         $products = Product::with(['flashDealProducts.flashDeal', 'rating', 'seller.shop', 'tags', 'clearanceSale' => function ($query) {
                 return $query->active();
             }])
@@ -32,8 +31,24 @@ class CategoryManager
                 $query->where('customer_id', $user != 'offline' ? $user['id'] : '0');
             }])
             ->active()
-            ->where('category_ids', 'like', "%{$id}%")
-            ->when($request->has('search') && !empty($request['search']), function ($query) use ($request) {
+            ->where(function ($query) use ($category_id) {
+                $category = Category::find($category_id);
+                $categoryIds = [$category_id];
+                if ($category && $category->position == 0) {
+                    $subCategoryIds = Category::where('parent_id', $category_id)->pluck('id')->toArray();
+                    if (!empty($subCategoryIds)) {
+                        $categoryIds = array_merge($categoryIds, $subCategoryIds);
+                        $subSubCategoryIds = Category::whereIn('parent_id', $subCategoryIds)->pluck('id')->toArray();
+                        if (!empty($subSubCategoryIds)) {
+                            $categoryIds = array_merge($categoryIds, $subSubCategoryIds);
+                        }
+                    }
+                }
+                $query->whereIn('category_id', $categoryIds)
+                      ->orWhereIn('sub_category_id', $categoryIds)
+                      ->orWhereIn('sub_sub_category_id', $categoryIds);
+            })
+            ->when($request && $request->has('search') && !empty($request['search']), function ($query) use ($request) {
                 $searchKey = $request['search'];
                 $productsIDArray = [];
                 $searchProducts = ProductManager::search_products($request, $searchKey);

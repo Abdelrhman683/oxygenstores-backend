@@ -75,11 +75,17 @@ class ProductListController extends Controller
         $request->merge(['data_from' => $dataForm]);
 
         if ($category['position'] == 0) {
+            // قسم رئيسي - نجيب منتجاته + منتجات أقسامه الفرعية والفرعية الفرعية
+            $childIds = \App\Models\Category::where('parent_id', $category['id'])->pluck('id')->toArray();
+            $grandchildIds = [];
+            if (!empty($childIds)) {
+                $grandchildIds = \App\Models\Category::whereIn('parent_id', $childIds)->pluck('id')->toArray();
+            }
+            $allIds = array_merge([$category['id']], $childIds, $grandchildIds);
+            $request->merge(['category_ids' => $allIds]);
+        } else {
+            // قسم فرعي أو فرعي فرعي - نجيب منتجاته مباشرة بـ category_id
             $request->merge(['category_id' => $category['id']]);
-        } else if ($category['position'] == 1) {
-            $request->merge(['sub_category_id' => $category['id']]);
-        } else if ($category['position'] == 2) {
-            $request->merge(['sub_sub_category_id' => $category['id']]);
         }
         return self::getProductsListPage(
             request: $request,

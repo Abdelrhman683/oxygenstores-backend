@@ -505,6 +505,33 @@ class Product extends Model
             cacheRemoveByType(type: 'products');
         });
 
+        static::addGlobalScope('yunan_first', function (Builder $builder) {
+            if (app()->runningInConsole()) {
+                return;
+            }
+
+            $segment = request()->segment(1);
+            $segment2 = request()->segment(2);
+            $segment3 = request()->segment(3);
+
+            $isAdminOrVendor = in_array($segment, ['admin', 'vendor', 'seller'], true)
+                || ($segment === 'api' && (
+                    in_array($segment2, ['admin', 'seller', 'vendor'], true) ||
+                    in_array($segment3, ['admin', 'seller', 'vendor'], true)
+                   ));
+
+            if (!$isAdminOrVendor) {
+                $query = $builder->getQuery();
+                $yunanOrder = [
+                    'type' => 'Raw',
+                    'sql' => 'CASE WHEN products.brand_id = 4 THEN 0 ELSE 1 END'
+                ];
+                $orders = $query->orders ?? [];
+                array_unshift($orders, $yunanOrder);
+                $query->orders = $orders;
+            }
+        });
+
         static::addGlobalScope('translate', function (Builder $builder) {
             $builder->with(['translations' => function ($query) {
                 if (strpos(url()->current(), '/api')) {

@@ -201,7 +201,9 @@ class ProductRepository implements ProductRepositoryInterface
             });
         })->when(isset($filters['brand_id']) && $filters['brand_id'] != 'all', function ($query) use ($filters) {
             return $query->where(['brand_id' => $filters['brand_id']]);
-        })->when(isset($filters['category_id']) && !empty($filters['category_id']) && $filters['category_id'] != 'all', function ($query) use ($filters) {
+        })->when(isset($filters['category_ids']) && !empty($filters['category_ids']), function ($query) use ($filters) {
+            return $query->whereIn('category_id', $filters['category_ids']);
+        })->when(!isset($filters['category_ids']) && isset($filters['category_id']) && !empty($filters['category_id']) && $filters['category_id'] != 'all', function ($query) use ($filters) {
             return $query->where(['category_id' => $filters['category_id']]);
         })->when(isset($filters['sub_category_id']) && !empty($filters['sub_category_id']) && $filters['sub_category_id'] != 'all', function ($query) use ($filters) {
             return $query->where(['sub_category_id' => $filters['sub_category_id']]);
@@ -261,12 +263,14 @@ class ProductRepository implements ProductRepositoryInterface
                         $query->where(['request_status' => $filters['request_status']]);
                     })
                     ->when(isset($filters['seller_id']), function ($query) use ($filters) {
-                        return $query->where(['user_id' => $filters['seller_id']]);
+                        $query->where(['user_id' => $filters['seller_id']]);
                     });
             })
             ->when(isset($filters['brand_id']), function ($query) use ($filters) {
                 return $query->where(['brand_id' => $filters['brand_id']]);
-            })->when(isset($filters['category_id']), function ($query) use ($filters) {
+            })->when(isset($filters['category_ids']) && !empty($filters['category_ids']), function ($query) use ($filters) {
+                return $query->whereIn('category_id', $filters['category_ids']);
+            })->when(!isset($filters['category_ids']) && isset($filters['category_id']), function ($query) use ($filters) {
                 return $query->where(['category_id' => $filters['category_id']]);
             })->when(isset($filters['sub_category_id']), function ($query) use ($filters) {
                 return $query->where(['sub_category_id' => $filters['sub_category_id']]);
@@ -370,7 +374,9 @@ class ProductRepository implements ProductRepositoryInterface
                 return $query->where('user_id', $filters['seller_id']);
             })->when(isset($filters['brand_id']), function ($query) use ($filters) {
                 return $query->where(['brand_id' => $filters['brand_id']]);
-            })->when(isset($filters['category_id']), function ($query) use ($filters) {
+            })->when(isset($filters['category_ids']) && !empty($filters['category_ids']), function ($query) use ($filters) {
+                return $query->whereIn('category_id', $filters['category_ids']);
+            })->when(!isset($filters['category_ids']) && isset($filters['category_id']), function ($query) use ($filters) {
                 return $query->where(['category_id' => $filters['category_id']]);
             })->when(isset($filters['sub_category_id']), function ($query) use ($filters) {
                 return $query->where(['sub_category_id' => $filters['sub_category_id']]);

@@ -204,7 +204,9 @@ class HomeController extends Controller
         });
 
         $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
-            $cats = $this->category->where('parent_id', 0)
+            // الأقسام الثلاثة المحددة: المكيفات (1) - الثلاجات (12) - الغسالات (11)
+            $fixedIds = [1, 12, 11];
+            $cats = $this->category->whereIn('id', $fixedIds)
                 ->with([
                     'product' => function ($query) {
                         return $query->active()->with([
@@ -215,7 +217,7 @@ class HomeController extends Controller
                     },
                     'childes' => function ($q) {
                         $q->with([
-                            'subCategoryProduct' => function ($q2) {
+                            'product' => function ($q2) {
                                 return $q2->active()->with([
                                     'clearanceSale' => function ($q3) {
                                         return $q3->active();
@@ -225,38 +227,29 @@ class HomeController extends Controller
                         ]);
                     }
                 ])
-                ->where(function ($query) {
-                    $query->whereHas('product', function ($q) {
-                        return $q->active();
-                    })->orWhereHas('childes.subCategoryProduct', function ($q) {
-                        return $q->active();
-                    });
-                })
-                ->orderBy('priority', 'desc')
                 ->get();
 
-            $cats->map(function ($category) {
+            // ترتيبهم حسب الترتيب المحدد
+            $cats = collect($fixedIds)->map(fn($id) => $cats->firstWhere('id', $id))->filter()->values();
+
+            $cats->each(function ($category) {
                 $aggregated = collect();
+                // منتجات القسم الرئيسي
                 if ($category->product && $category->product->count() > 0) {
                     $aggregated = $aggregated->merge($category->product);
                 }
+                // منتجات الأقسام الفرعية (عن طريق category_id)
                 if ($category->childes) {
                     foreach ($category->childes as $child) {
-                        if (isset($child->subCategoryProduct) && $child->subCategoryProduct->count() > 0) {
-                            $aggregated = $aggregated->merge($child->subCategoryProduct);
+                        if (isset($child->product) && $child->product->count() > 0) {
+                            $aggregated = $aggregated->merge($child->product);
                         }
                     }
                 }
                 $category->product = $aggregated->unique('id')->values();
-                return $category;
             });
 
-            $airCategory = $cats->firstWhere('name', 'like', '%مكيف%');
-            if ($airCategory) {
-                $cats = $cats->reject(fn($c) => $c->id === $airCategory->id)->prepend($airCategory)->values();
-            }
-
-            return $cats->take(3)->values();
+            return $cats;
         });
 
         $discountProducts = Cache::remember('discount_products_home', CACHE_FOR_3_HOURS, function () {
@@ -547,7 +540,9 @@ class HomeController extends Controller
         }
 
         $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
-            $cats = $this->category->where('parent_id', 0)
+            // الأقسام الثلاثة المحددة: المكيفات (1) - الثلاجات (12) - الغسالات (11)
+            $fixedIds = [1, 12, 11];
+            $cats = $this->category->whereIn('id', $fixedIds)
                 ->with([
                     'product' => function ($query) {
                         return $query->active()->with([
@@ -558,7 +553,7 @@ class HomeController extends Controller
                     },
                     'childes' => function ($q) {
                         $q->with([
-                            'subCategoryProduct' => function ($q2) {
+                            'product' => function ($q2) {
                                 return $q2->active()->with([
                                     'clearanceSale' => function ($q3) {
                                         return $q3->active();
@@ -568,41 +563,27 @@ class HomeController extends Controller
                         ]);
                     }
                 ])
-                ->where(function ($query) {
-                    $query->whereHas('product', function ($q) {
-                        return $q->active();
-                    })->orWhereHas('childes.subCategoryProduct', function ($q) {
-                        return $q->active();
-                    });
-                })
-                ->orderBy('priority', 'desc')
                 ->get();
 
-            // Aggregate each category's own products from its direct + child categories only
-            $cats->map(function ($category) {
+            // ترتيبهم حسب الترتيب المحدد
+            $cats = collect($fixedIds)->map(fn($id) => $cats->firstWhere('id', $id))->filter()->values();
+
+            $cats->each(function ($category) {
                 $aggregated = collect();
-                // Add direct products of this category
                 if ($category->product && $category->product->count() > 0) {
                     $aggregated = $aggregated->merge($category->product);
                 }
-                // Add products from immediate child categories only
                 if ($category->childes) {
                     foreach ($category->childes as $child) {
-                        if (isset($child->subCategoryProduct) && $child->subCategoryProduct->count() > 0) {
-                            $aggregated = $aggregated->merge($child->subCategoryProduct);
+                        if (isset($child->product) && $child->product->count() > 0) {
+                            $aggregated = $aggregated->merge($child->product);
                         }
                     }
                 }
                 $category->product = $aggregated->unique('id')->values();
-                return $category;
             });
 
-            $airCategory = $cats->firstWhere('name', 'like', '%مكيف%');
-            if ($airCategory) {
-                $cats = $cats->reject(fn($c) => $c->id === $airCategory->id)->prepend($airCategory)->values();
-            }
-
-            return $cats->take(3)->values();
+            return $cats;
         });
 
         return view(
@@ -762,7 +743,9 @@ class HomeController extends Controller
         ];
 
         $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
-            $cats = $this->category->where('parent_id', 0)
+            // الأقسام الثلاثة المحددة: المكيفات (1) - الثلاجات (12) - الغسالات (11)
+            $fixedIds = [1, 12, 11];
+            $cats = $this->category->whereIn('id', $fixedIds)
                 ->with([
                     'product' => function ($query) {
                         return $query->active()->with([
@@ -773,7 +756,7 @@ class HomeController extends Controller
                     },
                     'childes' => function ($q) {
                         $q->with([
-                            'subCategoryProduct' => function ($q2) {
+                            'product' => function ($q2) {
                                 return $q2->active()->with([
                                     'clearanceSale' => function ($q3) {
                                         return $q3->active();
@@ -783,41 +766,27 @@ class HomeController extends Controller
                         ]);
                     }
                 ])
-                ->where(function ($query) {
-                    $query->whereHas('product', function ($q) {
-                        return $q->active();
-                    })->orWhereHas('childes.subCategoryProduct', function ($q) {
-                        return $q->active();
-                    });
-                })
-                ->orderBy('priority', 'desc')
                 ->get();
 
-            // Aggregate each category's own products from its direct + child categories only
-            $cats->map(function ($category) {
+            // ترتيبهم حسب الترتيب المحدد
+            $cats = collect($fixedIds)->map(fn($id) => $cats->firstWhere('id', $id))->filter()->values();
+
+            $cats->each(function ($category) {
                 $aggregated = collect();
-                // Add direct products of this category
                 if ($category->product && $category->product->count() > 0) {
                     $aggregated = $aggregated->merge($category->product);
                 }
-                // Add products from immediate child categories only
                 if ($category->childes) {
                     foreach ($category->childes as $child) {
-                        if (isset($child->subCategoryProduct) && $child->subCategoryProduct->count() > 0) {
-                            $aggregated = $aggregated->merge($child->subCategoryProduct);
+                        if (isset($child->product) && $child->product->count() > 0) {
+                            $aggregated = $aggregated->merge($child->product);
                         }
                     }
                 }
                 $category->product = $aggregated->unique('id')->values();
-                return $category;
             });
 
-            $airCategory = $cats->firstWhere('name', 'like', '%مكيف%');
-            if ($airCategory) {
-                $cats = $cats->reject(fn($c) => $c->id === $airCategory->id)->prepend($airCategory)->values();
-            }
-
-            return $cats->take(3)->values();
+            return $cats;
         });
 
         $data = [];
