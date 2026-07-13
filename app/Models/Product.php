@@ -546,4 +546,50 @@ class Product extends Model
     {
         return 0.0;
     }
+
+    public function isAirConditioner(): bool
+    {
+        if ($this->category_id == 1 || $this->sub_category_id == 1 || $this->sub_sub_category_id == 1) {
+            return true;
+        }
+
+        if ($this->category && ($this->category->id == 1 || $this->category->parent_id == 1)) {
+            return true;
+        }
+
+        if ($this->subCategory && ($this->subCategory->id == 1 || $this->subCategory->parent_id == 1)) {
+            return true;
+        }
+
+        $categoriesToCheck = collect([$this->category, $this->subCategory, $this->subSubCategory])->filter();
+        foreach ($categoriesToCheck as $cat) {
+            if (str_contains($cat->name, 'مكيف') || str_contains($cat->name, 'تكييف') || str_contains($cat->slug, 'mkyf') || str_contains($cat->slug, 'conditioner')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getActiveCouponCode()
+    {
+        static $activeCoupons = null;
+        if ($activeCoupons === null) {
+            $activeCoupons = \App\Models\Coupon::active()
+                ->whereDate('start_date', '<=', date('Y-m-d'))
+                ->whereDate('expire_date', '>=', date('Y-m-d'))
+                ->get(['code', 'product_id']);
+        }
+
+        foreach ($activeCoupons as $coupon) {
+            if ($coupon->product_id) {
+                $allowedIds = explode(',', $coupon->product_id);
+                if (in_array($this->id, $allowedIds)) {
+                    return $coupon->code;
+                }
+            }
+        }
+
+        return null;
+    }
 }

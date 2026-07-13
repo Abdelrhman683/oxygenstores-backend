@@ -14,7 +14,11 @@
                             @php($wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $product->id)->count() : (session()->has('wish_list') && in_array($product->id, session('wish_list')) ? 1 : 0))
                             <div class="premium-card">
                                 <div class="premium-product-media">
-                                    @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+                                     @if($product->getActiveCouponCode())
+                                         <span class="premium-promo-badge">
+                                             {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                                         </span>
+                                     @elseif(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                                         <span class="premium-promo-badge">
                                             {{ translate('discount') }} {{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
                                         </span>
@@ -114,11 +118,15 @@
                             @php($wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $product->id)->count() : (session()->has('wish_list') && in_array($product->id, session('wish_list')) ? 1 : 0))
                             <div class="premium-card">
                                 <div class="premium-product-media">
-                                    @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
-                                        <span class="premium-promo-badge">
-                                            {{ translate('discount') }} {{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
-                                        </span>
-                                    @endif
+                                     @if($product->getActiveCouponCode())
+                                         <span class="premium-promo-badge">
+                                             {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                                         </span>
+                                     @elseif(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+                                         <span class="premium-promo-badge">
+                                             {{ translate('discount') }} {{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
+                                         </span>
+                                     @endif
 
                                     <div class="premium-card-actions">
                                         <button type="button" data-product-id="{{ $product['id'] }}"
@@ -235,11 +243,15 @@
                                     @php($wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $product->id)->count() : (session()->has('wish_list') && in_array($product->id, session('wish_list')) ? 1 : 0))
                                     <div class="premium-card">
                                         <div class="premium-product-media">
-                                            @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
-                                                <span class="premium-promo-badge">
-                                                    {{ translate('discount') }} {{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
-                                                </span>
-                                            @endif
+                                             @if($product->getActiveCouponCode())
+                                                 <span class="premium-promo-badge">
+                                                     {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                                                 </span>
+                                             @elseif(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+                                                 <span class="premium-promo-badge">
+                                                     {{ translate('discount') }} {{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
+                                                 </span>
+                                             @endif
 
                                             <div class="premium-card-actions">
                                                 <button type="button" data-product-id="{{ $product['id'] }}"

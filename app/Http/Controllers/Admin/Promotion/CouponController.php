@@ -50,7 +50,8 @@ class CouponController extends BaseController
     {
         $coupons = $this->couponRepo->getListWhere(searchValue: $request['searchValue'], filters: ['added_by' => 'admin'], dataLimit: getWebConfig(name: 'pagination_limit'));
         $customers = $this->customerRepo->getListWhereNotIn([0]);
-        return view('admin-views.coupon.add-new', compact('coupons', 'customers'));
+        $products = \App\Models\Product::active()->orderBy('name')->get(['id', 'name']);
+        return view('admin-views.coupon.add-new', compact('coupons', 'customers', 'products'));
     }
 
     public function add(CouponAddRequest $request, CouponService $couponService): JsonResponse
@@ -81,8 +82,9 @@ class CouponController extends BaseController
         $sellers = $this->vendorRepo->getListWhere(filters: ['status' => 'approved'], relations: ['shop'], dataLimit: 'all');
         $customers = $this->customerRepo->getListWhereNotIn([0]);
         $coupon = $this->couponRepo->getFirstWhere(['id' => $id]);
+        $products = \App\Models\Product::active()->orderBy('name')->get(['id', 'name']);
         if ($coupon) {
-            return view('admin-views.coupon.edit', compact('coupon', 'customers', 'sellers'));
+            return view('admin-views.coupon.edit', compact('coupon', 'customers', 'sellers', 'products'));
         }
         ToastMagic::error(translate('invalid_Coupon'));
         return redirect()->route('admin.coupon.add');

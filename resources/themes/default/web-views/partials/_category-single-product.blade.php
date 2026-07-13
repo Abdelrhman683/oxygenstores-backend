@@ -6,7 +6,11 @@
 
     <div class="premium-card h-100">
         <div class="premium-product-media">
-            @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+            @if($product->getActiveCouponCode())
+                <span class="premium-promo-badge">
+                    {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                </span>
+            @elseif(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                 <span class="premium-promo-badge">
                     {{ translate('discount') }} {{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
                 </span>
@@ -34,6 +38,11 @@
                     <span class="out_fo_stock">{{translate('out_of_stock')}}</span>
                 @endif
             </div>
+            @if($product->isAirConditioner())
+                <span class="product-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
+            @else
+                <span class="product-tax-badge">السعر شامل الضريبة</span>
+            @endif
         </div>
 
         <div class="premium-card-details">

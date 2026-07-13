@@ -85,6 +85,18 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <label for="product_ids"
+                                           class="form-label d-flex">{{translate('select_products')}}</label>
+                                    <select
+                                        class="js-example-theme-single custom-select"
+                                        name="product_ids[]" multiple>
+                                        @foreach($products as $prod)
+                                            <option
+                                                value="{{ $prod->id }}">{{ $prod->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="col-md-6 col-lg-4 first_order">
                                     <label
                                         for="exampleFormControlInput1"

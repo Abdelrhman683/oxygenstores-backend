@@ -3,7 +3,15 @@
         $overallRating = getOverallRating($product?->reviews);
     @endphp
     <div class="flash_deal_product get-view-by-onclick" data-link="{{ route('product',$product->slug) }}">
-        @if($product->discount > 0)
+        @if($product->getActiveCouponCode())
+            <div class="d-flex">
+            <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">
+                <span class="direction-ltr d-block">
+                    {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                </span>
+            </span>
+            </div>
+        @elseif($product->discount > 0)
             <div class="d-flex">
             <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">
                 <span class="direction-ltr d-block">
@@ -18,9 +26,14 @@
         @endif
         <div class=" d-flex">
             <div class="d-flex align-items-center justify-content-center p-12px">
-                <div class="flash-deals-background-image">
+                <div class="flash-deals-background-image position-relative">
                     <img class="__img-125px" alt=""
-                         src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}">
+                          src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}">
+                    @if($product->isAirConditioner())
+                        <span class="product-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
+                    @else
+                        <span class="product-tax-badge">السعر شامل الضريبة</span>
+                    @endif
                 </div>
             </div>
             <div class="flash_deal_product_details pl-3 pr-3 pr-1 d-flex mt-3">

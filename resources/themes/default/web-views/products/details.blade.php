@@ -138,7 +138,15 @@
                                                 @endforeach
                                             </div>
                                         </div>
-                                        @if (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+                                        @if($product->getActiveCouponCode())
+                                            <div class="discount-badge-wrapper">
+                                                <span class="">
+                                                    <span class="direction-ltr d-block dic_">
+                                                        {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        @elseif (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                                             <div class="discount-badge-wrapper">
                                                 <span class="">
                                                     <span class="direction-ltr d-block dic_">
@@ -615,13 +623,13 @@
                             <ul class="nav nav-tabs nav--tabs d-flex justify-content-lg-start justify-content-center gap-2 p-0"
                                 role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link __inline-27 mb-0 tab_link" data-toggle="tab"
+                                    <a class="nav-link __inline-27 mb-0 tab_link active" data-toggle="tab"
                                         href="#specifications" role="tab">
                                         {{ translate('المواصفات') }}
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link __inline-27 mb-0 tab_link active" data-toggle="tab"
+                                    <a class="nav-link __inline-27 mb-0 tab_link" data-toggle="tab"
                                         href="#overview" role="tab">
                                         {{ translate('overview') }}
                                     </a>
@@ -643,7 +651,7 @@
 
 
                             <div class="tab-content px-lg-3">
-                                <div class="tab-pane fade show active text-justify" id="overview" role="tabpanel">
+                                <div class="tab-pane fade text-justify" id="overview" role="tabpanel">
                                     <div class="details-content-wrap ov-hidden show-more--content">
                                         <div class="row pt-2 specification">
 
@@ -857,7 +865,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="specifications" role="tabpanel">
+                                <div class="tab-pane fade show active" id="specifications" role="tabpanel">
                                     <div class="specs-table">
                                         @if(count($dynamicAttributes) > 0)
                                             @foreach($dynamicAttributes as $attribute)
@@ -1207,7 +1215,11 @@ if ($product->added_by == 'seller' && isset($product->seller->shop)) {
                     <div class="shipping-info-card">
                         <div class="shipping-info-row ">
                             <span class="shipping-label">منطقتك:</span>
-                            <span class="shipping-value">الرياض</span>
+                            <?php
+                                $currentBranchId = getSelectedBranchId();
+                                $currentBranch = $currentBranchId ? \App\Models\Branch::find($currentBranchId) : null;
+                            ?>
+                            <span class="shipping-value" id="shipping-branch-name"><?php echo $currentBranch?->name ?? 'الرياض'; ?></span>
                         </div>
 
                         <div class="shipping-info-row">

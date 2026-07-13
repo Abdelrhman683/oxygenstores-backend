@@ -82,6 +82,14 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-md-6 col-lg-4">
+                                <label for="product_ids" class="form-label">{{translate('select_products')}}</label>
+                                <select class="js-example-theme-single custom-select" name="product_ids[]" multiple>
+                                    @foreach($products as $prod)
+                                        <option value="{{ $prod->id }}" {{ in_array($prod->id, explode(',', $coupon['product_id'] ?? '')) ? 'selected' : '' }}>{{ $prod->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="col-md-6 col-lg-4 first_order">
                                 <label  for="exampleFormControlInput1" class="form-label">{{translate('limit_for_same_user')}}<span class="text-danger">*</span></label>
                                 <input type="number" name="limit" min="0" value="{{ $coupon['limit'] }}" id="coupon_limit" class="form-control" placeholder="{{translate('ex'.':'.'10')}}">

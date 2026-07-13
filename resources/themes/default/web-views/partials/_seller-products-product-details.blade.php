@@ -4,7 +4,15 @@
 @endphp
 <div class="flash_deal_product rtl cursor-pointer mb-2 get-view-by-onclick"
     data-link="{{ route('product',$product->slug) }}">
-    @if($product->discount > 0)
+    @if($product->getActiveCouponCode())
+    <div class="d-flex position-absolute z-2">
+        <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">
+            <span class="direction-ltr d-block">
+                {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+            </span>
+        </span>
+    </div>
+    @elseif($product->discount > 0)
     <div class="d-flex position-absolute z-2">
         <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">
             <span class="direction-ltr d-block">

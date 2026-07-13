@@ -505,10 +505,29 @@ class OrderManager
             ];
         }
 
+        $allowedProductIds = $coupon->product_id ? explode(',', $coupon->product_id) : [];
+        if ($coupon->product_id) {
+            $hasProduct = false;
+            foreach ($cartList as $cartItem) {
+                if (in_array($cartItem['product_id'], $allowedProductIds)) {
+                    $hasProduct = true;
+                    break;
+                }
+            }
+            if (!$hasProduct) {
+                return [
+                    'status' => false,
+                    'messages' => translate('this_coupon_is_only_applicable_to_specific_products')
+                ];
+            }
+        }
+
         $onlyProductTotalAmount = 0;
         if ($coupon->coupon_type == 'first_order') {
             foreach ($cartList as $cartItem) {
-                $onlyProductTotalAmount += ($cartItem['price'] - $cartItem['discount']) * $cartItem['quantity'];
+                if (!$coupon->product_id || in_array($cartItem['product_id'], $allowedProductIds)) {
+                    $onlyProductTotalAmount += ($cartItem['price'] - $cartItem['discount']) * $cartItem['quantity'];
+                }
             }
         }
 
@@ -530,7 +549,9 @@ class OrderManager
         if ($coupon->coupon_type == 'discount_on_purchase') {
             foreach ($cartList as $cartItem) {
                 if (($coupon->seller_id == '0') || (is_null($coupon->seller_id) && $cartItem['seller_is'] == 'admin') || ($coupon->seller_id == $cartItem['seller_id'] && $cartItem['seller_is'] == 'seller')) {
-                    $onlyProductTotalAmount += ($cartItem['price'] - $cartItem['discount']) * $cartItem['quantity'];
+                    if (!$coupon->product_id || in_array($cartItem['product_id'], $allowedProductIds)) {
+                        $onlyProductTotalAmount += ($cartItem['price'] - $cartItem['discount']) * $cartItem['quantity'];
+                    }
                 }
             }
         }
@@ -553,7 +574,9 @@ class OrderManager
         } elseif ($coupon->coupon_type == 'free_delivery') {
             foreach ($cartList as $cartItem) {
                 if (($coupon->seller_id == '0') || (is_null($coupon->seller_id) && $cartItem['seller_is'] == 'admin') || ($coupon->seller_id == $cartItem['seller_id'] && $cartItem['seller_is'] == 'seller')) {
-                    $onlyProductTotalAmount += ($cartItem['price'] - $cartItem['discount']) * $cartItem['quantity'];
+                    if (!$coupon->product_id || in_array($cartItem['product_id'], $allowedProductIds)) {
+                        $onlyProductTotalAmount += ($cartItem['price'] - $cartItem['discount']) * $cartItem['quantity'];
+                    }
                 }
             }
 

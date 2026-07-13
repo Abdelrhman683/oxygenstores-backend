@@ -5,7 +5,15 @@
 <div class="product-single-hover style--card h-100">
     <div class="overflow-hidden position-relative">
         <div class="inline_product clickable d-flex justify-content-center">
-            @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+            @if($product->getActiveCouponCode())
+                <div class="d-flex">
+                    <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">
+                        <span class="direction-ltr d-block">
+                            {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                        </span>
+                    </span>
+                </div>
+            @elseif(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                 <div class="d-flex">
                     <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">
                         <span class="direction-ltr d-block">
@@ -25,6 +33,11 @@
                          src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}">
                 </a>
             </div>
+            @if($product->isAirConditioner())
+                <span class="product-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
+            @else
+                <span class="product-tax-badge">السعر شامل الضريبة</span>
+            @endif
 
             <div class="quick-view">
                 <div class="d-none d-md-flex gap-2 align-items-center quick-view-tag">

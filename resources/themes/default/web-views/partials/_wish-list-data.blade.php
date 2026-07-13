@@ -10,7 +10,11 @@
                                  alt="{{ translate('wishlist') }}">
                         </a>
 
-                        @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+                        @if($product->getActiveCouponCode())
+                            <span class="for-discount-value px-1 font-bold fs-13">
+                                {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                            </span>
+                        @elseif(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                             <span class="for-discount-value px-1 font-bold fs-13 direction-ltr">
                                 -{{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
                             </span>

@@ -72,7 +72,15 @@
 
                     </div>
                 </div>
-                @if (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+                @if($product->getActiveCouponCode())
+                    <div class="discount-badge-wrapper">
+                    <span class="">
+                        <span class="direction-ltr d-block dic_">
+                           {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+                        </span>
+                    </span>
+                    </div>
+                @elseif (getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
                     <div class="discount-badge-wrapper">
                     <span class="">
                         <span class="direction-ltr d-block dic_">
@@ -147,6 +155,15 @@
                         <div class="swiper-button-prev swiper-quickview-button-prev"></div>
                     </div>
                 </div>
+
+                <div class="text-center w-100">
+                    @if($product->isAirConditioner())
+                        <span class="product-details-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
+                    @else
+                        <span class="product-details-tax-badge">السعر شامل الضريبة</span>
+                    @endif
+                </div>
+
             </div>
         </div>
 
@@ -243,9 +260,18 @@
                         </span>
                     </div>
                             <div class="summary_det">
-                              <p >السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</p>
-                                </div>
-<div class="preview-stock"><p class="stock in-stock">متوفر في المخزون</p>
+                                @if($product->isAirConditioner())
+                                    <p>السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</p>
+                                @else
+                                    <p>السعر شامل الضريبة</p>
+                                @endif
+                            </div>
+<div class="preview-stock">
+    @if($product->product_type == 'physical' && $product->current_stock <= 0)
+        <p class="stock out-of-stock">غير متوفر في المخزون</p>
+    @else
+        <p class="stock in-stock">متوفر في المخزون</p>
+    @endif
 </div>
                                     <div class="specs-box">
     <ul class="specs-list p-0">

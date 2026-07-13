@@ -5588,6 +5588,17 @@ justify-content: start;
     color: #fff;
 }
 
+.preview-stock .out-of-stock {
+    background-color: #e53935;
+    width: max-content;
+    padding: 3px 10px 4px;
+    border-radius: 20px;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.2;
+    color: #fff;
+}
+
 /* =============================================
    Vertical Product Thumbnails (Details Page)
    ============================================= */
@@ -6058,4 +6069,68 @@ padding: 10px;
     font-size: 20px !important;
 }
     
+}
+
+/* Product Tax & Installation Badge Styles */
+.product-tax-badge {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: inline-block;
+    padding: 3px 6px;
+    font-size: 8px; /* small font size to fit neatly on cards */
+    font-weight: bold;
+    color: #03a84e; /* Premium e-commerce green */
+    background-color: #e8f9f0; /* Soft green */
+    border: 1px solid #c2ebd5;
+    border-radius: 4px;
+    text-align: center;
+    width: 90%;
+    max-width: 90%;
+    box-sizing: border-box;
+    line-height: 1.2;
+    pointer-events: none; /* so clicks pass through to image link */
+    white-space: normal;
+}
+
+/* Air Conditioner Tax Badge style */
+.product-tax-badge.ac-tax-badge {
+    color: #1565c0; /* Soft dark blue */
+    background-color: #e3f2fd; /* Soft light blue */
+    border: 1px solid #bbdefb;
+}
+
+/* Product details page static version */
+.product-details-tax-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #03a84e;
+    background-color: #e8f9f0;
+    border: 1px solid #c2ebd5;
+    border-radius: 50px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+    line-height: 1.4;
+}
+
+.product-details-tax-badge.ac-tax-badge {
+    color: #1565c0;
+    background-color: #e3f2fd;
+    border: 1px solid #bbdefb;
+}
+
+/* Promo Code Badge Styles */
+.for-discount-value,
+.premium-promo-badge,
+.discount-badge-wrapper .dic_ {
+    width: auto !important;
+    max-width: none !important;
+    white-space: nowrap !important;
 }

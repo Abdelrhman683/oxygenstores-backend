@@ -6,7 +6,13 @@
          data-link="{{ route('product', $product->slug) }}">
 
 
-        @if(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
+        @if($product->getActiveCouponCode())
+            <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">
+               <span class="direction-ltr d-block">
+                   {{ translate('استخدم كود') }} {{ $product->getActiveCouponCode() }}
+               </span>
+           </span>
+        @elseif(getProductPriceByType(product: $product, type: 'discount', result: 'value') > 0)
             <span class="for-discount-value p-1 pl-2 pr-2 font-bold fs-13">
                <span class="direction-ltr d-block">
                    -{{ getProductPriceByType(product: $product, type: 'discount', result: 'string') }}
@@ -24,6 +30,11 @@
                           src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}">
                     @if($product->product_type == 'physical' && $product->current_stock <= 0)
                         <span class="out_fo_stock">{{translate('out_of_stock')}}</span>
+                    @endif
+                    @if($product->isAirConditioner())
+                        <span class="product-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
+                    @else
+                        <span class="product-tax-badge">السعر شامل الضريبة</span>
                     @endif
                 </div>
             </div>
