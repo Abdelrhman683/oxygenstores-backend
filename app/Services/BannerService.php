@@ -39,7 +39,8 @@ class BannerService
                 "Popup Banner" => translate('popup_Banner'),
                 "Footer Banner" => translate('footer_Banner'),
                 "Main Section Banner" => translate('main_Section_Banner'),
-                "Exclusive Offers" => translate('exclusive_offers')
+                "Exclusive Offers" => translate('exclusive_offers'),
+                "Featured Section Banner" => translate('featured_section_banner')
             ];
 
         }elseif (theme_root_path() == 'theme_aster') {

@@ -65,6 +65,8 @@ class HomeController extends Controller
         $bannerTypeExclusiveOffers = $this->cacheBannerTable(bannerType: 'Exclusive Offers', dataLimit: 3);
         $topVendorsList = ProductManager::getPriorityWiseTopVendorQuery($this->cacheHomePageTopVendorsList());
         $bannerTypeFooterBanner = $this->cacheBannerTable(bannerType: 'Footer Banner', dataLimit: 10);
+        $bannerTypeFeaturedSection = $this->cacheBannerTable(bannerType: 'Featured Section Banner', dataLimit: 6);
+        $bannerTypeFeaturedSection = $bannerTypeFeaturedSection ? $bannerTypeFeaturedSection->sortBy('id')->values() : collect();
         $clearanceSaleProducts = $this->cacheHomePageClearanceSaleProducts();
 
         $categories = CategoryManager::getCategoriesWithCountingAndPriorityWiseSorting();
@@ -286,6 +288,7 @@ class HomeController extends Controller
                 'current_date',
                 'recommendedProduct',
                 'bannerTypeFooterBanner',
+                'bannerTypeFeaturedSection',
                 'newArrivalProducts',
                 'clearanceSaleProducts',
                 'recommendedCategories',

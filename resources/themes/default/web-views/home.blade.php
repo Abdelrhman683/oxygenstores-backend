@@ -167,7 +167,7 @@
                 </div>
             </div>
         @endif
-        @include('web-views.partials._banner-grid')
+        @include('web-views.partials._banner-grid', ['bannerTypeFeaturedSection' => $bannerTypeFeaturedSection])
 
 
 @include('web-views.partials._dynamic-category-section', [
