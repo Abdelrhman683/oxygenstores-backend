@@ -453,20 +453,29 @@ if (!function_exists('getSelectedBranchId')) {
     function getSelectedBranchId()
     {
         if (auth('customer')->check()) {
-            return auth('customer')->user()->branch_id;
+            return auth('customer')->user()->branch_id ?? \Illuminate\Support\Facades\DB::table('branches')
+                ->where('name', 'like', '%الرياض%')
+                ->orWhere('name', 'like', '%Riyadh%')
+                ->value('id') ?? 1;
         }
 
         $guestId = session('guest_id');
         if ($guestId) {
             $guest = \App\Models\GuestUser::find($guestId);
             if ($guest) {
-                return $guest->branch_id;
+                return $guest->branch_id ?? \Illuminate\Support\Facades\DB::table('branches')
+                    ->where('name', 'like', '%الرياض%')
+                    ->orWhere('name', 'like', '%Riyadh%')
+                    ->value('id') ?? 1;
             }
             // If the guest record was deleted from the DB, forget the guest_id session key
             session()->forget('guest_id');
         }
 
-        return null;
+        return \Illuminate\Support\Facades\DB::table('branches')
+            ->where('name', 'like', '%الرياض%')
+            ->orWhere('name', 'like', '%Riyadh%')
+            ->value('id') ?? 1;
     }
 }
 

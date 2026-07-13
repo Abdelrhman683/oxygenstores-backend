@@ -142,7 +142,7 @@
                     @endphp
                     <div class="action-item d-none d-md-inline-flex cursor-pointer" data-toggle="modal" data-target="#branchModal" style="cursor: pointer;" id="branch-selector-btn">
                         <i class="fa fa-map-marker"></i>
-                        <span class="d-none d-lg-block">الفرع (<span id="current-branch-name">{{ session('selected_city_name') ?? ($currentBranch?->name ?? 'اختر الفرع') }}</span>)</span>
+                        <span class="d-none d-lg-block">الفرع (<span id="current-branch-name">{{ $currentBranch?->name ?? 'اختر الفرع' }}</span>)</span>
                     </div>
                     <span class="separator-line d-none d-md-inline-block">|</span>
                     <a href="{{route('wishlists')}}" class="action-item action_item_heart d-none d-lg-inline-flex">
@@ -350,34 +350,61 @@
                             }
                         }
                     }
+
+                    // Fetch branch latitudes and longitudes from branchmeta
+                    $coords = \DB::table('branchmeta')
+                        ->whereIn('meta_key', ['branch_address_lat', 'branch_address_lng'])
+                        ->get();
+                    
+                    $branchLats = [];
+                    $branchLngs = [];
+                    foreach ($coords as $coord) {
+                        if ($coord->meta_key === 'branch_address_lat') {
+                            $branchLats[$coord->branch_id] = $coord->meta_value;
+                        } elseif ($coord->meta_key === 'branch_address_lng') {
+                            $branchLngs[$coord->branch_id] = $coord->meta_value;
+                        }
+                    }
+
+                    // Determine if we need to show the branch selector/ask for location
+                    $showBranchSelector = false;
+                    if (auth('customer')->check()) {
+                        if (!auth('customer')->user()->branch_id) {
+                            $showBranchSelector = true;
+                        }
+                    } else {
+                        $guestId = session('guest_id');
+                        $guest = $guestId ? \App\Models\GuestUser::find($guestId) : null;
+                        if (!$guest || !$guest->branch_id) {
+                            $showBranchSelector = true;
+                        }
+                    }
                 @endphp
                 @foreach($cities as $city)
                     @php
                         $branchId = $cityToBranchMap[$city->term_id] ?? null;
+                        $lat = $branchLats[$branchId] ?? null;
+                        $lng = $branchLngs[$branchId] ?? null;
                         
-                        $isActive = false;
-                        if (session()->has('selected_city_name')) {
-                            $isActive = (session('selected_city_name') == $city->name);
+                        // Check if the user/guest has branch_id set in the database
+                        $dbBranchId = null;
+                        if (auth('customer')->check()) {
+                            $dbBranchId = auth('customer')->user()->branch_id;
                         } else {
-                            $branchMainCities = [
-                                14 => 'الرياض',
-                                19 => 'بريدة',
-                                21 => 'الدمام',
-                                22 => 'جدة',
-                                20 => 'المدينة المنورة',
-                                24 => 'أبها',
-                                18 => 'حائل',
-                                23 => 'الباحة',
-                                26 => 'جازان'
-                            ];
-                            $isActive = ($currentBranchId == $branchId && isset($branchMainCities[$branchId]) && $branchMainCities[$branchId] == $city->name);
+                            $guestId = session('guest_id');
+                            $guest = $guestId ? \App\Models\GuestUser::find($guestId) : null;
+                            $dbBranchId = $guest?->branch_id;
                         }
+                        
+                        $isActive = ($dbBranchId && $dbBranchId == $branchId);
                     @endphp
                     @if($branchId)
                         <button type="button"
                                 class="region-card {{ $isActive ? 'active' : '' }}"
                                 data-branch-id="{{ $branchId }}"
-                                data-branch-name="{{ $city->name }}">
+                                data-branch-name="{{ $city->name }}"
+                                @if($lat) data-latitude="{{ $lat }}" @endif
+                                @if($lng) data-longitude="{{ $lng }}" @endif>
                             {{ $city->name }}
                         </button>
                     @endif
@@ -404,18 +431,100 @@
             let tempSelectedBranchId   = null;
             let tempSelectedBranchName = null;
 
-            // Auto-open modal if they haven't explicitly selected/dismissed the branch selection yet OR if no branch is stored
-            @if(!session()->has('branch_selected') || !getSelectedBranchId())
+            function showBranchModal() {
                 $('#branchModal').modal({ backdrop: 'static', keyboard: false });
                 $('#branchModal').modal('show');
+            }
+
+            function getDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Radius of the earth in km
+                const dLat = deg2rad(lat2 - lat1);
+                const dLon = deg2rad(lon2 - lon1);
+                const a = 
+                    Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                    Math.sin(dLon/2) * Math.sin(dLon/2)
+                ; 
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+                const d = R * c; // Distance in km
+                return d;
+            }
+
+            function deg2rad(deg) {
+                return deg * (Math.PI/180);
+            }
+
+            @if($showBranchSelector)
+                // Try automatic geolocation if not already attempted in this tab session
+                if (!sessionStorage.getItem('geo_tried') && navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            let userLat = position.coords.latitude;
+                            let userLng = position.coords.longitude;
+
+                            let nearestBranchId = null;
+                            let nearestBranchName = null;
+                            let minDistance = Infinity;
+
+                            $('.region-card').each(function() {
+                                let branchId = $(this).data('branch-id');
+                                let branchName = $(this).data('branch-name');
+                                let branchLat = parseFloat($(this).data('latitude'));
+                                let branchLng = parseFloat($(this).data('longitude'));
+
+                                if (!isNaN(branchLat) && !isNaN(branchLng)) {
+                                    let dist = getDistance(userLat, userLng, branchLat, branchLng);
+                                    if (dist < minDistance) {
+                                        minDistance = dist;
+                                        nearestBranchId = branchId;
+                                        nearestBranchName = branchName;
+                                    }
+                                }
+                            });
+
+                            if (nearestBranchId) {
+                                sessionStorage.setItem('geo_tried', 'true');
+                                $.ajax({
+                                    url: '{{ route("set-branch") }}',
+                                    method: 'POST',
+                                    data: {
+                                        _token: '{{ csrf_token() }}',
+                                        branch_id: nearestBranchId,
+                                        city_name: nearestBranchName
+                                    },
+                                    success: function(res) {
+                                        if (res.success) {
+                                            location.reload();
+                                        } else {
+                                            showBranchModal();
+                                        }
+                                    },
+                                    error: function() {
+                                        showBranchModal();
+                                    }
+                                });
+                            } else {
+                                showBranchModal();
+                            }
+                        },
+                        function(error) {
+                            sessionStorage.setItem('geo_tried', 'true');
+                            showBranchModal();
+                        },
+                        { timeout: 5000 }
+                    );
+                } else {
+                    showBranchModal();
+                }
             @endif
 
             // Close modal handler
             $(document).on('click', '.close-region-modal', function() {
-                @if(session()->has('branch_selected'))
+                let currentBranchId = '{{ auth('customer')->check() ? auth('customer')->user()->branch_id : (session('guest_id') ? \App\Models\GuestUser::find(session('guest_id'))?->branch_id : '') }}';
+                if (currentBranchId) {
                     $('#branchModal').modal('hide');
-                @else
-                    // If they haven't selected a branch yet, default to Riyadh
+                } else {
+                    // If they haven't selected a branch yet, default to Riyadh in database
                     $.ajax({
                         url: '{{ route("set-branch") }}',
                         method: 'POST',
@@ -433,7 +542,7 @@
                             $('#branchModal').modal('hide');
                         }
                     });
-                @endif
+                }
             });
 
             // Branch card selection

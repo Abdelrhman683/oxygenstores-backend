@@ -26,17 +26,9 @@ class GuestMiddleware
                     session()->forget('guest_id');
                 }
 
-                $branchId = session('branch_id');
-                if (!$branchId) {
-                    $branchId = \Illuminate\Support\Facades\DB::table('branches')
-                        ->where('name', 'like', '%الرياض%')
-                        ->orWhere('name', 'like', '%Riyadh%')
-                        ->value('id') ?? 1;
-                }
-
                 $guest = GuestUser::create([
                     'ip_address' => $request->ip(),
-                    'branch_id' => $branchId,
+                    'branch_id' => null,
                     'created_at' => now(),
                 ]);
 
