@@ -41,7 +41,7 @@
                                     </div>
                                 @endif
 
-<div class="ox_checkout_payment_method">
+<!-- <div class="ox_checkout_payment_method">
 
     <div class="ox-checkout-summary px-3 px-md-0 mb-3">
 
@@ -168,7 +168,7 @@
 
     </div>
 
-</div>
+</div> -->
 
 
 

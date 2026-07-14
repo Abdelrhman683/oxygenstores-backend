@@ -30,9 +30,7 @@
                     <img class="__img-125px" alt=""
                           src="{{ getStorageImages(path: $product->thumbnail_full_url, type: 'product') }}">
                     @if($product->isAirConditioner())
-                        <span class="product-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
-                    @else
-                        <span class="product-tax-badge">السعر شامل الضريبة</span>
+                                    <span class="product-tax-badge ac-tax-badge">شامل التركيب</span>
                     @endif
                 </div>
             </div>

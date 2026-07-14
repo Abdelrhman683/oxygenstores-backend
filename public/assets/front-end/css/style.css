@@ -8388,7 +8388,7 @@ span.badge-accent:hover {
 
 .out_fo_stock {
     position: absolute;
-    bottom: 0;
+    bottom: 26px;
     left: 0;
     width: 100%;
     padding: 10px 5px;

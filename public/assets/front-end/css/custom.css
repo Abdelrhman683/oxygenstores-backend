@@ -6074,16 +6074,15 @@ padding: 10px;
 /* Product Tax & Installation Badge Styles */
 .product-tax-badge {
     position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
+    bottom: 16px;
+    left: 0;
     z-index: 10;
     display: inline-block;
     padding: 3px 6px;
-    font-size: 8px; /* small font size to fit neatly on cards */
-    font-weight: bold;
-    color: #03a84e; /* Premium e-commerce green */
-    background-color: #e8f9f0; /* Soft green */
+    font-size: 8px;
+    font-weight: 500;
+    color: #03a84e;
+background-color: #e8f9f0;
     border: 1px solid #c2ebd5;
     border-radius: 4px;
     text-align: center;
@@ -6091,15 +6090,28 @@ padding: 10px;
     max-width: 90%;
     box-sizing: border-box;
     line-height: 1.2;
-    pointer-events: none; /* so clicks pass through to image link */
-    white-space: normal;
+    pointer-events: none;
+    /*soclickspassthroughtoimagelink*/white-space: normal;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    
 }
 
 /* Air Conditioner Tax Badge style */
 .product-tax-badge.ac-tax-badge {
-    color: #1565c0; /* Soft dark blue */
-    background-color: #e3f2fd; /* Soft light blue */
-    border: 1px solid #bbdefb;
+    width: max-content;
+    font-size: 13px;
+    background: #feeb9f;
+    color: #1c344a;
+    text-align: center;
+    line-height: 10px;
+    padding: 8px;
+    border-radius: 3px;
+    border: none !important;
+        font-weight: 500;
+
 }
 
 /* Product details page static version */
