@@ -292,29 +292,31 @@ $(document).on("keydown", "input", function (e) {
 function checkoutFromShipping() {
     let physical_product = $('#physical_product').val();
     let billing_address_same_shipping;
+    let allAreFilled = true;
 
     if(physical_product === 'yes') {
         let sameAsShippingCheckbox = $('#same_as_shipping_address');
         billing_address_same_shipping = sameAsShippingCheckbox ? sameAsShippingCheckbox.is(":checked") : false;
 
-        let allAreFilled = true;
-        document.getElementById("address-form").querySelectorAll("[required]").forEach(function (i) {
-            if (!allAreFilled) return;
-            if (!i.value) allAreFilled = false;
-            if (i.type === "radio") {
-                let radioValueCheck = false;
-                document.getElementById("address-form").querySelectorAll(`[name=${i.name}]`).forEach(function (r) {
-                    if (r.checked) radioValueCheck = true;
-                });
-                allAreFilled = radioValueCheck;
-            }
-        });
+        let addressForm = document.getElementById("address-form");
+        if (addressForm) {
+            addressForm.querySelectorAll("[required]").forEach(function (i) {
+                if (!allAreFilled) return;
+                if (!i.value) allAreFilled = false;
+                if (i.type === "radio") {
+                    let radioValueCheck = false;
+                    document.getElementById("address-form").querySelectorAll(`[name=${i.name}]`).forEach(function (r) {
+                        if (r.checked) radioValueCheck = true;
+                    });
+                    allAreFilled = radioValueCheck;
+                }
+            });
+        }
 
         let allAreFilled_shipping = true;
 
         let billingAddressForm = $('#billing-address-form');
         if (billing_address_same_shipping != true && billingAddressForm.length > 0) {
-
             document.getElementById("billing-address-form").querySelectorAll("[required]").forEach(function (i) {
                 if (!allAreFilled_shipping) return;
                 if (!i.value) allAreFilled_shipping = false;
@@ -327,8 +329,46 @@ function checkoutFromShipping() {
                 }
             });
         }
+        allAreFilled = allAreFilled && allAreFilled_shipping;
     }else {
         billing_address_same_shipping = false;
+        let billingAddressForm = document.getElementById("billing-address-form");
+        if (billingAddressForm) {
+            billingAddressForm.querySelectorAll("[required]").forEach(function (i) {
+                if (!allAreFilled) return;
+                if (!i.value) allAreFilled = false;
+            });
+        }
+    }
+
+    if (allAreFilled) {
+        let otpBtn = $('#btn-checkout-send-otp');
+        if (otpBtn.length > 0 && !window.isCheckoutOtpVerified) {
+            let otpVerifySection = $('.checkout-otp-verify-section');
+            if (otpVerifySection.hasClass('d-none')) {
+                otpBtn.trigger('click');
+                let msg = $('#message-otp-sent-successfully').data('text') || 'Verification code has been sent to your phone. Please enter the code to login and continue your order.';
+                toastr.info(msg);
+                let phoneElem = $("#phone");
+                if (phoneElem.length > 0) {
+                    $('html, body').animate({
+                        scrollTop: phoneElem.offset().top - 100
+                    }, 500);
+                }
+                return;
+            } else {
+                let code = $('#checkout_otp_code').val();
+                if (!code) {
+                    let msg = $('#message-otp-input-required').data('text') || 'Please enter the OTP verification code.';
+                    toastr.error(msg);
+                    $('#checkout_otp_code').focus();
+                    return;
+                } else {
+                    $('#btn-checkout-verify-otp').trigger('click');
+                    return;
+                }
+            }
+        }
     }
 
     let isCheckCreateAccount = $('#is_check_create_account');

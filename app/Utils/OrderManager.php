@@ -1380,63 +1380,66 @@ class OrderManager
             );
 
             $order = Order::with('customer', 'seller.shop', 'details')->find($order_id);
-            OrderManager::getAddOrderTransactionsOnGenerateOrder(order: $order, ordersData: $ordersData);
+            if ($data['payment_status'] == 'paid' || $data['payment_method'] == 'cash_on_delivery' || $data['payment_method'] == 'offline_payment') {
+                OrderManager::getAddOrderTransactionsOnGenerateOrder(order: $order, ordersData: $ordersData);
 
-            $orderPlacedNotificationEvents[] = OrderManager::getGenerateOrderNotificationInfo(
-                vendorType: $vendorWiseCart['seller_is'],
-                vendorId: $vendorWiseCart['seller_id'],
-                order: $order,
-                customer: $getCustomerInfo['customer'],
-            );
+                $orderPlacedNotificationEvents[] = OrderManager::getGenerateOrderNotificationInfo(
+                    vendorType: $vendorWiseCart['seller_is'],
+                    vendorId: $vendorWiseCart['seller_id'],
+                    order: $order,
+                    customer: $getCustomerInfo['customer'],
+                );
 
-            $orderPlacedMailEvents[] = OrderManager::getGenerateOrderMailInfo(
-                vendorType: $vendorWiseCart['seller_is'],
-                vendorId: $vendorWiseCart['seller_id'],
-                vendorWiseCart: $vendorWiseCart,
-                order: $order,
-                customer: $getCustomerInfo['customer'],
-            );
+                $orderPlacedMailEvents[] = OrderManager::getGenerateOrderMailInfo(
+                    vendorType: $vendorWiseCart['seller_is'],
+                    vendorId: $vendorWiseCart['seller_id'],
+                    vendorWiseCart: $vendorWiseCart,
+                    order: $order,
+                    customer: $getCustomerInfo['customer'],
+                );
+            }
         }
 
         $user = Helpers::getCustomerInformation(($data['requestObj'] ?? request()->all()));
 
         $notificationSent = false;
-        foreach ($orderPlacedIds as $orderPlacedId) {
-            if (!$notificationSent && $user != 'offline') {
-                $getOrder = Order::where('id', $orderPlacedId)->first();
-                $referralUser = ReferralCustomer::where('user_id', $user['id'])->first();
-                if ($referralUser && $referralUser->is_used != 1 && $referralUser->ordered_notify != 1) {
-                    $orderPlacedNotificationEvents[] = [
-                        'notification' => true,
-                        'notificationData' => (object)[
-                            'key' => 'your_referred_customer_has_been_place_order',
-                            'type' => 'promoter',
-                            'order' => $getOrder,
-                        ],
-                    ];
-                }
-                $notificationSent = true;
-            }
-        }
-
-        if ($user != 'offline') {
-            ReferralCustomer::where('user_id', $user['id'])->update(['is_used' => 1]);
-        }
-
-
-        foreach ($orderPlacedNotificationEvents as $orderPlacedEventGroup) {
-            foreach ($orderPlacedEventGroup as $orderPlacedEvent) {
-                if (!empty($orderPlacedEvent)) {
-                    event(new OrderPlacedEvent(notification: $orderPlacedEvent['notificationData']));
+        if ($data['payment_status'] == 'paid' || $data['payment_method'] == 'cash_on_delivery' || $data['payment_method'] == 'offline_payment') {
+            foreach ($orderPlacedIds as $orderPlacedId) {
+                if (!$notificationSent && $user != 'offline') {
+                    $getOrder = Order::where('id', $orderPlacedId)->first();
+                    $referralUser = ReferralCustomer::where('user_id', $user['id'])->first();
+                    if ($referralUser && $referralUser->is_used != 1 && $referralUser->ordered_notify != 1) {
+                        $orderPlacedNotificationEvents[] = [
+                            'notification' => true,
+                            'notificationData' => (object)[
+                                'key' => 'your_referred_customer_has_been_place_order',
+                                'type' => 'promoter',
+                                'order' => $getOrder,
+                            ],
+                        ];
+                    }
+                    $notificationSent = true;
                 }
             }
-        }
 
-        foreach ($orderPlacedMailEvents as $orderPlacedMailEventGroup) {
-            foreach ($orderPlacedMailEventGroup as $orderPlacedMailEvent) {
-                try {
-                    event(new OrderPlacedEvent(email: $orderPlacedMailEvent['email'], data: $orderPlacedMailEvent['data']));
-                } catch (Exception $exception) {
+            if ($user != 'offline') {
+                ReferralCustomer::where('user_id', $user['id'])->update(['is_used' => 1]);
+            }
+
+            foreach ($orderPlacedNotificationEvents as $orderPlacedEventGroup) {
+                foreach ($orderPlacedEventGroup as $orderPlacedEvent) {
+                    if (!empty($orderPlacedEvent)) {
+                        event(new OrderPlacedEvent(notification: $orderPlacedEvent['notificationData']));
+                    }
+                }
+            }
+
+            foreach ($orderPlacedMailEvents as $orderPlacedMailEventGroup) {
+                foreach ($orderPlacedMailEventGroup as $orderPlacedMailEvent) {
+                    try {
+                        event(new OrderPlacedEvent(email: $orderPlacedMailEvent['email'], data: $orderPlacedMailEvent['data']));
+                    } catch (Exception $exception) {
+                    }
                 }
             }
         }
@@ -1489,9 +1492,12 @@ class OrderManager
         return [];
     }
 
-    public static function getAddOrderTransactionsOnGenerateOrder($order, $ordersData): void
+    public static function getAddOrderTransactionsOnGenerateOrder($order, $ordersData = null): void
     {
-        if ($ordersData['payment_method'] != 'cash_on_delivery' && $ordersData['payment_method'] != 'offline_payment') {
+        $payment_method = $ordersData['payment_method'] ?? $order['payment_method'];
+        $admin_commission = $ordersData['admin_commission'] ?? $order['admin_commission'];
+
+        if ($payment_method != 'cash_on_delivery' && $payment_method != 'offline_payment') {
             $orderSummary = OrderManager::getOrderTotalAndSubTotalAmountSummary($order);
             $orderAmount = $orderSummary['subtotal'] + $orderSummary['total_tax'] - $orderSummary['total_discount_on_product'] - $order['discount'];
 
@@ -1509,14 +1515,14 @@ class OrderManager
                 'seller_is' => $order['seller_is'],
                 'order_id' => $order['id'],
                 'order_amount' => $orderAmount,
-                'seller_amount' => $orderAmount - $ordersData['admin_commission'],
-                'admin_commission' => $ordersData['admin_commission'],
+                'seller_amount' => $orderAmount - $admin_commission,
+                'admin_commission' => $admin_commission,
                 'received_by' => 'admin',
                 'status' => 'hold',
                 'delivery_charge' => $order['shipping_cost'] - $order['extra_discount'],
                 'tax' => $orderSummary['total_tax'],
                 'delivered_by' => 'admin',
-                'payment_method' => $ordersData['payment_method'],
+                'payment_method' => $payment_method,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

@@ -27,7 +27,7 @@ class User extends Authenticatable
     protected $fillable = [
         'f_name', 'l_name', 'name', 'email', 'password', 'country_code', 'phone', 'image', 'login_medium',
         'is_active', 'social_id', 'is_phone_verified', 'temporary_token', 'referral_code', 'referred_by',
-        'street_address', 'country', 'city', 'zip'
+        'street_address', 'country', 'city', 'zip', 'branch_id'
     ];
 
     /**
@@ -52,6 +52,7 @@ class User extends Authenticatable
         'wallet_balance' => 'float',
         'loyalty_point' => 'float',
         'referred_by' => 'integer',
+        'branch_id' => 'integer',
     ];
 
     public function wish_list()

@@ -8,6 +8,7 @@ use App\Utils\SMSModule;
 use App\Utils\CartManager;
 use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Utils\CustomerManager;
 use App\Services\FirebaseService;
 use Illuminate\Http\JsonResponse;
@@ -120,22 +121,34 @@ class CustomerAuthController extends Controller
         $firebaseOTPVerification = getWebConfig(name: 'firebase_otp_verification') ?? [];
         $errorMsg = translate('OTP_sending_failed');
 
+        Log::info('[OTP] loginByOTP attempt', [
+            'phone'            => $phoneNumber,
+            'firebase_enabled' => !empty($firebaseOTPVerification) && $firebaseOTPVerification['status'] ? 'YES' : 'NO',
+            'app_mode'         => env('APP_MODE'),
+        ]);
+
         if ($firebaseOTPVerification && $firebaseOTPVerification['status']) {
             $firebaseResponse = $this->firebaseService->sendOtp($phoneNumber);
             $response = 'error';
+            Log::info('[OTP] Firebase sendOtp response', ['phone' => $phoneNumber, 'response' => $firebaseResponse]);
             if ($firebaseResponse['status'] == 'success') {
                 $token = $firebaseResponse['sessionInfo'];
                 $response = $firebaseResponse['status'];
             } else {
                 $errorMsg = translate(ucfirst(strtolower($firebaseResponse['errors'])));
+                Log::error('[OTP] Firebase sendOtp failed', ['phone' => $phoneNumber, 'errors' => $firebaseResponse['errors']]);
             }
         } else {
-            $response = $this->customerAuthService->sendCustomerPhoneVerificationToken($phoneNumber, $token);
-            $response = $response['response'] ?? 'error';
+            $smsResult = $this->customerAuthService->sendCustomerPhoneVerificationToken($phoneNumber, $token);
+            $response = $smsResult['response'] ?? 'error';
+            Log::info('[OTP] SMS gateway response', ['phone' => $phoneNumber, 'response' => $response, 'app_mode' => env('APP_MODE')]);
             if (env('APP_MODE') == 'dev') {
                 $response = 'success';
+                Log::info('[OTP] Dev mode: forcing response to success', ['phone' => $phoneNumber]);
             }
         }
+
+        Log::info('[OTP] Final response before save', ['phone' => $phoneNumber, 'response' => $response]);
 
         if ($response == 'success') {
             $this->phoneOrEmailVerificationRepo->updateOrCreate(params: ['phone_or_email' => $phoneNumber], value: [

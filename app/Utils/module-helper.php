@@ -65,26 +65,93 @@ if (!function_exists('digital_payment_success')) {
             ];
             request()->merge($requestObj);
 
-            $orderIds = OrderManager::generateOrder(data: [
-                'is_guest' => $additionalData['is_guest_in_order'] ?? 0,
-                'guest_id' => ($additionalData['is_guest_in_order'] ?? 0) ? $additionalData['customer_id'] : null,
-                'customer_id' => $additionalData['customer_id'],
-                'order_status' => 'confirmed',
-                'payment_method' => $paymentData['payment_method'],
-                'payment_status' => 'paid',
-                'transaction_ref' => $paymentData['transaction_id'],
-                'new_customer_id' => $addCustomer ? $addCustomer['id'] : ($additionalData['new_customer_id'] ?? null),
-                'newCustomerRegister' => $addCustomer,
+            $orderIds = $additionalData['order_ids'] ?? [];
+            if (!empty($orderIds)) {
+                $orderPlacedNotificationEvents = [];
+                $orderPlacedMailEvents = [];
 
-                'order_note' => $additionalData['order_note'],
-                'coupon_code' => $additionalData['coupon_code'] ?? null,
-                'address_id' => $additionalData['address_id'] ?? null,
-                'billing_address_id' => $additionalData['billing_address_id'] ?? null,
-                'requestObj' => $requestObj,
-            ]);
+                foreach ($orderIds as $orderId) {
+                    $order = Order::with('customer', 'seller.shop', 'details')->find($orderId);
+                    if ($order) {
+                        if ($addCustomer) {
+                            $order->customer_id = $addCustomer->id;
+                            $order->is_guest = 0;
+                        }
 
-            foreach ($orderIds as $orderId) {
-                OrderManager::generateReferBonusForFirstOrder(orderId: $orderId);
+                        $order->order_status = 'confirmed';
+                        $order->payment_status = 'paid';
+                        $order->payment_method = $paymentData['payment_method'];
+                        $order->transaction_ref = $paymentData['transaction_id'];
+                        $order->save();
+
+                        OrderManager::add_order_status_history($orderId, $order->customer_id, 'confirmed', 'customer');
+
+                        OrderManager::getAddOrderTransactionsOnGenerateOrder(order: $order);
+
+                        OrderManager::generateReferBonusForFirstOrder(orderId: $orderId);
+
+                        $customerObj = $addCustomer ?? $order->customer;
+
+                        $orderPlacedNotificationEvents[] = OrderManager::getGenerateOrderNotificationInfo(
+                            vendorType: $order->seller_is,
+                            vendorId: $order->seller_id,
+                            order: $order,
+                            customer: $customerObj,
+                        );
+
+                        $orderPlacedMailEvents[] = OrderManager::getGenerateOrderMailInfo(
+                            vendorType: $order->seller_is,
+                            vendorId: $order->seller_id,
+                            vendorWiseCart: [
+                                'seller_is' => $order->seller_is,
+                                'seller_id' => $order->seller_id,
+                                'shipping_address_id' => $order->shipping_address_id,
+                                'billing_address_id' => $order->billing_address_id,
+                            ],
+                            order: $order,
+                            customer: $customerObj,
+                        );
+                    }
+                }
+
+                foreach ($orderPlacedNotificationEvents as $orderPlacedEventGroup) {
+                    foreach ($orderPlacedEventGroup as $orderPlacedEvent) {
+                        if (!empty($orderPlacedEvent)) {
+                            event(new \App\Events\OrderPlacedEvent(notification: $orderPlacedEvent['notificationData']));
+                        }
+                    }
+                }
+
+                foreach ($orderPlacedMailEvents as $orderPlacedMailEventGroup) {
+                    foreach ($orderPlacedMailEventGroup as $orderPlacedMailEvent) {
+                        try {
+                            event(new \App\Events\OrderPlacedEvent(email: $orderPlacedMailEvent['email'], data: $orderPlacedMailEvent['data']));
+                        } catch (\Exception $exception) {
+                        }
+                    }
+                }
+            } else {
+                $orderIds = OrderManager::generateOrder(data: [
+                    'is_guest' => $additionalData['is_guest_in_order'] ?? 0,
+                    'guest_id' => ($additionalData['is_guest_in_order'] ?? 0) ? $additionalData['customer_id'] : null,
+                    'customer_id' => $additionalData['customer_id'],
+                    'order_status' => 'confirmed',
+                    'payment_method' => $paymentData['payment_method'],
+                    'payment_status' => 'paid',
+                    'transaction_ref' => $paymentData['transaction_id'],
+                    'new_customer_id' => $addCustomer ? $addCustomer['id'] : ($additionalData['new_customer_id'] ?? null),
+                    'newCustomerRegister' => $addCustomer,
+
+                    'order_note' => $additionalData['order_note'],
+                    'coupon_code' => $additionalData['coupon_code'] ?? null,
+                    'address_id' => $additionalData['address_id'] ?? null,
+                    'billing_address_id' => $additionalData['billing_address_id'] ?? null,
+                    'requestObj' => $requestObj,
+                ]);
+
+                foreach ($orderIds as $orderId) {
+                    OrderManager::generateReferBonusForFirstOrder(orderId: $orderId);
+                }
             }
         }
     }

@@ -503,6 +503,8 @@
     </div>
 
     <span id="message-update-this-address" data-text="{{ translate('Update_this_Address') }}"></span>
+    <span id="message-otp-sent-successfully" data-text="{{ translate('Verification code has been sent to your phone. Please enter the code to login and continue your order.') }}"></span>
+    <span id="message-otp-input-required" data-text="{{ translate('Please enter the OTP verification code.') }}"></span>
     <span id="route-customer-choose-shipping-address-other" data-url="{{ route('customer.choose-shipping-address-other') }}"></span>
     <span id="default-latitude-address" data-value="{{ $defaultLocation ? $defaultLocation['lat']:'-33.8688' }}"></span>
     <span id="default-longitude-address" data-value="{{ $defaultLocation ? $defaultLocation['lng']:'151.2195' }}"></span>
@@ -633,7 +635,12 @@
                 success: function(response) {
                     if(response.status === 'success') {
                         toastr.success(response.message);
-                        location.reload();
+                        window.isCheckoutOtpVerified = true;
+                        if (typeof checkoutFromShipping === 'function') {
+                            checkoutFromShipping();
+                        } else {
+                            location.reload();
+                        }
                     } else {
                         toastr.error(response.message);
                         $('#btn-checkout-verify-otp').prop('disabled', false).text('{{ translate("Verify & Login") }}');

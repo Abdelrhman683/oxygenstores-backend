@@ -718,6 +718,11 @@ class WebController extends Controller
         session()->forget('newCustomerRegister');
         session()->forget('newRegisterCustomerInfo');
         if(auth()->guard('customer')->check()) {
+            $firstOrderId = $orderIds[0] ?? null;
+            if ($firstOrderId) {
+                Toastr::success(translate('Order_Placed_Successfully'));
+                return redirect()->route('account-order-details', ['id' => $firstOrderId]);
+            }
             return redirect()->route('account-oder');
         }
         return redirect(route('home'));

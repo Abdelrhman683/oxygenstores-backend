@@ -370,6 +370,27 @@ class PaymentController extends Controller
             $currency_code = Currency::find($default)->code;
         }
 
+        // Generate the order first to save it as pending/unpaid
+        $orderIds = OrderManager::generateOrder(data: [
+            'is_guest' => $additionalData['is_guest_in_order'] ?? 0,
+            'guest_id' => ($additionalData['is_guest_in_order'] ?? 0) ? $additionalData['customer_id'] : null,
+            'customer_id' => $additionalData['customer_id'],
+            'order_status' => 'pending',
+            'payment_method' => $request['payment_method'],
+            'payment_status' => 'unpaid',
+            'transaction_ref' => '',
+            'new_customer_id' => $additionalData['new_customer_id'] ?? null,
+            'newCustomerRegister' => null,
+
+            'order_note' => $additionalData['order_note'],
+            'coupon_code' => $additionalData['coupon_code'] ?? null,
+            'address_id' => $additionalData['address_id'] ?? null,
+            'billing_address_id' => $additionalData['billing_address_id'] ?? null,
+            'requestObj' => $request,
+        ]);
+
+        $additionalData['order_ids'] = $orderIds;
+
         $paymentInfo = new PaymentInfo(
             success_hook: 'digital_payment_success',
             failure_hook: 'digital_payment_fail',
