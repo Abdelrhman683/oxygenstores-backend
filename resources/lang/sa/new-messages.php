@@ -7098,4 +7098,8 @@ return [
 	"Resend_OTP" => "Resend OTP",
 	"Verification_code_has_been_sent_to_your_phone._Please_enter_the_code_to_login_and_continue_your_order." => "Verification code has been sent to your phone. Please enter the code to login and continue your order.",
 	"Please_enter_the_OTP_verification_code." => "Please enter the OTP verification code.",
+	"pagination_limit_field_is_required" => "Pagination limit field is required",
+	"Ex_:_House#38,_Road#04,_Demo_City" => "Ex : House#38, Road#04, Demo City",
+	"ex:_2" => "Ex: 2",
+	"company_copyright_text_is_required" => "Company copyright text is required",
 ];

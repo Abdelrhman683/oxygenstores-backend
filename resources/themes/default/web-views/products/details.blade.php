@@ -1163,7 +1163,7 @@ if ($product->added_by == 'seller' && isset($product->seller->shop)) {
                             <span class="store_name">البائع :</span>
                             <a href="{{ $shopRoute }}" class="store_bold d-inline-flex align-items-center gap-1">
                                 <img class="store_img" loading="lazy"
-                                    src="{{ theme_asset('public/assets/front-end/img/gree.webp') }}">
+                                    src="{{ theme_asset('public/assets/front-end/img/new-logo-detailes.png') }}">
                                 <span>{{ $shopName }}</span>
                             </a>
                         </div>

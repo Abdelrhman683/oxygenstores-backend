@@ -33,9 +33,7 @@
                 </a>
             </div>
             @if($product->isAirConditioner())
-                <span class="product-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
-            @else
-                <span class="product-tax-badge">السعر شامل الضريبة</span>
+                                    <span class="product-tax-badge ac-tax-badge">شامل التركيب</span>
             @endif
 
             @if($product->product_type == 'physical' && $product->current_stock <= 0)

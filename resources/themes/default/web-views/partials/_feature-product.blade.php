@@ -47,9 +47,7 @@
                     @if($product->product_type == 'physical' && $product->current_stock <= 0)
                         <span class="out_fo_stock">{{translate('out_of_stock')}}</span>
                 @if($product->isAirConditioner())
-                    <span class="product-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
-                @else
-                    <span class="product-tax-badge">السعر شامل الضريبة</span>
+                                    <span class="product-tax-badge ac-tax-badge">شامل التركيب</span>
                 @endif
             </div>
             <div class="single-product-details px-0">

@@ -347,7 +347,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="{{ Request::is('admin/products/list/vendor*')||(Request::is('admin/products/view/vendor/*'))||Request::is('admin/products/updated-product-list') ? 'sub-menu-opened' : '' }}">
+                <!-- <li class="{{ Request::is('admin/products/list/vendor*')||(Request::is('admin/products/view/vendor/*'))||Request::is('admin/products/updated-product-list') ? 'sub-menu-opened' : '' }}">
                     <a class="nav-link nav-link-toggle {{ Request::is('admin/products/list/vendor*')||(Request::is('admin/products/view/vendor/*'))||Request::is('admin/products/updated-product-list') ? 'active' : '' }}"
                        href="javascript:" title="{{ translate('vendor_Products') }}">
                         <i class="fi fi-sr-seller"></i>
@@ -412,7 +412,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> -->
                 <li>
                     <a class="nav-link {{ Request::is('admin/products/product-gallery') ? 'active' : '' }}"
                        href="{{ route('admin.products.product-gallery') }}" title="{{ translate('Product_Gallery') }}">
@@ -586,6 +586,67 @@
             @endif
 
             @if(Helpers::module_permission_check('support_section'))
+
+
+<li class="{{ Request::is('admin/messages*') || Request::is('admin/contact*') || Request::is('admin/support-ticket*') ? 'sub-menu-opened' : '' }}">
+    <a class="nav-link nav-link-toggle text-capitalize {{ Request::is('admin/messages*') || Request::is('admin/contact*') || Request::is('admin/support-ticket*') ? 'active' : '' }}"
+       href="javascript:;"
+       title="{{ translate('help_&_support') }}">
+        <i class="fi fi-sr-life-ring"></i>
+        <span class="aside-mini-hidden-element flex-grow-1 d-flex justify-content-between align-items-center">
+            <span class="text-truncate max-w-180">
+                {{ translate('help_&_support') }}
+            </span>
+            <i class="fi fi-sr-angle-down"></i>
+        </span>
+    </a>
+
+    <ul class="aside-submenu navbar-nav">
+        <li class="nav-item px-3 py-2 fw-semibold text-dark bg-section2 aside-mini-show-element">
+            {{ translate('help_&_support') }}
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {{ Request::is('admin/messages*') ? 'active' : '' }}"
+               href="{{ route('admin.messages.index', ['type' => 'customer']) }}"
+               title="{{ translate('inbox') }}">
+                <span class="text-truncate">
+                    {{ translate('inbox') }}
+                </span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {{ Request::is('admin/contact*') ? 'active' : '' }}"
+               href="{{ route('admin.contact.list') }}"
+               title="{{ translate('messages') }}">
+                <span class="position-relative text-truncate">
+                    {{ translate('messages') }}
+                    @php($message=\App\Models\Contact::where('seen',0)->count())
+                    @if($message!=0)
+                        <span class="btn-status btn-xs-status btn-status-danger position-absolute top-0 menu-status"></span>
+                    @endif
+                </span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {{ Request::is('admin/support-ticket*') ? 'active' : '' }}"
+               href="{{ route('admin.support-ticket.view') }}"
+               title="{{ translate('support_Ticket') }}">
+                <span class="position-relative text-truncate">
+                    {{ translate('support_Ticket') }}
+                    @if(\App\Models\SupportTicket::where('status','open')->count()>0)
+                        <span class="btn-status btn-xs-status btn-status-danger position-absolute top-0 menu-status"></span>
+                    @endif
+                </span>
+            </a>
+        </li>
+    </ul>
+</li>
+
+
+<!-- 
                 <li class="nav-item nav-item_title {{ (Request::is('admin/support-ticket*') || Request::is('admin/contact*')) ? 'scroll-here' : '' }}">
                     <small class="nav-subtitle" title="">{{ translate('help_&_support') }}</small>
                 </li>
@@ -629,7 +690,7 @@
                             </span>
                         </span>
                     </a>
-                </li>
+                </li> -->
             @endif
 
             @if(Helpers::module_permission_check('report'))
@@ -696,14 +757,14 @@
                                 </span>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link {{ Request::is('admin/report/vendor-report') ? 'active' : '' }}"
                                href="{{ route('admin.report.vendor-report') }}" title="{{ translate('vendor_Sales') }}">
                                 <span class="text-truncate text-capitalize">
                                     {{ translate('vendor_Sales') }}
                                 </span>
                             </a>
-                        </li>
+                        </li> -->
                         <li>
                             <a class="nav-link {{ (Request::is('admin/transaction/order-transaction-list') || Request::is('admin/transaction/expense-transaction-list') || Request::is('admin/transaction/refund-transaction-list') || Request::is('admin/report/transaction/refund-transaction-list') || Request::is('admin/transaction/wallet-bonus')) ? 'active' : '' }}"
                                href="{{ route('admin.transaction.order-transaction-list') }}"
@@ -910,7 +971,7 @@
                     </ul>
                 </li>
 
-                <li class="{{ Request::is('admin/delivery-man*') ? 'sub-menu-opened' : '' }}">
+                <!-- <li class="{{ Request::is('admin/delivery-man*') ? 'sub-menu-opened' : '' }}">
                     <a class="nav-link nav-link-toggle text-capitalize {{ Request::is('admin/delivery-man*') ? 'active' : '' }}"
                        href="javascript:"
                        title="{{ translate('delivery_men') }}">
@@ -953,7 +1014,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> -->
 
                 @if(auth('admin')->user()->admin_role_id==1)
                     <li class=" {{ (Request::is('admin/employee*') || Request::is('admin/custom-role*')) ? 'sub-menu-opened' : '' }}">
@@ -1269,7 +1330,7 @@
                     </a>
                 </li>
 
-                @if(getCheckAddonPublishedStatus(moduleName: 'AI'))
+                <!-- @if(getCheckAddonPublishedStatus(moduleName: 'AI'))
                     <li>
                         <a class="nav-link nav-link-toggle {{
                                 Request::is('admin/third-party/ai-setting') || Request::is('admin/third-party/ai-setting/vendors-usage-limits') ? 'active' : '' }}"
@@ -1283,7 +1344,7 @@
                             </span>
                         </a>
                     </li>
-                @endif
+                @endif -->
 
                 <li>
                     <a class="nav-link {{ Request::is('admin/third-party/mail') ||
@@ -1303,7 +1364,7 @@
                 </li>
             @endif
 
-            @if(Helpers::module_permission_check('themes_and_addons'))
+            <!-- @if(Helpers::module_permission_check('themes_and_addons'))
                 <li class="nav-item nav-item_title">
                     <small class="nav-subtitle" title="">
                         {{ translate('Themes_&_Addons') }}
@@ -1377,7 +1438,7 @@
                     </li>
                 @endif
 
-            @endif
+            @endif -->
 
             <?php $checkSetupGuideRequirements = checkSetupGuideRequirements(panel: 'admin'); ?>
 
