@@ -457,6 +457,15 @@ class WebController extends Controller
             $availablePaymentMethod = ['wallet_status'];
         }
 
+        $shippingAddress = null;
+        if (session()->has('address_id')) {
+            $shippingAddress = ShippingAddress::find(session('address_id'));
+        }
+        $billingAddress = null;
+        if (session()->has('billing_address_id')) {
+            $billingAddress = ShippingAddress::find(session('billing_address_id'));
+        }
+
         if (session()->has('address_id') && session()->has('billing_address_id')) {
             return view(VIEW_FILE_NAMES['payment_details'], [
                 'cashOnDeliveryBtnShow' => $cashOnDeliveryBtnShow,
@@ -473,13 +482,13 @@ class WebController extends Controller
                 'payment_gateways_list' => payment_gateways(),
                 'offline_payment_methods' => $offlinePaymentMethods,
                 'activeMinimumMethods' => count($availablePaymentMethod) > 0,
+                'shippingAddress' => $shippingAddress,
+                'billingAddress' => $billingAddress,
             ]);
         }
 
         Toastr::error(translate('incomplete_info'));
         return back();
-    }
-
     public function getCashOnDeliveryCheckoutComplete(Request $request): View|RedirectResponse|JsonResponse
     {
         if ($request['payment_method'] != 'cash_on_delivery') {

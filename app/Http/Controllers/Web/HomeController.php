@@ -246,7 +246,7 @@ class HomeController extends Controller
                         }
                     }
                 }
-                $category->product = $aggregated->unique('id')->values();
+                $category->product = $aggregated->unique('id')->take(10)->values();
             });
 
             return $cats;
@@ -580,7 +580,7 @@ class HomeController extends Controller
                         }
                     }
                 }
-                $category->product = $aggregated->unique('id')->values();
+                $category->product = $aggregated->unique('id')->take(10)->values();
             });
 
             return $cats;
@@ -783,7 +783,7 @@ class HomeController extends Controller
                         }
                     }
                 }
-                $category->product = $aggregated->unique('id')->values();
+                $category->product = $aggregated->unique('id')->take(10)->values();
             });
 
             return $cats;

@@ -41,6 +41,16 @@
                                     </div>
                                 @endif
 
+@php($address = $shippingAddress ?? $billingAddress)
+@php($cart = \App\Utils\CartManager::getCartListQuery(type: 'checked'))
+@php($tamaraConfigSetting = DB::table('addon_settings')->where('key_name', 'tamara')->where('settings_type', 'payment_config')->first())
+@php($tamaraPublicKey = '')
+@if($tamaraConfigSetting)
+    @php($mode = $tamaraConfigSetting->mode)
+    @php($values = json_decode($mode == 'live' ? $tamaraConfigSetting->live_values : $tamaraConfigSetting->test_values))
+    @php($tamaraPublicKey = $values?->public_key ?? '')
+@endif
+
 <div class="ox_checkout_payment_method">
 
     <div class="ox-checkout-summary px-3 px-md-0 mb-3">
@@ -58,55 +68,17 @@
                 </div>
                 
                 <div class="ox-address-block" id="ox-address-block">
-                    <div><span class="label">الإسم:</span> مؤسسة ذرة أكسجين التجارية</div>
-                    <div><span class="label">العنوان:</span> address 1 SA</div>
-                    <div><span class="label">المدينة:</span> الرياض</div>
-                    <div><span class="label">رقم الهاتف:</span> <span class="phone" dir="ltr">+966 536652244</span></div>
+                    @if($address)
+                        <div><span class="label">الإسم:</span> {{ $address->contact_person_name }}</div>
+                        <div><span class="label">العنوان:</span> {{ $address->address }}</div>
+                        <div><span class="label">المدينة:</span> {{ $address->city }}</div>
+                        <div><span class="label">رقم الهاتف:</span> <span class="phone" dir="ltr">{{ $address->phone }}</span></div>
+                    @else
+                        <div class="text-danger">يرجى تحديث معلومات العنوان</div>
+                    @endif
                 </div>
 
-                <a href="#" class="ox-edit-link" id="ox-toggle-address-btn" onclick="oxToggleAddressForm(event)">تعديل العنوان</a>
-            </div>
-
-            <div class="ox-edit-address-form" id="ox-edit-address-form">
-                <div class="ox-form-row">
-                    <div class="ox-form-group">
-                        <label>الاسم الأول <span class="req">*</span></label>
-                        <input type="text" value="مؤسسة ذرة أكسجين" placeholder="الاسم الأول">
-                    </div>
-                    <div class="ox-form-group">
-                        <label>الاسم الأخير <span class="req">*</span></label>
-                        <input type="text" value="التجارية" placeholder="الاسم الأخير">
-                    </div>
-                </div>
-                <div class="ox-form-row">
-                    <div class="ox-form-group">
-                        <label>المنطقة <span class="req">*</span></label>
-                        <select>
-                            <option selected>الرياض</option>
-                            <option>جدة</option>
-                            <option>مكة المكرمة</option>
-                            <option>المدينة المنورة</option>
-                            <option>الدمام</option>
-                        </select>
-                    </div>
-                    <div class="ox-form-group">
-                        <label>الشارع والحي <span class="req">*</span></label>
-                        <input type="text" value="address 1" placeholder="الشارع والحي">
-                    </div>
-                </div>
-                <div class="ox-form-row">
-                    <div class="ox-form-group">
-                        <label>رقم الهاتف <span class="req">*</span></label>
-                        <input type="tel" value="966536652244+" placeholder="رقم الهاتف" dir="ltr">
-                    </div>
-                    <div class="ox-form-group">
-                        <label>البريد الإلكتروني <span class="req">*</span></label>
-                        <input type="email" value="admin@oxygenstores.com.sa" placeholder="البريد الإلكتروني" dir="ltr">
-                    </div>
-                </div>
-                <div class="ox-save-btn">
-                    <button type="button">تأكيد رقم الهاتف وحفظ العنوان</button>
-                </div>
+                <a href="{{ route('checkout-details') }}" class="ox-edit-link" id="ox-toggle-address-btn">تعديل العنوان</a>
             </div>
         </div>
 
@@ -122,13 +94,28 @@
                 </div>
                 
                 <div class="d-flex align-items-center flex-column gap-3">
-                    <span class="ox-products-count">( 1 منتج )</span>
-                    <img class="ox-product-thumb"
-                         src="{{ theme_asset(path: 'public/assets/front-end/img/placeholder.png') }}"
-                         alt="product thumbnail">
+                    @php($cartCount = $cart->count())
+                    @if($cartCount == 1)
+                        <span class="ox-products-count">( منتج واحد )</span>
+                    @elseif($cartCount == 2)
+                        <span class="ox-products-count">( منتجان )</span>
+                    @elseif($cartCount >= 3 && $cartCount <= 10)
+                        <span class="ox-products-count">( {{ $cartCount }} منتجات )</span>
+                    @else
+                        <span class="ox-products-count">( {{ $cartCount }} منتج )</span>
+                    @endif
+                    
+                    <div class="d-flex gap-2 align-items-center flex-wrap justify-content-center mt-2">
+                        @foreach($cart as $cartItem)
+                            <img class="ox-product-thumb"
+                                 src="{{ getStorageImages(path: $cartItem?->product?->thumbnail_full_url, type: 'product') }}"
+                                 alt="{{ $cartItem?->product?->name }}"
+                                 title="{{ $cartItem?->product?->name }}">
+                        @endforeach
+                    </div>
                 </div>
 
-                <a href="#" class="ox-edit-link">مراجعة المنتجات</a>
+                <a href="{{ route('shop-cart') }}" class="ox-edit-link">مراجعة المنتجات</a>
             </div>
         </div>
 
@@ -142,7 +129,7 @@
                     </div>
                     طريقة الدفع
                 </div>
-                <a href="#" class="ox-edit-link">تغيير</a>
+                <a href="{{ route('checkout-details') }}" class="ox-edit-link">تغيير</a>
             </div>
 
             <div class="ox-payment-options">
@@ -155,14 +142,14 @@
                     </svg>
                 </div>
                 <div class="ox-payment-option" style="min-width: 100%; display: block; border: none; padding: 0;">
-                    <tamara-widget type="tamara-summary" amount="3099" uuid="5f3df4db-995d-4aa6-b0ac-5708d379f06e"></tamara-widget>
+                    <tamara-widget type="tamara-summary" amount="{{ $amount }}" @if(!empty($tamaraPublicKey)) uuid="{{ $tamaraPublicKey }}" @endif></tamara-widget>
                 </div>
             </div>
 
             <div class="ox-additional-info">
                 <h6>معلومات إضافية</h6>
                 <p class="sub">ملاحظات الطلب (اختياري)</p>
-                <textarea placeholder="ملاحظات حول الطلب، مثال: ملاحظة خاصة بتسليم الطلب."></textarea>
+                <textarea id="order_note" placeholder="ملاحظات حول الطلب، مثال: ملاحظة خاصة بتسليم الطلب.">{{ session('order_note') }}</textarea>
             </div>
         </div>
 
@@ -497,31 +484,31 @@
 @endsection
 
 @push('script')
+    <script>
+        window.tamaraWidgetConfig = {
+            lang: '{{ session("direction") == "rtl" ? "ar" : "en" }}',
+            country: 'SA',
+            publicKey: '{{ $tamaraPublicKey ?? "d5eee77d-f5d5-4177-b6f6-8a0f913e61c0" }}'
+        };
+    </script>
     <script defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
 
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/payment.js') }}"></script>
     <script>
-        function oxToggleAddressForm(e) {
-            e.preventDefault();
-            const formObj = document.getElementById('ox-edit-address-form');
-            const addressBlock = document.getElementById('ox-address-block');
-            const iconObj = document.getElementById('ox-address-icon');
-            
-            if (formObj) {
-                formObj.classList.toggle('open');
-            }
-            if (iconObj) {
-                iconObj.classList.toggle('editing');
-            }
-            if (addressBlock) {
-                if (formObj && formObj.classList.contains('open')) {
-                    addressBlock.style.display = 'none';
-                    addressBlock.classList.remove('fade-in');
-                } else {
-                    addressBlock.style.display = 'block';
-                    addressBlock.classList.add('fade-in');
-                }
-            }
-        }
+        $(document).ready(function() {
+            $('#order_note').on('change', function() {
+                let orderNote = $(this).val();
+                $.post({
+                    url: $("#route-order-note").data("url"),
+                    data: {
+                        _token: $('meta[name="_token"]').attr("content"),
+                        order_note: orderNote,
+                    },
+                    success: function (response) {
+                        console.log('Order note updated in session');
+                    }
+                });
+            });
+        });
     </script>
 @endpush
