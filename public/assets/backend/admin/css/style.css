@@ -576,9 +576,10 @@ p:last-child {
   z-index: 1049;
 }
 .aside-header {
-  background-color: var(--bs-white);
+  /* background-color: var(--bs-white); */
+  background-color: #000;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--bs-border-color);
+  /* border-bottom: 1px solid var(--bs-border-color); */
 }
 .aside-body {
   padding-inline: 10px;

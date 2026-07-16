@@ -1,7 +1,7 @@
 <div class="position-relative nav--tab-wrapper mb-4">
     <ul class="nav nav-pills nav--tab" id="pills-tab" role="tablist">
 
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link {{ Request::is('admin/system-setup/environment-setup') ? 'active' : '' }}"
                href="{{ route('admin.system-setup.environment-setup') }}">
                 {{ translate('Environment_Settings') }}
@@ -26,7 +26,7 @@
                href="{{ route('admin.system-setup.software-update') }}">
                 {{ translate('Software_Update') }}
             </a>
-        </li>
+        </li> -->
 
         <li class="nav-item">
             <a class="nav-link {{ Request::is('admin/system-setup/language') ? 'active' : '' }}"
@@ -41,13 +41,13 @@
                 {{ translate('Currency') }}
             </a>
         </li>
-
+<!-- 
         <li class="nav-item">
             <a class="nav-link {{ Request::is('admin/system-setup/db-index') ?'active' : '' }}"
                href="{{ route('admin.system-setup.db-index') }}">
                 {{ translate('Clean_Database') }}
             </a>
-        </li>
+        </li> -->
 
     </ul>
     <div class="nav--tab__prev">

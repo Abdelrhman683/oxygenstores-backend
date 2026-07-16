@@ -12,12 +12,12 @@
                 {{ translate('Website_Setup') }}
             </a>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
             <a class="nav-link {{ Request::is('admin/business-settings/vendor-settings') ? 'active' : '' }}"
                 href="{{ route('admin.business-settings.vendor-settings.index') }}">
                 {{ translate('Vendors') }}
             </a>
-        </li>
+        </li> -->
         <li class="nav-item">
             <a class="nav-link {{ Request::is('admin/business-settings/product-settings') ? 'active' : '' }}"
                 href="{{ route('admin.business-settings.product-settings.index') }}">
