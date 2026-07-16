@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Payment_Methods;
 
+use App\Models\Cart;
+use App\Models\Order;
 use App\Models\PaymentRequest;
+use App\Models\ShippingAddress;
 use App\Models\User;
 use App\Traits\Processor;
 use Illuminate\Http\JsonResponse;
@@ -12,6 +15,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class TabbyPaymentController extends Controller
 {
@@ -19,18 +23,29 @@ class TabbyPaymentController extends Controller
 
     private $config_values;
     private PaymentRequest $payment;
-    private $user;
+    private User $user;
+    private $api_key;
+    private $merchant_code;
+    private $base_url;
 
     public function __construct(PaymentRequest $payment, User $user)
     {
         $config = $this->payment_config('tabby', 'payment_config');
         if (!is_null($config) && $config->mode == 'live') {
             $this->config_values = json_decode($config->live_values);
-        } elseif (!is_null($config) && $config->mode == 'test') {
-            $this->config_values = json_decode($config->test_values);
+            $this->base_url      = 'https://api.tabby.ai/api/v2';
+        } else {
+            $this->config_values = json_decode($config?->test_values ?? '{}');
+            $this->base_url      = 'https://api.tabby.ai/api/v2';
         }
+
+        if ($config) {
+            $this->api_key       = $this->config_values->secret_key ?? ($this->config_values->api_key ?? ($this->config_values->public_key ?? null));
+            $this->merchant_code = $this->config_values->merchant_code ?? '';
+        }
+
         $this->payment = $payment;
-        $this->user = $user;
+        $this->user    = $user;
     }
 
     public function payment(Request $request)
@@ -48,28 +63,82 @@ class TabbyPaymentController extends Controller
             return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
         }
 
-        $payer = json_decode($payment_data['payer_information']);
+        $payer      = json_decode($payment_data['payer_information']);
+        $additional = json_decode($payment_data['additional_data'] ?? '{}');
+
+        $customer_id = $additional->customer_id ?? null;
+        $is_guest    = (int)($additional->is_guest ?? 0);
+        $address_id  = $additional->address_id ?? null;
+
+        // ─── عنوان الشحن الحقيقي ───────────────────────────────────────
+        $shipping_address = $address_id ? ShippingAddress::find($address_id) : null;
+
+        // ─── منتجات السلة الحقيقية ─────────────────────────────────────
+        $items = $this->buildCartItems($customer_id, $is_guest, $payment_data);
+
+        // ─── سجل العميل ────────────────────────────────────────────────
+        $loyalty_level    = 0;
+        $registered_since = now()->utc()->toIso8601ZuluString();
+        $order_history    = [];
+
+        if ($customer_id && !$is_guest) {
+            $customer = User::find($customer_id);
+            if ($customer) {
+                $registered_since = $customer->created_at->utc()->toIso8601ZuluString();
+                $loyalty_level    = Order::where('customer_id', $customer_id)
+                    ->where('payment_status', 'paid')
+                    ->count();
+            }
+
+            $past_orders = Order::where('customer_id', $customer_id)
+                ->latest()
+                ->take(10)
+                ->get();
+
+            foreach ($past_orders as $order) {
+                $order_history[] = [
+                    'purchased_at'   => $order->created_at->utc()->toIso8601ZuluString(),
+                    'amount'         => number_format($order->order_amount, 2, '.', ''),
+                    'payment_method' => $this->mapPaymentMethod($order->payment_method ?? ''),
+                    'status'         => $this->mapOrderStatus($order->payment_status ?? ''),
+                ];
+            }
+        }
+
         $currency = strtoupper($payment_data->currency_code);
-        $amount = round($payment_data->payment_amount, 2);
+        $amount   = round($payment_data->payment_amount, 2);
 
-        // Determine Tabby endpoint based on currency/region
-        $url = ($currency === 'SAR') ? 'https://api.tabby.sa/api/v2/checkout' : 'https://api.tabby.ai/api/v2/checkout';
-
-        $data = [
+        $payload = [
             'payment' => [
-                'amount'      => (string)$amount,
+                'amount'      => (string)number_format($amount, 2, '.', ''),
                 'currency'    => $currency,
                 'description' => 'Payment for order #' . $payment_data->id,
                 'buyer'       => [
-                    'phone' => $payer->phone ?? '0000000000',
-                    'email' => $payer->email ?? 'buyer@tabby.ai',
-                    'name'  => $payer->name ?? 'Customer',
+                    'phone' => $payer->phone ?? '',
+                    'email' => $payer->email ?? '',
+                    'name'  => $payer->name  ?? 'Customer',
+                    'dob'   => '1990-01-01',
                 ],
-                'order'       => [
-                    'reference_id' => $payment_data->id,
+                'buyer_history' => [
+                    'registered_since' => $registered_since,
+                    'loyalty_level'    => $loyalty_level,
                 ],
+                'order' => [
+                    'tax_amount'      => '0.00',
+                    'shipping_amount' => '0.00',
+                    'discount_amount' => '0.00',
+                    'updated_at'      => now()->utc()->toIso8601ZuluString(),
+                    'reference_id'    => $payment_data->id,
+                    'items'           => $items,
+                ],
+                'shipping_address' => [
+                    'city'    => $shipping_address->city    ?? ($payer->city    ?? 'Riyadh'),
+                    'address' => $shipping_address->address ?? ($payer->address ?? 'N/A'),
+                    'zip'     => $shipping_address->zip     ?? ($payer->zip     ?? '11111'),
+                ],
+                'order_history' => $order_history,
             ],
-            'merchant_code' => $this->config_values->merchant_code ?? '',
+            'merchant_code' => $this->merchant_code ?? '',
             'lang'          => 'ar',
             'merchant_urls' => [
                 'success' => route('tabby.callback', ['payment_id' => $payment_data->id, 'status' => 'success']),
@@ -80,13 +149,40 @@ class TabbyPaymentController extends Controller
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . ($this->config_values->secret_key ?? ''),
+                'Authorization' => 'Bearer ' . $this->api_key,
                 'Content-Type'  => 'application/json'
-            ])->post($url, $data);
+            ])->post($this->base_url . '/checkout', $payload);
 
-            if ($response->successful()) {
-                $resData = $response->json();
-                $webUrl = $resData['configuration']['available_products']['installments'][0]['web_url'] ?? ($resData['payment']['web_url'] ?? null);
+            $result = $response->json();
+
+            Log::info('Tabby Create Session Response (Oxygen)', [
+                'status_code' => $response->status(),
+                'status'      => $result['status'] ?? null,
+            ]);
+
+            if ($response->successful() && isset($result['status']) && $result['status'] === 'created') {
+                
+                // ─── Background Pre-Scoring Check ─────────────────────────
+                $available = $result['configuration']['available_products'] ?? [];
+                $has_installments = !empty($available['installments'] ?? []);
+                $has_pay_in_full  = !empty($available['pay_in_full'] ?? []);
+
+                if (!$has_installments && !$has_pay_in_full) {
+                    Log::warning('Tabby (Oxygen): Pre-scoring rejected - no available products', ['customer_id' => $customer_id]);
+                    $payment_data_fail = $this->payment::where(['id' => $request['payment_id']])->first();
+                    return $this->payment_response($payment_data_fail, 'fail');
+                }
+
+                $webUrl = null;
+                foreach ($available['installments'] ?? [] as $product) {
+                    if (isset($product['web_url'])) {
+                        $webUrl = $product['web_url'];
+                        break;
+                    }
+                }
+                if (!$webUrl) {
+                    $webUrl = $available['pay_in_full']['web_url'] ?? null;
+                }
 
                 if ($webUrl) {
                     return redirect()->away($webUrl);
@@ -98,21 +194,36 @@ class TabbyPaymentController extends Controller
             Log::error('Tabby request exception: ' . $e->getMessage());
         }
 
-        return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
+        $payment_data_fail = $this->payment::where(['id' => $request['payment_id']])->first();
+        if (isset($payment_data_fail) && function_exists($payment_data_fail->failure_hook)) {
+            call_user_func($payment_data_fail->failure_hook, $payment_data_fail);
+        }
+        return $this->payment_response($payment_data_fail, 'fail');
     }
 
     public function callback(Request $request)
     {
         $payment_id = $request->get('payment_id');
-        $status = $request->get('status');
+        $status     = $request->get('status');
 
         $payment_data = $this->payment::where(['id' => $payment_id])->first();
 
         if (isset($payment_data) && $status === 'success') {
+            
+            // ─── Verify & Capture ──────────────────────────────────────────
+            $tabby_payment_id = $request->query('payment_id');
+            if ($tabby_payment_id && $tabby_payment_id !== $payment_id) {
+                try {
+                    $this->verifyAndCapture($tabby_payment_id);
+                } catch (\Exception $e) {
+                    Log::error('Tabby Callback Capture Error (Oxygen): ' . $e->getMessage());
+                }
+            }
+
             $this->payment::where(['id' => $payment_id])->update([
                 'payment_method' => 'tabby',
                 'is_paid'        => 1,
-                'transaction_id' => $request->get('payment_id'),
+                'transaction_id' => $tabby_payment_id ?? $payment_id,
             ]);
 
             $payment_data = $this->payment::where(['id' => $payment_id])->first();
@@ -125,6 +236,116 @@ class TabbyPaymentController extends Controller
         if (isset($payment_data) && function_exists($payment_data->failure_hook)) {
             call_user_func($payment_data->failure_hook, $payment_data);
         }
+
+        if ($status === 'cancel') {
+            session()->flash('payment_cancel_reason', 'cancelled');
+        } else {
+            session()->flash('payment_cancel_reason', 'rejected');
+        }
+
         return $this->payment_response($payment_data, 'fail');
+    }
+
+    public function verifyAndCapture(string $tabbyPaymentId): bool
+    {
+        $retrieve = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->api_key,
+            'Content-Type'  => 'application/json',
+        ])->get($this->base_url . '/payments/' . $tabbyPaymentId);
+
+        if (!$retrieve->successful()) {
+            Log::error('Tabby (Oxygen): Retrieve failed', ['id' => $tabbyPaymentId, 'body' => $retrieve->body()]);
+            return false;
+        }
+
+        $paymentData = $retrieve->json();
+
+        if (($paymentData['status'] ?? null) !== 'AUTHORIZED') {
+            Log::warning('Tabby (Oxygen): Not AUTHORIZED', ['status' => $paymentData['status'] ?? null, 'id' => $tabbyPaymentId]);
+            return false;
+        }
+
+        $capture = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->api_key,
+            'Content-Type'  => 'application/json',
+        ])->post($this->base_url . '/payments/' . $tabbyPaymentId . '/captures', [
+            'amount' => $paymentData['amount'] ?? null,
+        ]);
+
+        if (!$capture->successful()) {
+            Log::error('Tabby (Oxygen): Capture failed', ['id' => $tabbyPaymentId, 'body' => $capture->body()]);
+            return false;
+        }
+
+        Log::info('Tabby (Oxygen): Payment captured', ['id' => $tabbyPaymentId]);
+        return true;
+    }
+
+    // ─── Helper Methods ────────────────────────────────────────────────
+
+    private function buildCartItems($customer_id, int $is_guest, $payment_data): array
+    {
+        if (!$customer_id) {
+            return $this->fallbackItem($payment_data);
+        }
+
+        $cart_items = Cart::where('customer_id', $customer_id)
+            ->where('is_guest', $is_guest)
+            ->get();
+
+        if ($cart_items->isEmpty()) {
+            return $this->fallbackItem($payment_data);
+        }
+
+        return $cart_items->map(function ($cart) {
+            $unit_price  = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
+            $product_url = url('/product/' . ($cart->slug ?? $cart->product_id));
+            $image_url   = $cart->thumbnail
+                ? asset('storage/app/public/product/' . $cart->thumbnail)
+                : asset('public/assets/back-end/img/logo.png');
+
+            return [
+                'title'           => $cart->name ?? 'Product',
+                'quantity'        => max(1, (int)($cart->quantity ?? 1)),
+                'unit_price'      => number_format($unit_price, 2, '.', ''),
+                'discount_amount' => '0.00',
+                'reference_id'    => (string)$cart->product_id,
+                'image_url'       => $image_url,
+                'product_url'     => $product_url,
+                'category'        => 'General',
+            ];
+        })->toArray();
+    }
+
+    private function fallbackItem($payment_data): array
+    {
+        return [[
+            'title'           => 'Order',
+            'quantity'        => 1,
+            'unit_price'      => number_format($payment_data->payment_amount, 2, '.', ''),
+            'discount_amount' => '0.00',
+            'reference_id'    => $payment_data->id,
+            'image_url'       => asset('public/assets/back-end/img/logo.png'),
+            'product_url'     => url('/'),
+            'category'        => 'General',
+        ]];
+    }
+
+    private function mapPaymentMethod(string $method): string
+    {
+        return match ($method) {
+            'cash_on_delivery' => 'cod',
+            'tabby'            => 'tabby',
+            'tamara'           => 'tamara',
+            default            => 'card',
+        };
+    }
+
+    private function mapOrderStatus(string $status): string
+    {
+        return match ($status) {
+            'paid'   => 'complete',
+            default  => 'processing',
+        };
     }
 }

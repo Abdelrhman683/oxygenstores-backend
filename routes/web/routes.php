@@ -24,6 +24,7 @@ use App\Http\Controllers\Payment_Methods\SenangPayController;
 use App\Http\Controllers\Payment_Methods\SslCommerzPaymentController;
 use App\Http\Controllers\Payment_Methods\StripePaymentController;
 use App\Http\Controllers\Payment_Methods\TabbyPaymentController;
+use App\Http\Controllers\Payment_Methods\TabbyWebhookController;
 use App\Http\Controllers\Payment_Methods\TamaraPaymentController;
 use App\Http\Controllers\Web\CartController;
 use App\Http\Controllers\Web\ChattingController;
@@ -504,6 +505,9 @@ if (!$isGatewayPublished) {
         Route::group(['prefix' => 'tabby', 'as' => 'tabby.'], function () {
             Route::any('pay', [TabbyPaymentController::class, 'payment'])->name('pay');
             Route::any('callback', [TabbyPaymentController::class, 'callback'])->name('callback');
+            Route::post('webhook', [TabbyWebhookController::class, 'handle'])
+                ->name('webhook')
+                ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
         });
 
         //TAMARA

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Payment_Methods;
 
+use App\Models\Cart;
 use App\Models\PaymentRequest;
+use App\Models\ShippingAddress;
 use App\Models\User;
 use App\Traits\Processor;
 use Illuminate\Http\JsonResponse;
@@ -10,13 +12,14 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class PaymobController extends Controller
 {
     use Processor;
 
     private mixed $config_values;
-
     private PaymentRequest $payment;
     private User $user;
     private string $base_url;
@@ -40,30 +43,12 @@ class PaymobController extends Controller
         }
         $this->payment = $payment;
         $this->user = $user;
-        $country = $this->config_values['supported_country'];
+        $country = $this->config_values['supported_country'] ?? '';
         if (array_key_exists($country, $this->supportedCountries)) {
             $this->base_url = $this->supportedCountries[$country];
         } else {
             $this->base_url = $this->defaultBaseUrl;
         }
-    }
-
-    protected function cURL($url, $json)
-    {
-        $ch = curl_init($url);
-
-        $headers = array();
-        $headers[] = 'Content-Type: application/json';
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-        $output = curl_exec($ch);
-
-        curl_close($ch);
-        return json_decode($output);
     }
 
     public function credit(Request $request): JsonResponse|RedirectResponse
@@ -83,151 +68,109 @@ class PaymobController extends Controller
 
         session()->put('payment_id', $payment_data->id);
 
-        if ($payment_data['additional_data'] != null) {
-            $business = json_decode($payment_data['additional_data']);
-            $business_name = $business->business_name ?? "my_business";
-        } else {
-            $business_name = "my_business";
+        $additional    = json_decode($payment_data['additional_data'] ?? '{}');
+        $business_name = $additional->business_name ?? 'my_business';
+        $customer_id   = $additional->customer_id ?? null;
+        $is_guest      = (int)($additional->is_guest ?? 0);
+        $address_id    = $additional->address_id ?? null;
+
+        $payer            = json_decode($payment_data['payer_information']);
+        $shipping_address = $address_id ? ShippingAddress::find($address_id) : null;
+
+        // ─── منتجات السلة الحقيقية ─────────────────────────────────────
+        $items = [];
+        if ($customer_id) {
+            $cart_items = Cart::where('customer_id', $customer_id)
+                ->where('is_guest', $is_guest)
+                ->get();
+
+            foreach ($cart_items as $cart) {
+                $unit_price = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
+                $items[] = [
+                    'name'        => $cart->name ?? 'Product',
+                    'amount'      => round($unit_price * 100),
+                    'description' => 'Product ID: ' . $cart->product_id,
+                    'quantity'    => max(1, (int)($cart->quantity ?? 1)),
+                ];
+            }
         }
 
-        $payer = json_decode($payment_data['payer_information']);
+        if (empty($items)) {
+            $items[] = [
+                'name'        => $business_name,
+                'amount'      => round($payment_data->payment_amount * 100),
+                'description' => 'payable amount',
+                'quantity'    => 1,
+            ];
+        }
+
         $url = $this->base_url . '/v1/intention/';
         $config = $this->config_values;
-        $token = $config['secret_key']; //secret key
+        $token = $config['secret_key'];
 
-        // Data for the request
         $integration_id = (int)$config['integration_id'];
+
+        $first_name = !empty($payer->name) ? explode(' ', $payer->name)[0] : 'Customer';
+        $last_name  = !empty($payer->name) ? (explode(' ', $payer->name)[1] ?? 'Customer') : 'Customer';
+
         $data = [
             'amount' => round($payment_data->payment_amount * 100),
             'currency' => $payment_data->currency_code,
-            'payment_methods' => [$integration_id], //integration id will be integer
-            'items' => [
-                [
-                    'name' => 'payable amount',
-                    'amount' => round($payment_data->payment_amount * 100),
-                    'description' => 'payable amount',
-                    'quantity' => 1,
-                ]
-            ],
+            'payment_methods' => [$integration_id],
+            'items' => $items,
             'billing_data' => [
                 "apartment" => "N/A",
                 "email" => !empty($payer->email) ? $payer->email : 'test@gmail.com',
                 "floor" => "N/A",
-                "first_name" => !empty($payer->name) ? $payer->name : "rashed",
-                "street" => "N/A",
+                "first_name" => $first_name,
+                "street" => $shipping_address->address ?? "N/A",
                 "building" => "N/A",
                 "phone_number" => !empty($payer->phone) ? $payer->phone : "0182780000000",
                 "shipping_method" => "PKG",
-                "postal_code" => "N/A",
-                "city" => "N/A",
-                "country" => "N/A",
-                "last_name" => !empty($payer->name) ? $payer->name : "rashed",
-                "state" => "N/A",
+                "postal_code" => $shipping_address->zip ?? "N/A",
+                "city" => $shipping_address->city ?? "N/A",
+                "country" => $shipping_address->country ?? "SA",
+                "last_name" => $last_name,
+                "state" => $shipping_address->state ?? "N/A",
             ],
             'special_reference' => time(),
             'customer' => [
-                'first_name' => !empty($payer->name) ? $payer->name : "rashed",
-                'last_name' => !empty($payer->name) ? $payer->name : "rashed",
+                'first_name' => $first_name,
+                'last_name' => $last_name,
                 'email' => !empty($payer->email) ? $payer->email : 'test@gmail.com',
-                'extras' => [
-                    're' => '22',
-                ],
-            ],
-            'extras' => [
-                'ee' => 22,
             ],
             "redirection_url" => route('paymob.callback'),
         ];
 
-        $ch = curl_init($url);
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Token ' . $token,
+                'Content-Type'  => 'application/json'
+            ])->post($url, $data);
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: Token ' . $token,
-            'Content-Type: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            if ($response->successful()) {
+                $result = $response->json();
+                if (isset($result['client_secret'])) {
+                    $secret_key = $result['client_secret'];
+                    $publicKey = $config['public_key'];
+                    $urlRedirect = $this->base_url . "/unifiedcheckout/?publicKey=$publicKey&clientSecret=$secret_key";
+                    return redirect()->to($urlRedirect);
+                }
+            }
 
-        $response = curl_exec($ch);
-        $result = json_decode($response, true);
-        if (!isset($result['client_secret'])) {
-            return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
+            Log::error('Paymob Intention request failed: ' . $response->body());
+        } catch (\Exception $e) {
+            Log::error('Paymob Intention request exception: ' . $e->getMessage());
         }
-        $secret_key = $result['client_secret'];
-        curl_close($ch);
-        $publicKey = $config['public_key'];
-        $urlRedirect = $this->base_url . "/unifiedcheckout/?publicKey=$publicKey&clientSecret=$secret_key";
-        return redirect()->to($urlRedirect);
 
-    }
-
-    public function createOrder($token, $payment_data, $business_name)
-    {
-        $items[] = [
-            'name' => $business_name,
-            'amount_cents' => round($payment_data->payment_amount * 100),
-            'description' => 'payment ID :' . $payment_data->id,
-            'quantity' => 1
-        ];
-
-        $data = [
-            "auth_token" => $token,
-            "delivery_needed" => "false",
-            "amount_cents" => round($payment_data->payment_amount * 100),
-            "currency" => $payment_data->currency_code,
-            "items" => $items,
-
-        ];
-
-        return $this->cURL(
-            $this->base_url . '/api/ecommerce/orders',
-            $data
-        );
-    }
-
-    public function getPaymentToken($order, $token, $payment_data, $payer)
-    {
-        $value = $payment_data->payment_amount;
-        $billingData = [
-            "apartment" => "N/A",
-            "email" => !empty($payer->email) ? $payer->email : 'test@gmail.com',
-            "floor" => "N/A",
-            "first_name" => !empty($payer->name) ? $payer->name : "rashed",
-            "street" => "N/A",
-            "building" => "N/A",
-            "phone_number" => !empty($payer->phone) ? $payer->phone : "0182780000000",
-            "shipping_method" => "PKG",
-            "postal_code" => "N/A",
-            "city" => "N/A",
-            "country" => "N/A",
-            "last_name" => !empty($payer->name) ? $payer->name : "rashed",
-            "state" => "N/A",
-        ];
-
-        $data = [
-            "auth_token" => $token,
-            "amount_cents" => round($value * 100),
-            "expiration" => 3600,
-            "order_id" => $order->id,
-            "billing_data" => $billingData,
-            "currency" => $payment_data->currency_code,
-            "integration_id" => is_array($this->config_values) ? $this->config_values['integration_id'] : $this->config_values->integration_id
-        ];
-
-        $response = $this->cURL(
-            $this->base_url . '/api/acceptance/payment_keys',
-            $data
-        );
-
-        return $response->token;
+        return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
     }
 
     public function callback(Request $request)
     {
         $data = $request->all();
         ksort($data);
-        $hmac = $data['hmac'];
+        $hmac = $data['hmac'] ?? '';
         $array = [
             'amount_cents',
             'created_at',

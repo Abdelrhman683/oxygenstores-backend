@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Payment_Methods;
 
+use App\Models\Cart;
 use App\Models\PaymentRequest;
+use App\Models\ShippingAddress;
 use App\Models\User;
 use App\Traits\Processor;
 use Illuminate\Http\JsonResponse;
@@ -19,18 +21,27 @@ class TamaraPaymentController extends Controller
 
     private $config_values;
     private PaymentRequest $payment;
-    private $user;
+    private User $user;
+    private $api_token;
+    private $base_url;
 
     public function __construct(PaymentRequest $payment, User $user)
     {
         $config = $this->payment_config('tamara', 'payment_config');
         if (!is_null($config) && $config->mode == 'live') {
             $this->config_values = json_decode($config->live_values);
-        } elseif (!is_null($config) && $config->mode == 'test') {
-            $this->config_values = json_decode($config->test_values);
+            $this->base_url      = $this->config_values->base_url ?? 'https://api.tamara.co';
+        } else {
+            $this->config_values = json_decode($config?->test_values ?? '{}');
+            $this->base_url      = $this->config_values->base_url ?? 'https://api-sandbox.tamara.co';
         }
+
+        if ($config && isset($this->config_values)) {
+            $this->api_token = $this->config_values->api_token ?? ($this->config_values->api_key ?? null);
+        }
+
         $this->payment = $payment;
-        $this->user = $user;
+        $this->user    = $user;
     }
 
     public function payment(Request $request)
@@ -48,12 +59,30 @@ class TamaraPaymentController extends Controller
             return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
         }
 
-        $payer = json_decode($payment_data['payer_information']);
-        $currency = strtoupper($payment_data->currency_code);
-        $amount = round($payment_data->payment_amount, 2);
+        $payer      = json_decode($payment_data['payer_information']);
+        $additional = json_decode($payment_data['additional_data'] ?? '{}');
 
-        $isLive = (!is_null($this->config_values) && isset($this->config_values->mode) && $this->config_values->mode === 'live');
-        $url = $isLive ? 'https://api.tamara.co/checkout' : 'https://api-sandbox.tamara.co/checkout';
+        $customer_id = $additional->customer_id ?? null;
+        $is_guest    = (int)($additional->is_guest ?? 0);
+        $address_id  = $additional->address_id ?? null;
+
+        // ─── عنوان الشحن الحقيقي ───────────────────────────────────────
+        $shipping_address = $address_id ? ShippingAddress::find($address_id) : null;
+
+        // ─── منتجات السلة الحقيقية ─────────────────────────────────────
+        $items = $this->buildTamaraItems($customer_id, $is_guest, $payment_data);
+
+        $currency = strtoupper($payment_data->currency_code);
+        $amount   = round($payment_data->payment_amount, 2);
+
+        $buyer_name  = $payer->name ?? 'Customer';
+        $buyer_phone = (string)($payer->phone ?? '0500000000');
+        $buyer_email = (string)($payer->email ?? 'buyer@tamara.co');
+
+        $ship_line1   = $shipping_address->address ?? ($payer->address ?? 'N/A');
+        $ship_city    = $shipping_address->city    ?? ($payer->city    ?? 'Riyadh');
+        $ship_country = $shipping_address->country ?? 'SA';
+        $ship_phone   = $shipping_address->phone   ?? $buyer_phone;
 
         $data = [
             'order_reference_id' => $payment_data->id,
@@ -65,10 +94,18 @@ class TamaraPaymentController extends Controller
             'country_code'       => 'SA',
             'payment_type'       => 'PAY_BY_INSTALMENTS',
             'consumer'           => [
-                'first_name'   => $payer->name ?? 'Customer',
-                'last_name'    => $payer->name ?? 'Customer',
-                'phone_number' => $payer->phone ?? '0000000000',
-                'email'        => $payer->email ?? 'buyer@tamara.co',
+                'first_name'   => $buyer_name,
+                'last_name'    => $buyer_name,
+                'phone_number' => $buyer_phone,
+                'email'        => $buyer_email,
+            ],
+            'shipping_address' => [
+                'first_name'   => $buyer_name,
+                'last_name'    => $buyer_name,
+                'line1'        => $ship_line1,
+                'city'         => $ship_city,
+                'country_code' => $ship_country,
+                'phone_number' => $ship_phone,
             ],
             'merchant_url'       => [
                 'success'      => route('tamara.callback', ['payment_id' => $payment_data->id, 'status' => 'success']),
@@ -84,30 +121,18 @@ class TamaraPaymentController extends Controller
                 'amount'   => 0.0,
                 'currency' => $currency,
             ],
-            'items'              => [
-                [
-                    'name'         => 'Order Payment',
-                    'type'         => 'Physical',
-                    'reference_id' => $payment_data->id,
-                    'sku'          => 'order-payment',
-                    'quantity'     => 1,
-                    'total_amount' => [
-                        'amount'   => (float)$amount,
-                        'currency' => $currency,
-                    ]
-                ]
-            ]
+            'items'              => $items,
         ];
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . ($this->config_values->api_token ?? ''),
+                'Authorization' => 'Bearer ' . $this->api_token,
                 'Content-Type'  => 'application/json'
-            ])->post($url, $data);
+            ])->post($this->base_url . '/checkout', $data);
 
             if ($response->successful()) {
                 $resData = $response->json();
-                $webUrl = $resData['checkout_url'] ?? null;
+                $webUrl  = $resData['checkout_url'] ?? null;
 
                 if ($webUrl) {
                     return redirect()->away($webUrl);
@@ -119,13 +144,17 @@ class TamaraPaymentController extends Controller
             Log::error('Tamara request exception: ' . $e->getMessage());
         }
 
-        return response()->json($this->response_formatter(GATEWAYS_DEFAULT_204), 200);
+        $payment_data_fail = $this->payment::where(['id' => $request['payment_id']])->first();
+        if (isset($payment_data_fail) && function_exists($payment_data_fail->failure_hook)) {
+            call_user_func($payment_data_fail->failure_hook, $payment_data_fail);
+        }
+        return $this->payment_response($payment_data_fail, 'fail');
     }
 
     public function callback(Request $request)
     {
         $payment_id = $request->get('payment_id');
-        $status = $request->get('status');
+        $status     = $request->get('status');
 
         $payment_data = $this->payment::where(['id' => $payment_id])->first();
 
@@ -146,6 +175,65 @@ class TamaraPaymentController extends Controller
         if (isset($payment_data) && function_exists($payment_data->failure_hook)) {
             call_user_func($payment_data->failure_hook, $payment_data);
         }
+
+        if ($status === 'cancel') {
+            session()->flash('payment_cancel_reason', 'cancelled');
+        } else {
+            session()->flash('payment_cancel_reason', 'rejected');
+        }
+
         return $this->payment_response($payment_data, 'fail');
+    }
+
+    // ─── Helper Methods ────────────────────────────────────────────────
+
+    private function buildTamaraItems($customer_id, int $is_guest, $payment_data): array
+    {
+        $currency = strtoupper($payment_data->currency_code);
+
+        if (!$customer_id) {
+            return $this->fallbackTamaraItem($payment_data, $currency);
+        }
+
+        $cart_items = Cart::where('customer_id', $customer_id)
+            ->where('is_guest', $is_guest)
+            ->get();
+
+        if ($cart_items->isEmpty()) {
+            return $this->fallbackTamaraItem($payment_data, $currency);
+        }
+
+        return $cart_items->map(function ($cart) use ($currency) {
+            $unit_price  = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
+            $total_price = $unit_price * max(1, (int)($cart->quantity ?? 1));
+
+            return [
+                'reference_id' => (string)$cart->product_id,
+                'type'         => 'Physical',
+                'name'         => $cart->name ?? 'Product',
+                'sku'          => 'SKU-' . $cart->product_id,
+                'quantity'     => max(1, (int)($cart->quantity ?? 1)),
+                'unit_price'   => ['amount' => (float)number_format($unit_price, 2, '.', ''),  'currency' => $currency],
+                'total_amount' => ['amount' => (float)number_format($total_price, 2, '.', ''), 'currency' => $currency],
+                'discount_amount' => ['amount' => 0.0, 'currency' => $currency],
+                'tax_amount'      => ['amount' => 0.0, 'currency' => $currency],
+            ];
+        })->toArray();
+    }
+
+    private function fallbackTamaraItem($payment_data, string $currency): array
+    {
+        $amount = (float)number_format($payment_data->payment_amount, 2, '.', '');
+        return [[
+            'reference_id'    => (string)$payment_data->id,
+            'type'            => 'Physical',
+            'name'            => 'Order Item',
+            'sku'             => 'SKU-0001',
+            'quantity'        => 1,
+            'unit_price'      => ['amount' => $amount, 'currency' => $currency],
+            'total_amount'    => ['amount' => $amount, 'currency' => $currency],
+            'discount_amount' => ['amount' => 0.0, 'currency' => $currency],
+            'tax_amount'      => ['amount' => 0.0, 'currency' => $currency],
+        ]];
     }
 }
