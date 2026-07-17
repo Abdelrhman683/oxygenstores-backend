@@ -174,6 +174,16 @@
                     (يشمل {{ webCurrencyConverter(amount: $totalVatIncluded) }} ضريبة القيمة المضافة)
                 </div>
             @endif
+
+            @if($totalAmount > 0)
+                <div class="mt-3">
+                    <tamara-widget type="tamara-summary"
+                        amount="{{ $totalAmount - $referralAmount }}"
+                        inline-type="2">
+                    </tamara-widget>
+                    <div id="TabbyPromoCart" class="mt-2"></div>
+                </div>
+            @endif
         </div>
         @php($company_reliability = getWebConfig(name: 'company_reliability'))
         @if ($company_reliability != null)
@@ -246,6 +256,15 @@
                 (يشمل {{ webCurrencyConverter(amount: $totalVatIncluded) }} ضريبة القيمة المضافة)
             </div>
         @endif
+        @if($totalAmount > 0)
+            <div class="mt-2 w-100 text-center">
+                <tamara-widget type="tamara-summary"
+                    amount="{{ $totalAmount - $referralAmount }}"
+                    inline-type="2">
+                </tamara-widget>
+                <div id="TabbyPromoCartMobile" class="mt-1"></div>
+            </div>
+        @endif
     </div>
 
     @if (str_contains(request()->url(), 'checkout-payment'))
@@ -281,5 +300,41 @@
         $(document).ready(function() {
             orderSummaryStickyFunction()
         });
+    </script>
+    <script>
+        window.tamaraWidgetConfig = {
+            lang: 'ar',
+            country: 'SA',
+            publicKey: 'd5eee77d-f5d5-4177-b6f6-8a0f913e61c0'
+        };
+    </script>
+    <script defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
+    <script src="https://checkout.tabby.ai/tabby-promo.js"></script>
+    <script>
+        (function initTabbyCartPromo() {
+            var amount = {{ $totalAmount - $referralAmount }};
+            if (amount > 0 && typeof TabbyPromo !== 'undefined') {
+                if (document.getElementById('TabbyPromoCart')) {
+                    new TabbyPromo({
+                        selector: '#TabbyPromoCart',
+                        currency: 'SAR',
+                        price: amount,
+                        lang: 'ar',
+                        source: 'cart',
+                        publicKey: 'pk_test_019c344f-bd29-e95d-46df-8dcda6d1644b'
+                    });
+                }
+                if (document.getElementById('TabbyPromoCartMobile')) {
+                    new TabbyPromo({
+                        selector: '#TabbyPromoCartMobile',
+                        currency: 'SAR',
+                        price: amount,
+                        lang: 'ar',
+                        source: 'cart',
+                        publicKey: 'pk_test_019c344f-bd29-e95d-46df-8dcda6d1644b'
+                    });
+                }
+            }
+        })();
     </script>
 @endpush

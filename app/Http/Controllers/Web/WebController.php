@@ -489,6 +489,8 @@ class WebController extends Controller
 
         Toastr::error(translate('incomplete_info'));
         return back();
+    }
+
     public function getCashOnDeliveryCheckoutComplete(Request $request): View|RedirectResponse|JsonResponse
     {
         if ($request['payment_method'] != 'cash_on_delivery') {
