@@ -5,6 +5,10 @@
 @push('css_or_js')
     @include(VIEW_FILE_NAMES['product_seo_meta_content_partials'], ['metaContentData' => $product?->seoInfo, 'productDetails' => $product])
     <link rel="stylesheet" href="{{ theme_asset(path: 'public/assets/front-end/css/product-details.css') }}" />
+    <link rel="stylesheet" media="screen"
+        href="{{ theme_asset(path: 'public/assets/front-end/vendor/drift-zoom/dist/drift-basic.min.css') }}">
+    <link rel="stylesheet" media="screen"
+        href="{{ theme_asset(path: 'public/assets/front-end/vendor/lightgallery.js/dist/css/lightgallery.min.css') }}">
 @endpush
 
 @section('content')
@@ -1628,6 +1632,11 @@ if ($product->added_by == 'seller' && isset($product->seller->shop)) {
 @endsection
 
 @push('script')
+    <script src="{{ theme_asset(path: 'public/assets/front-end/vendor/drift-zoom/dist/Drift.min.js') }}"></script>
+    <script
+        src="{{ theme_asset(path: 'public/assets/front-end/vendor/lightgallery.js/dist/js/lightgallery.min.js') }}"></script>
+    <script src="{{ theme_asset(path: 'public/assets/front-end/vendor/lg-video.js/dist/lg-video.min.js') }}"></script>
+    <script src="{{ theme_asset(path: 'public/assets/front-end/plugin/easyzoom/easyzoom.min.js') }}"></script>
     <script>
         $(document).on('change', 'input[name="color"]', function () {
             const selectedColor = $(this).val();

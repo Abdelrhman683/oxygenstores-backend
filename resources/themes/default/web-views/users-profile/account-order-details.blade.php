@@ -1150,5 +1150,6 @@
 @push('script')
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/spartan-multi-image-picker.js') }}"></script>
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/payment.js') }}"></script>
+    <script src="{{ theme_asset(path: 'public/assets/front-end/js/account-order-details.js') }}"></script>
 @endpush
 

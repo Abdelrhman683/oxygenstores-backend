@@ -125,6 +125,7 @@
 
 @push('script')
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/product-list-filter.js') }}"></script>
+    <script src="{{ theme_asset(path: 'public/assets/front-end/js/seller-filter.js') }}"></script>
 @endpush
 <style>
     .cz-sidebar {
