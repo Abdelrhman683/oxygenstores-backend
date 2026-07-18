@@ -367,18 +367,9 @@
                     }
 
                     // Determine if we need to show the branch selector/ask for location
-                    $showBranchSelector = false;
-                    if (auth('customer')->check()) {
-                        if (!auth('customer')->user()->branch_id) {
-                            $showBranchSelector = true;
-                        }
-                    } else {
-                        $guestId = session('guest_id');
-                        $guest = $guestId ? \App\Models\GuestUser::find($guestId) : null;
-                        if (!$guest || !$guest->branch_id) {
-                            $showBranchSelector = true;
-                        }
-                    }
+                    $showBranchSelector = !session()->has('branch_id')
+                        && !(auth('customer')->check() && auth('customer')->user()->branch_id)
+                        && !(session('guest_id') && \App\Models\GuestUser::where('id', session('guest_id'))->whereNotNull('branch_id')->exists());
                 @endphp
                 @foreach($cities as $city)
                     @php
@@ -386,16 +377,7 @@
                         $lat = $branchLats[$branchId] ?? null;
                         $lng = $branchLngs[$branchId] ?? null;
                         
-                        // Check if the user/guest has branch_id set in the database
-                        $dbBranchId = null;
-                        if (auth('customer')->check()) {
-                            $dbBranchId = auth('customer')->user()->branch_id;
-                        } else {
-                            $guestId = session('guest_id');
-                            $guest = $guestId ? \App\Models\GuestUser::find($guestId) : null;
-                            $dbBranchId = $guest?->branch_id;
-                        }
-                        
+                        $dbBranchId = getSelectedBranchId();
                         $isActive = ($dbBranchId && $dbBranchId == $branchId);
                     @endphp
                     @if($branchId)
@@ -520,7 +502,7 @@
 
             // Close modal handler
             $(document).on('click', '.close-region-modal', function() {
-                let currentBranchId = '{{ auth('customer')->check() ? auth('customer')->user()->branch_id : (session('guest_id') ? \App\Models\GuestUser::find(session('guest_id'))?->branch_id : '') }}';
+                let currentBranchId = '{{ getSelectedBranchId() }}';
                 if (currentBranchId) {
                     $('#branchModal').modal('hide');
                 } else {

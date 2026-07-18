@@ -7102,4 +7102,12 @@ return [
 	"Ex_:_House#38,_Road#04,_Demo_City" => "Ex : House#38, Road#04, Demo City",
 	"ex:_2" => "Ex: 2",
 	"company_copyright_text_is_required" => "Company copyright text is required",
+	"Please_confirm_the_offline_payment_information_before_editing_this_order." => "Please confirm the offline payment information before editing this order.",
+	"Customer_Payment_info" => "Customer Payment info",
+	"Payment_Note" => "Payment Note",
+	"Thank_You_For_Your_Purchase!" => "Thank You For Your Purchase!",
+	"We_have_received_your_order_and_will_ship_it_shortly." => "We have received your order and will ship it shortly.",
+	"Your_Order_ID" => "Your Order ID",
+	"keep_it_handy_for_tracking." => "Keep it handy for tracking.",
+	"Explore_More_Items" => "Explore More Items",
 ];

@@ -117,10 +117,9 @@ class ProductDetailsController extends Controller
                 dataLimit: 2, offset: 1
             );
 
+            // Use current_stock accessor which reads branch qty from product_stocks
+            // instead of variation JSON qty which holds global (non-branch) stock
             $firstVariationQuantity = $product['current_stock'];
-            if (count(json_decode($product['variation'], true)) > 0) {
-                $firstVariationQuantity = json_decode($product['variation'], true)[0]['qty'];
-            }
             $firstVariationQuantity = $product['product_type'] == 'physical' ? $firstVariationQuantity : 999;
 
             $rating = getRating(reviews: $product->reviews);
@@ -229,10 +228,9 @@ class ProductDetailsController extends Controller
                 dataLimit: 2, offset: 1
             );
 
+            // Use current_stock accessor which reads branch qty from product_stocks
+            // instead of variation JSON qty which holds global (non-branch) stock
             $firstVariationQuantity = $product['current_stock'];
-            if (count(json_decode($product['variation'], true)) > 0) {
-                $firstVariationQuantity = json_decode($product['variation'], true)[0]['qty'];
-            }
             $firstVariationQuantity = $product['product_type'] == 'physical' ? $firstVariationQuantity : 999;
 
             $decimalPointSettings = getWebConfig('decimal_point_settings');

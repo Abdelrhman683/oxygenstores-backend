@@ -103,7 +103,7 @@ class HomeController extends Controller
             ->where('deal_of_the_days.status', 1)
             ->first();
 
-        $airConditionerProducts = Cache::remember('air_conditioner_products_home', CACHE_FOR_3_HOURS, function () {
+        $airConditionerProducts = Cache::remember($this->getBranchCacheKey('air_conditioner_products_home'), CACHE_FOR_3_HOURS, function () {
             $acCategory = $this->category->where('parent_id', 0)
                 ->where('name', 'like', '%مكيف%')
                 ->first();
@@ -127,7 +127,7 @@ class HomeController extends Controller
                 ->get();
         });
 
-        $bestSellerAllTimeProducts = Cache::remember('best_seller_all_time_products_home', CACHE_FOR_3_HOURS, function () {
+        $bestSellerAllTimeProducts = Cache::remember($this->getBranchCacheKey('best_seller_all_time_products_home'), CACHE_FOR_3_HOURS, function () {
             return $this->product->active()
                 ->with(['clearanceSale' => function ($q) {
                     return $q->active(); }])
@@ -137,7 +137,7 @@ class HomeController extends Controller
                 ->get();
         });
 
-        $bestSellerThisMonthProducts = Cache::remember('best_seller_this_month_products_home', CACHE_FOR_3_HOURS, function () {
+        $bestSellerThisMonthProducts = Cache::remember($this->getBranchCacheKey('best_seller_this_month_products_home'), CACHE_FOR_3_HOURS, function () {
             $startOfMonth = now()->startOfMonth();
             return $this->product->active()
                 ->with(['clearanceSale' => function ($q) {
@@ -152,7 +152,7 @@ class HomeController extends Controller
                 ->get();
         });
 
-        $twoDoorFridgeProducts = Cache::remember('two_door_fridge_products_home', CACHE_FOR_3_HOURS, function () {
+        $twoDoorFridgeProducts = Cache::remember($this->getBranchCacheKey('two_door_fridge_products_home'), CACHE_FOR_3_HOURS, function () {
             $cat = $this->category
                 ->where(function ($q) {
                     $q->where('name', 'like', '%بابين%')
@@ -178,7 +178,7 @@ class HomeController extends Controller
         });
 
 
-        $washerProducts = Cache::remember('washer_products_home', CACHE_FOR_3_HOURS, function () {
+        $washerProducts = Cache::remember($this->getBranchCacheKey('washer_products_home'), CACHE_FOR_3_HOURS, function () {
             $cat = $this->category
                 ->where('parent_id', 0)
                 ->where(function ($q) {
@@ -203,7 +203,7 @@ class HomeController extends Controller
                 ->get();
         });
 
-        $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
+        $recommendedCategories = Cache::remember($this->getBranchCacheKey('recommended_categories_with_products'), CACHE_FOR_3_HOURS, function () {
             // الأقسام الثلاثة المحددة: المكيفات (1) - الثلاجات (12) - الغسالات (11)
             $fixedIds = [1, 12, 11];
             $cats = $this->category->whereIn('id', $fixedIds)
@@ -252,7 +252,7 @@ class HomeController extends Controller
             return $cats;
         });
 
-        $discountProducts = Cache::remember('discount_products_home', CACHE_FOR_3_HOURS, function () {
+        $discountProducts = Cache::remember($this->getBranchCacheKey('discount_products_home'), CACHE_FOR_3_HOURS, function () {
             return $this->product->active()
                 ->where('discount', '>', 0)
                 ->with(['clearanceSale' => function ($q) {
@@ -539,7 +539,7 @@ class HomeController extends Controller
             }
         }
 
-        $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
+        $recommendedCategories = Cache::remember($this->getBranchCacheKey('recommended_categories_with_products'), CACHE_FOR_3_HOURS, function () {
             // الأقسام الثلاثة المحددة: المكيفات (1) - الثلاجات (12) - الغسالات (11)
             $fixedIds = [1, 12, 11];
             $cats = $this->category->whereIn('id', $fixedIds)
@@ -645,7 +645,7 @@ class HomeController extends Controller
         $clearanceSaleProducts = $this->cacheHomePageClearanceSaleProducts();
         $recommendedProduct = $this->cacheHomePageRandomSingleProductItem();
 
-        $featuredProductsList = Cache::remember(CACHE_FOR_FEATURED_PRODUCTS_LIST, CACHE_FOR_3_HOURS, function () {
+        $featuredProductsList = Cache::remember($this->getBranchCacheKey(CACHE_FOR_FEATURED_PRODUCTS_LIST), CACHE_FOR_3_HOURS, function () {
             $featuredProductsList = $this->product->with([
                 'clearanceSale' => function ($query) {
                     $query->active();
@@ -657,7 +657,7 @@ class HomeController extends Controller
             return ProductManager::getPriorityWiseFeaturedProductsQuery(query: $featuredProductsList, dataLimit: 15);
         });
 
-        $mostSearchingProducts = Cache::remember(CACHE_FOR_MOST_SEARCHING_PRODUCTS_LIST, CACHE_FOR_3_HOURS, function () {
+        $mostSearchingProducts = Cache::remember($this->getBranchCacheKey(CACHE_FOR_MOST_SEARCHING_PRODUCTS_LIST), CACHE_FOR_3_HOURS, function () {
             return Product::active()->with([
                 'category',
                 'clearanceSale' => function ($query) {
@@ -742,7 +742,7 @@ class HomeController extends Controller
             })->whereNull('delivery_man_id')->count(),
         ];
 
-        $recommendedCategories = Cache::remember('recommended_categories_with_products', CACHE_FOR_3_HOURS, function () {
+        $recommendedCategories = Cache::remember($this->getBranchCacheKey('recommended_categories_with_products'), CACHE_FOR_3_HOURS, function () {
             // الأقسام الثلاثة المحددة: المكيفات (1) - الثلاجات (12) - الغسالات (11)
             $fixedIds = [1, 12, 11];
             $cats = $this->category->whereIn('id', $fixedIds)

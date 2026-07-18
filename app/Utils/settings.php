@@ -452,30 +452,46 @@ if (!function_exists('cacheRemoveByType')) {
 if (!function_exists('getSelectedBranchId')) {
     function getSelectedBranchId()
     {
-        if (auth('customer')->check()) {
-            return auth('customer')->user()->branch_id ?? \Illuminate\Support\Facades\DB::table('branches')
-                ->where('name', 'like', '%الرياض%')
-                ->orWhere('name', 'like', '%Riyadh%')
-                ->value('id') ?? 1;
+        if (request()->hasHeader('branch-id') && is_numeric(request()->header('branch-id'))) {
+            return (int) request()->header('branch-id');
         }
 
-        $guestId = session('guest_id');
-        if ($guestId) {
-            $guest = \App\Models\GuestUser::find($guestId);
-            if ($guest) {
-                return $guest->branch_id ?? \Illuminate\Support\Facades\DB::table('branches')
-                    ->where('name', 'like', '%الرياض%')
-                    ->orWhere('name', 'like', '%Riyadh%')
-                    ->value('id') ?? 1;
+        if (request()->has('branch_id') && is_numeric(request()->branch_id)) {
+            return (int) request()->branch_id;
+        }
+
+        try {
+            if (session()->has('branch_id') && is_numeric(session('branch_id'))) {
+                return (int) session('branch_id');
             }
-            // If the guest record was deleted from the DB, forget the guest_id session key
-            session()->forget('guest_id');
-        }
+        } catch (\Throwable $e) {}
 
-        return \Illuminate\Support\Facades\DB::table('branches')
+        try {
+            if (request()->cookie('selected_branch_id') && is_numeric(request()->cookie('selected_branch_id'))) {
+                return (int) request()->cookie('selected_branch_id');
+            }
+        } catch (\Throwable $e) {}
+
+        try {
+            if (auth('customer')->check() && auth('customer')->user()->branch_id) {
+                return (int) auth('customer')->user()->branch_id;
+            }
+        } catch (\Throwable $e) {}
+
+        try {
+            $guestId = session('guest_id');
+            if ($guestId) {
+                $guest = \App\Models\GuestUser::find($guestId);
+                if ($guest && $guest->branch_id) {
+                    return (int) $guest->branch_id;
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        return (int) (\Illuminate\Support\Facades\DB::table('branches')
             ->where('name', 'like', '%الرياض%')
             ->orWhere('name', 'like', '%Riyadh%')
-            ->value('id') ?? 1;
+            ->value('id') ?? 1);
     }
 }
 

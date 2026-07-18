@@ -91,6 +91,31 @@ trait  SmsGateway
         return 'not_found';
     }
 
+    public static function formatOtpMessage(?string $template, $otp): string
+    {
+        $template = trim((string)$template);
+
+        if (empty($template)) {
+            return "Your OTP code is: {$otp}";
+        }
+
+        $placeholders = ['#OTP#', '#otp#', '{otp}', '{OTP}', '#code#', '#CODE#', '{code}', '{CODE}', '#token#', '#TOKEN#', '{token}', '{TOKEN}'];
+        $replaced = false;
+
+        foreach ($placeholders as $placeholder) {
+            if (strpos($template, $placeholder) !== false) {
+                $template = str_replace($placeholder, $otp, $template);
+                $replaced = true;
+            }
+        }
+
+        if (!$replaced) {
+            $template .= " : {$otp}";
+        }
+
+        return $template;
+    }
+
     public static function twilio($receiver, $otp): string
     {
         $config = self::get_settings('twilio');
@@ -619,7 +644,7 @@ trait  SmsGateway
         if (isset($config) && $config['status'] == 1) {
             // Taqnyat requires international format without + (e.g. 9665xxxxxxxx)
             $receiver = ltrim(str_replace('+', '', $receiver), '0');
-            $message = str_replace('#OTP#', $otp, $config['otp_template']);
+            $message = self::formatOtpMessage($config['otp_template'] ?? '', $otp);
             $bearer_token = $config['bearer_token'];
             $sender = $config['sender'];
 

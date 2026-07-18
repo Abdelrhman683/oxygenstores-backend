@@ -191,15 +191,17 @@ class Product extends Model
         $businessMode = getWebConfig(name: 'business_mode');
         $productType = $digitalProductSetting ? ['digital', 'physical'] : ['physical'];
 
-        return $query->when($businessMode == 'single', function ($query) {
+        $query->when($businessMode == 'single', function ($query) {
                 $query->where(['added_by' => 'admin']);
             })
             ->when($brandSetting, function ($query) use ($brandSetting, $productType) {
                 if (!in_array('digital', $productType)) {
-                    $query->whereHas('brand', function ($query) {
-                        $query->where('status', 1);
-                    })->orWhere(function ($query) {
-                        $query->whereNull('brand_id')->where('status', 1);
+                    $query->where(function ($query) {
+                        $query->whereHas('brand', function ($query) {
+                            $query->where('status', 1);
+                        })->orWhere(function ($query) {
+                            $query->whereNull('brand_id')->where('status', 1);
+                        });
                     });
                 }
             })
@@ -210,14 +212,47 @@ class Product extends Model
             ->where(['request_status' => 1])
             ->SellerApproved()
             ->whereIn('product_type', $productType);
+
+        // Branch-specific quantity check for active products
+        if (!app()->runningInConsole()) {
+            $segment = request()->segment(1);
+            $segment2 = request()->segment(2);
+            $segment3 = request()->segment(3);
+
+            $isAdminOrVendor = in_array($segment, ['admin', 'vendor', 'seller'], true)
+                || ($segment === 'api' && (
+                    in_array($segment2, ['admin', 'seller', 'vendor'], true) ||
+                    in_array($segment3, ['admin', 'seller', 'vendor'], true)
+                   ));
+
+            if (!$isAdminOrVendor) {
+                $branchId = getSelectedBranchId();
+                if ($branchId) {
+                    $query->where(function ($query) use ($branchId) {
+                        $query->where('product_type', 'digital')
+                            ->orWhere(function ($query) use ($branchId) {
+                                $query->where('product_type', 'physical')
+                                    ->whereHas('stocks', function ($query) use ($branchId) {
+                                        $query->where('branch_id', $branchId)
+                                            ->where('qty', '>', 0);
+                                    });
+                            });
+                    });
+                }
+            }
+        }
+
+        return $query;
     }
 
     public function scopeSellerApproved($query): void
     {
-        $query->whereHas('seller', function ($query) {
-            $query->where(['status' => 'approved']);
-        })->orWhere(function ($query) {
-            $query->where(['added_by' => 'admin', 'status' => 1]);
+        $query->where(function ($query) {
+            $query->whereHas('seller', function ($query) {
+                $query->where(['status' => 'approved']);
+            })->orWhere(function ($query) {
+                $query->where(['added_by' => 'admin', 'status' => 1]);
+            });
         });
     }
 
@@ -529,6 +564,39 @@ class Product extends Model
                 $orders = $query->orders ?? [];
                 array_unshift($orders, $yunanOrder);
                 $query->orders = $orders;
+            }
+        });
+
+        // Global scope: hide products that have no stock (qty > 0) for the selected branch
+        // in product_stocks table. Applies to ALL product queries automatically.
+        static::addGlobalScope('branch_stock_filter', function (Builder $builder) {
+            $segment = request()->segment(1);
+            $segment2 = request()->segment(2);
+            $segment3 = request()->segment(3);
+
+            $isAdminOrVendor = in_array($segment, ['admin', 'vendor', 'seller'], true)
+                || ($segment === 'api' && (
+                    in_array($segment2, ['admin', 'seller', 'vendor'], true) ||
+                    in_array($segment3, ['admin', 'seller', 'vendor'], true)
+                   ));
+
+            if (!$isAdminOrVendor) {
+                $branchId = getSelectedBranchId();
+
+                if ($branchId) {
+                    $builder->where(function ($query) use ($branchId) {
+                        // Digital products are never filtered by branch stock
+                        $query->where('product_type', 'digital')
+                            ->orWhere(function ($query) use ($branchId) {
+                                // Physical products must have qty > 0 in the selected branch
+                                $query->where('product_type', 'physical')
+                                    ->whereHas('stocks', function ($query) use ($branchId) {
+                                        $query->where('branch_id', $branchId)
+                                            ->where('qty', '>', 0);
+                                    });
+                            });
+                    });
+                }
             }
         });
 

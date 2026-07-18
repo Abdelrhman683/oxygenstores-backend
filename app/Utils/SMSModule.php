@@ -81,12 +81,37 @@ class SMSModule
         return 'not_found';
     }
 
+    public static function formatOtpMessage(?string $template, $otp): string
+    {
+        $template = trim((string)$template);
+
+        if (empty($template)) {
+            return "Your OTP code is: {$otp}";
+        }
+
+        $placeholders = ['#OTP#', '#otp#', '{otp}', '{OTP}', '#code#', '#CODE#', '{code}', '{CODE}', '#token#', '#TOKEN#', '{token}', '{TOKEN}'];
+        $replaced = false;
+
+        foreach ($placeholders as $placeholder) {
+            if (strpos($template, $placeholder) !== false) {
+                $template = str_replace($placeholder, $otp, $template);
+                $replaced = true;
+            }
+        }
+
+        if (!$replaced) {
+            $template .= " : {$otp}";
+        }
+
+        return $template;
+    }
+
     public static function twilio($receiver, $otp): string
     {
         $config = self::get_settings('twilio');
         $response = 'error';
         if (isset($config) && $config['status'] == 1) {
-            $message = str_replace("#OTP#", $otp, $config['otp_template']);
+            $message = self::formatOtpMessage($config['otp_template'] ?? '', $otp);
             $sid = $config['sid'];
             $token = $config['token'];
             try {
@@ -115,7 +140,7 @@ class SMSModule
         $config = self::get_settings('nexmo');
         $response = 'error';
         if (isset($config) && $config['status'] == 1) {
-            $message = str_replace("#OTP#", $otp, $config['otp_template']);
+            $message = self::formatOtpMessage($config['otp_template'] ?? '', $otp);
             try {
                 $ch = curl_init();
 
@@ -220,7 +245,7 @@ class SMSModule
             $curl = curl_init();
             $from = $config['from'];
             $to = $receiver;
-            $message = str_replace("#OTP#", $otp, $config['otp_template']);
+            $message = self::formatOtpMessage($config['otp_template'] ?? '', $otp);
 
             try {
                 curl_setopt_array($curl, array(
@@ -261,7 +286,7 @@ class SMSModule
         $response = 'error';
         if (isset($config) && $config['status'] == 1) {
             $receiver = str_replace("+", "", $receiver);
-            $message = str_replace("#OTP#", $otp, $config['otp_template']);
+            $message = self::formatOtpMessage($config['otp_template'] ?? '', $otp);
             $api_key = $config['api_key'];
 
             $curl = curl_init();
@@ -295,7 +320,7 @@ class SMSModule
         if (isset($config) && $config['status'] == 1) {
             // Taqnyat requires international format without + (e.g. 9665xxxxxxxx)
             $receiverFormatted = ltrim(str_replace('+', '', $receiver), '0');
-            $message = str_replace('#OTP#', $otp, $config['otp_template']);
+            $message = self::formatOtpMessage($config['otp_template'] ?? '', $otp);
             $bearer_token = $config['bearer_token'];
             $sender = $config['sender'];
 

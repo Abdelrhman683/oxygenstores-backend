@@ -8,6 +8,11 @@ if (!function_exists('loadCurrency')) {
      */
     function loadCurrency(): void
     {
+        static $currencyLoaded = false;
+        if ($currencyLoaded && session()->has('system_default_currency_info')) {
+            return;
+        }
+
         $defaultCurrency = getWebConfig(name: 'system_default_currency');
         $currentCurrencyInfo = session('system_default_currency_info');
         $currency = null;
@@ -34,6 +39,7 @@ if (!function_exists('loadCurrency')) {
             $usd = exchangeRate(USD);
             session()->put('usd', $usd);
         }
+        $currencyLoaded = true;
     }
 }
 

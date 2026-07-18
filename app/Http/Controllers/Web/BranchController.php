@@ -23,11 +23,15 @@ class BranchController extends Controller
 
         $branchId = (int) $request->branch_id;
 
+        // Store in session and cookie for immediate request and browser access
+        session(['branch_id' => $branchId]);
+        cookie()->queue('selected_branch_id', $branchId, 60 * 24 * 30);
+
         if (Auth::guard('customer')->check()) {
             // Logged-in customer: persist branch_id in the users table
             Auth::guard('customer')->user()->update(['branch_id' => $branchId]);
         } else {
-            // Guest: store in database only
+            // Guest: store in database and session
             $guestId = session('guest_id');
             $guest = $guestId ? \App\Models\GuestUser::find($guestId) : null;
             if ($guest) {
@@ -40,6 +44,10 @@ class BranchController extends Controller
                 ]);
                 session(['guest_id' => $guest->id]);
             }
+        }
+
+        if (request()->hasSession()) {
+            session()->save();
         }
 
         $branch = Branch::find($branchId);

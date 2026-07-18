@@ -1001,6 +1001,10 @@ class ProductManager
 
     public static function getPriorityWiseFeaturedProductsQuery($query, $dataLimit = 'all', $offset = 1, $appends = null)
     {
+        if (getSelectedBranchId()) {
+            $query = self::applyBranchStockHideFilter($query);
+        }
+
         $featuredProductSortBy = getWebConfig(name: 'featured_product_priority');
 
         $query = $query->withCount(['orderDetails', 'reviews', 'wishList'])->withAvg('reviews', 'rating');
@@ -1010,11 +1014,7 @@ class ProductManager
             $query = self::getSortingProductByTemporaryClose(query: $query, temporaryCloseStatus: $featuredProductSortBy['temporary_close_sorting']);
 
             if ($featuredProductSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             if ($featuredProductSortBy['sort_by'] == 'latest_created') {
@@ -1068,6 +1068,10 @@ class ProductManager
 
     public static function getPriorityWiseTopRatedProductsQuery($query, $dataLimit = 'all', $offset = 1, $appends = null)
     {
+        if (getSelectedBranchId()) {
+            $query = self::applyBranchStockHideFilter($query);
+        }
+
         $topRatedProductSortBy = getWebConfig(name: 'top_rated_product_list_priority');
 
         $query = $query->withCount(['orderDetails', 'reviews', 'wishList'])->withAvg('reviews', 'rating');
@@ -1077,11 +1081,7 @@ class ProductManager
             $query = self::getSortingProductByTemporaryClose(query: $query, temporaryCloseStatus: $topRatedProductSortBy['temporary_close_sorting']);
 
             if ($topRatedProductSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             if ($topRatedProductSortBy['sort_by'] == 'latest_created') {
@@ -1152,6 +1152,10 @@ class ProductManager
 
     public static function getPriorityWiseBestSellingProductsQuery($query, $dataLimit = 'all', $offset = 1, $appends = null)
     {
+        if (getSelectedBranchId()) {
+            $query = self::applyBranchStockHideFilter($query);
+        }
+
         $bestSellingProductSortBy = getWebConfig(name: 'best_selling_product_list_priority');
 
         $query = $query->withCount(['orderDetails', 'reviews', 'wishList'])->withAvg('reviews', 'rating');
@@ -1161,11 +1165,7 @@ class ProductManager
             $query = self::getSortingProductByTemporaryClose(query: $query, temporaryCloseStatus: $bestSellingProductSortBy['temporary_close_sorting']);
 
             if ($bestSellingProductSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             if ($bestSellingProductSortBy['sort_by'] == 'latest_created') {
@@ -1218,6 +1218,10 @@ class ProductManager
 
     public static function getPriorityWiseNewArrivalProductsQuery($query, $dataLimit = 'all', $offset = 1, $appends = null)
     {
+        if (getSelectedBranchId()) {
+            $query = self::applyBranchStockHideFilter($query);
+        }
+
         $newArrivalProductSortBy = getWebConfig(name: 'new_arrival_product_list_priority');
 
         $query = $query->withCount(['orderDetails', 'reviews', 'wishList'])->withAvg('reviews', 'rating');
@@ -1227,11 +1231,7 @@ class ProductManager
             $query = self::getSortingProductByTemporaryClose(query: $query, temporaryCloseStatus: $newArrivalProductSortBy['temporary_close_sorting']);
 
             if ($newArrivalProductSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             if ($newArrivalProductSortBy['duration'] && $newArrivalProductSortBy['duration'] != 0) {
@@ -1295,6 +1295,10 @@ class ProductManager
 
     public static function getPriorityWiseCategoryWiseProductsQuery($query, $dataLimit = 'all', $offset = 1, $appends = null)
     {
+        if (getSelectedBranchId()) {
+            $query = self::applyBranchStockHideFilter($query);
+        }
+
         $categoryWiseProductSortBy = getWebConfig(name: 'category_wise_product_list_priority');
 
         $query = $query->withCount(['orderDetails', 'reviews', 'wishList'])->withAvg('reviews', 'rating');
@@ -1304,11 +1308,7 @@ class ProductManager
             $query = self::getSortingProductByTemporaryClose(query: $query, temporaryCloseStatus: $categoryWiseProductSortBy['temporary_close_sorting']);
 
             if ($categoryWiseProductSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             if ($categoryWiseProductSortBy['sort_by'] == 'latest_created') {
@@ -1336,12 +1336,6 @@ class ProductManager
                         return $product->added_by != 'admin';
                     });
                 }
-            }
-
-            if ($categoryWiseProductSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->filter(function ($product) {
-                    return $product->product_type != 'digital' && $product->current_stock > 0;
-                });
             }
 
             if ($categoryWiseProductSortBy['out_of_stock_product'] == 'desc') {
@@ -1410,11 +1404,7 @@ class ProductManager
             });
 
             if ($featureDealSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             $query = $query->get();
@@ -1436,13 +1426,7 @@ class ProductManager
             }
 
             if ($featureDealSortBy['out_of_stock_product'] == 'desc') {
-                $stockProduct = $query->filter(function ($product) {
-                    return $product->product_type == 'digital' || $product->current_stock != 0;
-                });
-                $outOfStock = $query->filter(function ($product) {
-                    return $product->current_stock <= 0 && $product->product_type != 'digital';
-                });
-                $query = $stockProduct->merge($outOfStock);
+                $query = self::mergeStockAndOutOfStockProduct(query: $query);
             }
 
             if (isset($featureDealSortBy['temporary_close_sorting']) && $featureDealSortBy['temporary_close_sorting'] == 'desc') {
@@ -1490,11 +1474,7 @@ class ProductManager
         if ($searchedProductListSortBy && ($searchedProductListSortBy['custom_sorting_status'] == 1)) {
             $query = self::getSortingProductByTemporaryClose(query: $query, temporaryCloseStatus: $searchedProductListSortBy['temporary_close_sorting']);
             if ($searchedProductListSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
         }
         $searchKeyword = str_ireplace(['\'', '"', ',', ';', '<', '>', '?'], ' ', preg_replace('/\s\s+/', ' ', $keyword));
@@ -1578,11 +1558,7 @@ class ProductManager
             $query = self::getSortingProductByTemporaryClose(query: $query, temporaryCloseStatus: $flashDealSortBy['temporary_close_sorting'] ?? 'desc');
 
             if ($flashDealSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             $query = $query->get();
@@ -1728,11 +1704,7 @@ class ProductManager
 
         if ($vendorProductListSortBy && ($vendorProductListSortBy['custom_sorting_status'] == 1)) {
             if ($vendorProductListSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             $query = $query->get();
@@ -1800,6 +1772,13 @@ class ProductManager
 
     public static function mergeStockAndOutOfStockProduct($query): mixed
     {
+        $branchId = getSelectedBranchId();
+        if ($branchId) {
+            return $query->filter(function ($product) {
+                return $product->product_type == 'digital' || $product->current_stock > 0;
+            })->values();
+        }
+
         $stockProduct = $query->filter(function ($product) {
             return $product->product_type == 'digital' || $product->current_stock > 0;
         });
@@ -1807,6 +1786,37 @@ class ProductManager
             return $product->current_stock <= 0 && $product->product_type != 'digital';
         });
         return $stockProduct->merge($outOfStock);
+    }
+
+    /**
+     * Apply branch-aware stock hide filter to an Eloquent query builder.
+     * Uses qty from product_stocks for the selected branch instead of the global current_stock column.
+     */
+    public static function applyBranchStockHideFilter($query): mixed
+    {
+        $branchId = getSelectedBranchId();
+
+        if ($branchId) {
+            return $query->where(function ($q) use ($branchId) {
+                $q->where('product_type', 'digital')
+                    ->orWhere(function ($q) use ($branchId) {
+                        $q->where('product_type', 'physical')
+                            ->whereHas('stocks', function ($q) use ($branchId) {
+                                $q->where('branch_id', $branchId)
+                                    ->where('qty', '>', 0);
+                            });
+                    });
+            });
+        }
+
+        // Fallback to global current_stock when no branch is selected
+        return $query->where(function ($q) {
+            $q->where('product_type', 'digital')
+                ->orWhere(function ($q) {
+                    $q->where('product_type', 'physical')
+                        ->where('current_stock', '>', 0);
+                });
+        });
     }
 
     public static function getPublishingHouseList($productIds = [], $vendorId = null, $type = null): mixed
@@ -2379,11 +2389,7 @@ class ProductManager
             $query = self::getSortingProductByTemporaryClose(query: $query, temporaryCloseStatus: $stockClearanceProductSortBy['temporary_close_sorting']);
 
             if ($stockClearanceProductSortBy['out_of_stock_product'] == 'hide') {
-                $query = $query->where(function ($query) {
-                    $query->where('product_type', 'digital')->orWhere(function ($query) {
-                        $query->where('product_type', 'physical')->where('current_stock', '>', 0);
-                    });
-                });
+                $query = self::applyBranchStockHideFilter($query);
             }
 
             if ($stockClearanceProductSortBy['sort_by'] == 'clearance_expiration_date') {

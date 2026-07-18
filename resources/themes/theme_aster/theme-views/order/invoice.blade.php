@@ -8,6 +8,12 @@
     $companyEmail = $companyEmail ?? getWebConfig(name: 'company_email');
     $companyPhone = $companyPhone ?? getWebConfig(name: 'company_phone');
     $shopCity = getWebConfig(name: 'shop_city') ?? '';
+
+    $sellerName = ($order->seller_is != 'admin' && isset($order->seller) && isset($order->seller->shop)) ? $order->seller->shop->name : $companyName;
+    $vatNumber = ($order->seller_is != 'admin' && isset($order->seller) && $order->seller->gst != null) ? $order->seller->gst : '301157358600003';
+    $totalAmount = $orderTotalPriceSummary['totalAmount'] ?? $order->order_amount;
+    $vatAmount = $orderTotalPriceSummary['taxTotal'] ?? 0;
+    $zatcaQr = \App\Utils\Helpers::getZatcaQrCodeValue($sellerName, $vatNumber, $order['created_at'], $totalAmount, $vatAmount);
 @endphp
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="rtl"
       style="text-align: right;"
@@ -544,15 +550,8 @@
                 </table>
             </td>
             <td style="width: 40%; text-align: right; vertical-align: middle;">
-                @php
-                    $sellerName = ($order->seller_is != 'admin' && isset($order->seller) && isset($order->seller->shop)) ? $order->seller->shop->name : $companyName;
-                    $vatNumber = ($order->seller_is != 'admin' && isset($order->seller) && $order->seller->gst != null) ? $order->seller->gst : '301157358600003';
-                    $totalAmount = $orderTotalPriceSummary['totalAmount'] ?? $order->order_amount;
-                    $vatAmount = $orderTotalPriceSummary['taxTotal'] ?? 0;
-                    $zatcaQr = \App\Utils\Helpers::getZatcaQrCodeValue($sellerName, $vatNumber, $order['created_at'], $totalAmount, $vatAmount);
-                @endphp
                 <div style="display: inline-block; border: 1px solid #EAEAEA; padding: 6px; border-radius: 6px;">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode($zatcaQr) }}" style="width: 80px; height: 80px; display: block;" alt="QR Code"/>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode($zatcaQr ?? '') }}" style="width: 80px; height: 80px; display: block;" alt="QR Code"/>
                 </div>
             </td>
         </tr>
