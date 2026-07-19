@@ -89,8 +89,14 @@ trait  Processor
             $getNewUser = ($additionalData['new_customer_id'] != 0) ? 1 : 0;
         }
 
-        $orderIds = Order::where(['transaction_ref' => $payment_info['transaction_id']])->get()->pluck('id')->toArray();
-        $encodedOrderIds = base64_encode(json_encode($orderIds));
+        $orderIds = [];
+        if (!empty($payment_info['transaction_id'])) {
+            $orderIds = Order::where('transaction_ref', $payment_info['transaction_id'])->pluck('id')->toArray();
+        }
+        if (empty($orderIds) && !empty($additionalData['order_ids'])) {
+            $orderIds = is_array($additionalData['order_ids']) ? $additionalData['order_ids'] : json_decode($additionalData['order_ids'], true);
+        }
+        $encodedOrderIds = base64_encode(json_encode(array_values((array)$orderIds)));
 
         $token_string = 'payment_method=' . $payment_info->payment_method . '&&transaction_reference=' . $payment_info->transaction_id;
         if (in_array($payment_info->payment_platform, ['web', 'app']) && $payment_info['external_redirect_link'] != null) {

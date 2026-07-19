@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Payment_Methods;
 
 use App\Models\Cart;
+use App\Models\OrderDetail;
 use App\Models\PaymentRequest;
 use App\Models\ShippingAddress;
 use App\Models\User;
@@ -69,15 +70,30 @@ class TamaraPaymentController extends Controller
         // ─── عنوان الشحن الحقيقي ───────────────────────────────────────
         $shipping_address = $address_id ? ShippingAddress::find($address_id) : null;
 
-        // ─── منتجات السلة الحقيقية ─────────────────────────────────────
-        $items = $this->buildTamaraItems($customer_id, $is_guest, $payment_data);
+        // ─── منتجات السلة أو الطلب الحقيقية ─────────────────────────────
+        $items = $this->buildTamaraItems($customer_id, $is_guest, $payment_data, $additional);
 
         $currency = strtoupper($payment_data->currency_code);
         $amount   = round($payment_data->payment_amount, 2);
 
         $buyer_name  = $payer->name ?? 'Customer';
-        $buyer_phone = (string)($payer->phone ?? '0500000000');
-        $buyer_email = (string)($payer->email ?? 'buyer@tamara.co');
+        $raw_phone   = $shipping_address->phone ?? ($payer->phone ?? null);
+        $raw_email   = $shipping_address->email ?? ($payer->email ?? null);
+        if ($customer_id) {
+            $customer_obj = User::find($customer_id);
+            if ($customer_obj) {
+                if (empty($raw_phone)) {
+                    $raw_phone = $customer_obj->phone ?? null;
+                }
+                if (empty($raw_email)) {
+                    $raw_email = $customer_obj->email ?? null;
+                }
+            }
+        }
+        $buyer_phone    = $this->formatTamaraPhone($raw_phone);
+        $phone_digits   = preg_replace('/[^\d]/', '', $buyer_phone);
+        $fallback_email = !empty($phone_digits) ? 'c' . $phone_digits . '@customer.store' : 'buyer@tamara.co';
+        $buyer_email    = filter_var($raw_email, FILTER_VALIDATE_EMAIL) ? $raw_email : $fallback_email;
 
         $ship_line1   = $shipping_address->address ?? ($payer->address ?? 'N/A');
         $ship_city    = $shipping_address->city    ?? ($payer->city    ?? 'Riyadh');
@@ -187,38 +203,132 @@ class TamaraPaymentController extends Controller
 
     // ─── Helper Methods ────────────────────────────────────────────────
 
-    private function buildTamaraItems($customer_id, int $is_guest, $payment_data): array
+    private function formatTamaraPhone(?string $phone): string
+    {
+        if (empty($phone)) {
+            return '0500000000';
+        }
+        $cleaned = preg_replace('/[^\d+]/', '', trim($phone));
+        if (str_starts_with($cleaned, '00966')) {
+            return '+' . substr($cleaned, 2);
+        }
+        if (str_starts_with($cleaned, '966')) {
+            return '+' . $cleaned;
+        }
+        if (str_starts_with($cleaned, '05')) {
+            return '+966' . substr($cleaned, 1);
+        }
+        if (str_starts_with($cleaned, '5') && strlen($cleaned) == 9) {
+            return '+966' . $cleaned;
+        }
+        if (!str_starts_with($cleaned, '+') && strlen($cleaned) > 0) {
+            return '+' . $cleaned;
+        }
+        return $cleaned;
+    }
+
+    private function buildTamaraItems($customer_id, int $is_guest, $payment_data, $additional = null): array
     {
         $currency = strtoupper($payment_data->currency_code);
+        $items = [];
+        $additional = is_array($additional) ? (object)$additional : $additional;
+        $order_ids  = $additional->order_ids ?? null;
 
-        if (!$customer_id) {
+        // 1. Fetch from OrderDetail if order_ids exist in additional data
+        if (!empty($order_ids)) {
+            $order_ids_array = [];
+            if (is_array($order_ids)) {
+                $order_ids_array = $order_ids;
+            } elseif (is_string($order_ids)) {
+                $decoded = json_decode($order_ids, true);
+                $order_ids_array = is_array($decoded) ? $decoded : [$order_ids];
+            } elseif (is_numeric($order_ids)) {
+                $order_ids_array = [(int)$order_ids];
+            }
+
+            if (!empty($order_ids_array)) {
+                $order_details = OrderDetail::whereIn('order_id', $order_ids_array)->get();
+                foreach ($order_details as $detail) {
+                    $product_info = json_decode($detail->product_details ?? '{}', true);
+                    $name         = $product_info['name'] ?? ($detail->product_id ? 'Product #' . $detail->product_id : 'Product');
+                    $unit_price   = max(0.01, ($detail->price ?? 0) - ($detail->discount ?? 0));
+                    $qty          = max(1, (int)($detail->qty ?? 1));
+                    $total_price  = $unit_price * $qty;
+
+                    $items[] = [
+                        'reference_id'    => (string)($detail->product_id ?? $detail->id),
+                        'type'            => 'Physical',
+                        'name'            => (string)$name,
+                        'sku'             => 'SKU-' . ($detail->product_id ?? $detail->id),
+                        'quantity'        => $qty,
+                        'unit_price'      => ['amount' => (float)number_format($unit_price, 2, '.', ''),  'currency' => $currency],
+                        'total_amount'    => ['amount' => (float)number_format($total_price, 2, '.', ''), 'currency' => $currency],
+                        'discount_amount' => ['amount' => 0.0, 'currency' => $currency],
+                        'tax_amount'      => ['amount' => 0.0, 'currency' => $currency],
+                    ];
+                }
+            }
+        }
+
+        // 2. Fetch from OrderDetail if attribute is order
+        if (empty($items) && ($payment_data->attribute ?? '') === 'order' && !empty($payment_data->attribute_id)) {
+            $order_details = OrderDetail::where('order_id', $payment_data->attribute_id)->get();
+            foreach ($order_details as $detail) {
+                $product_info = json_decode($detail->product_details ?? '{}', true);
+                $name         = $product_info['name'] ?? ($detail->product_id ? 'Product #' . $detail->product_id : 'Product');
+                $unit_price   = max(0.01, ($detail->price ?? 0) - ($detail->discount ?? 0));
+                $qty          = max(1, (int)($detail->qty ?? 1));
+                $total_price  = $unit_price * $qty;
+
+                $items[] = [
+                    'reference_id'    => (string)($detail->product_id ?? $detail->id),
+                    'type'            => 'Physical',
+                    'name'            => (string)$name,
+                    'sku'             => 'SKU-' . ($detail->product_id ?? $detail->id),
+                    'quantity'        => $qty,
+                    'unit_price'      => ['amount' => (float)number_format($unit_price, 2, '.', ''),  'currency' => $currency],
+                    'total_amount'    => ['amount' => (float)number_format($total_price, 2, '.', ''), 'currency' => $currency],
+                    'discount_amount' => ['amount' => 0.0, 'currency' => $currency],
+                    'tax_amount'      => ['amount' => 0.0, 'currency' => $currency],
+                ];
+            }
+        }
+
+        // 3. Fetch from Cart
+        $customer_id = $customer_id ?? $payment_data->payer_id ?? null;
+        if (empty($items) && $customer_id) {
+            $cart_items = Cart::where('customer_id', $customer_id)
+                ->where('is_guest', $is_guest)
+                ->get();
+
+            if ($cart_items->isEmpty()) {
+                $cart_items = Cart::where('customer_id', $customer_id)->get();
+            }
+
+            foreach ($cart_items as $cart) {
+                $unit_price  = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
+                $qty         = max(1, (int)($cart->quantity ?? 1));
+                $total_price = $unit_price * $qty;
+
+                $items[] = [
+                    'reference_id'    => (string)$cart->product_id,
+                    'type'            => 'Physical',
+                    'name'            => (string)($cart->name ?? 'Product'),
+                    'sku'             => 'SKU-' . $cart->product_id,
+                    'quantity'        => $qty,
+                    'unit_price'      => ['amount' => (float)number_format($unit_price, 2, '.', ''),  'currency' => $currency],
+                    'total_amount'    => ['amount' => (float)number_format($total_price, 2, '.', ''), 'currency' => $currency],
+                    'discount_amount' => ['amount' => 0.0, 'currency' => $currency],
+                    'tax_amount'      => ['amount' => 0.0, 'currency' => $currency],
+                ];
+            }
+        }
+
+        if (empty($items)) {
             return $this->fallbackTamaraItem($payment_data, $currency);
         }
 
-        $cart_items = Cart::where('customer_id', $customer_id)
-            ->where('is_guest', $is_guest)
-            ->get();
-
-        if ($cart_items->isEmpty()) {
-            return $this->fallbackTamaraItem($payment_data, $currency);
-        }
-
-        return $cart_items->map(function ($cart) use ($currency) {
-            $unit_price  = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
-            $total_price = $unit_price * max(1, (int)($cart->quantity ?? 1));
-
-            return [
-                'reference_id' => (string)$cart->product_id,
-                'type'         => 'Physical',
-                'name'         => $cart->name ?? 'Product',
-                'sku'          => 'SKU-' . $cart->product_id,
-                'quantity'     => max(1, (int)($cart->quantity ?? 1)),
-                'unit_price'   => ['amount' => (float)number_format($unit_price, 2, '.', ''),  'currency' => $currency],
-                'total_amount' => ['amount' => (float)number_format($total_price, 2, '.', ''), 'currency' => $currency],
-                'discount_amount' => ['amount' => 0.0, 'currency' => $currency],
-                'tax_amount'      => ['amount' => 0.0, 'currency' => $currency],
-            ];
-        })->toArray();
+        return $items;
     }
 
     private function fallbackTamaraItem($payment_data, string $currency): array

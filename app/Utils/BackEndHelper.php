@@ -69,15 +69,13 @@ class BackEndHelper
     public static function order_status($status): string
     {
         return match ($status) {
-            "pending" => "Pending",
-            "confirmed" => "Confirmed",
-            "processing" => "Packaging",
-            "out_for_delivery" => "Out for Delivery",
-            "delivered" => "Delivered",
-            "returned" => "Returned",
-            "failed" => "Failed to Deliver",
-            "canceled" => "Canceled",
-            default => '',
+            "pending" => translate('pending'),
+            "processing" => translate('processing'),
+            "confirmed" => translate('confirmed'),
+            "delivered" => translate('delivered'),
+            "returned" => translate('returned'),
+            "on_hold", "out_for_delivery" => translate('on_hold'),
+            default => translate($status),
         };
     }
 }

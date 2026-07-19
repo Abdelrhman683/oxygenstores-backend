@@ -25,6 +25,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Carbon;
+use App\Utils\CartManager;
 
 class CustomerAPIAuthController extends Controller
 {
@@ -167,6 +168,8 @@ class CustomerAPIAuthController extends Controller
                     'temp_block_time' => null,
                     'updated_at' => now()
                 ]);
+
+                CartManager::cartListSessionToDatabase($request);
 
                 return response()->json(['token' => $token, 'status' => true], 200);
             } else {

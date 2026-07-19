@@ -133,18 +133,62 @@
             </div>
 
             <div class="ox-payment-options">
-                <div class="ox-payment-option">
-                    <img src="{{ theme_asset(path: 'public/assets/front-end/img/card-payment.png') }}" alt="Visa">
-                </div>
-                <div class="ox-payment-option active">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M0 3l8-2 8 2v1H0V3zm0 2h16v1H0V5zm1 2h14v7H1V7zm2 1v5h2V8H3zm4 0v5h2V8H7zm4 0v5h2V8h-2z"/>
-                    </svg>
-                </div>
-                <div class="ox-payment-option" style="min-width: 100%; display: block; border: none; padding: 0;">
-                    <tamara-widget type="tamara-summary" amount="{{ $amount }}" @if(!empty($tamaraPublicKey)) uuid="{{ $tamaraPublicKey }}" @endif></tamara-widget>
-                </div>
+                @if ($digital_payment['status'] == 1)
+                    @foreach ($payment_gateways_list as $payment_gateway)
+                        @if ($payment_gateway->key_name == 'paymob_accept')
+                            <div class="ox-payment-option {{ $loop->first ? 'active' : '' }}" data-gateway="paymob_accept" title="Paymob accept">
+                                <img src="{{ theme_asset(path: 'public/assets/front-end/img/card-payment.png') }}" alt="Paymob accept">
+                            </div>
+                        @elseif ($payment_gateway->key_name == 'tamara')
+                            <div class="ox-payment-option {{ $loop->first ? 'active' : '' }}" data-gateway="tamara" title="Tamara">
+                                <img src="https://cdn.tamara.co/widget-v2/assets/lavendar-logo.703d190a.svg" alt="Tamara">
+                            </div>
+                        @elseif ($payment_gateway->key_name == 'tabby')
+                            <div class="ox-payment-option {{ $loop->first ? 'active' : '' }}" data-gateway="tabby" title="Tabby">
+                                <img src="{{ theme_asset(path: 'public/assets/front-end/img/tabby-icon.webp') }}" alt="Tabby" onerror="this.src='https://checkout.tabby.ai/assets/logo-green.svg'">
+                            </div>
+                        @else
+                            @php($additionalData = $payment_gateway['additional_data'] != null ? json_decode($payment_gateway['additional_data']) : [])
+                            <?php
+                            $gatewayImgPath = dynamicAsset(path: 'public/assets/back-end/img/modal/payment-methods/' . $payment_gateway->key_name . '.png');
+                            if ($additionalData != null && $additionalData?->gateway_image && file_exists(base_path('storage/app/public/payment_modules/gateway_image/' . $additionalData->gateway_image))) {
+                                $gatewayImgPath = $additionalData->gateway_image ? dynamicStorage(path: 'storage/app/public/payment_modules/gateway_image/' . $additionalData->gateway_image) : $gatewayImgPath;
+                            }
+                            ?>
+                            <div class="ox-payment-option {{ $loop->first ? 'active' : '' }}" data-gateway="{{ $payment_gateway->key_name }}" title="{{ str_replace('_', ' ', $payment_gateway->key_name) }}">
+                                @if (!empty($gatewayImgPath))
+                                    <img src="{{ $gatewayImgPath }}" alt="{{ $payment_gateway->key_name }}">
+                                @else
+                                    <span class="fs-12 fw-bold">{{ ucwords(str_replace('_', ' ', $payment_gateway->key_name)) }}</span>
+                                @endif
+                            </div>
+                        @endif
+                    @endforeach
+                @endif
+
+                @if (isset($offline_payment) && $offline_payment['status'] && count($offline_payment_methods) > 0)
+                    <div class="ox-payment-option {{ ($digital_payment['status'] == 0 || count($payment_gateways_list) == 0) ? 'active' : '' }}" data-gateway="pay_offline" title="تحويل مصرفي">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M0 3l8-2 8 2v1H0V3zm0 2h16v1H0V5zm1 2h14v7H1V7zm2 1v5h2V8H3zm4 0v5h2V8H7zm4 0v5h2V8h-2z"/>
+                        </svg>
+                    </div>
+                @endif
             </div>
+
+            @if (isset($offline_payment) && $offline_payment['status'] && count($offline_payment_methods) > 0)
+                <div class="mt-3 pay_offline_card d-none">
+                    <div class="p-3 bg-light rounded border">
+                        <h6 class="fs-13 fw-bold mb-2">{{ translate('select_offline_payment_method') }}</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach ($offline_payment_methods as $method)
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary offline_payment_button text-capitalize"
+                                        id="{{ $method->id }}">{{ $method->method_name }}</button>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <div class="ox-additional-info">
                 <h6>معلومات إضافية</h6>
@@ -159,7 +203,7 @@
 
 
 
-                                <div class="p-20">
+                                <div class="p-20 d-none" style="display: none !important;">
                                     @if (
                                         ($cashOnDeliveryBtnShow && $cash_on_delivery['status']) ||
                                             $digital_payment['status'] == 1 ||
@@ -176,14 +220,14 @@
                                                                   class="needs-validation" id="cash_on_delivery_form">
                                                                 <label class="m-0 pt-2 pb-1">
                                                                     <input type="hidden" name="payment_method"
-                                                                           value="cash_on_delivery" checked>
+                                                                           value="cash_on_delivery">
                                                                     <input type="hidden" class="form-control"
                                                                            name="bring_change_amount"
                                                                            id="bring_change_amount_value">
                                                                     <span
                                                                         class="btn btn-block click-if-alone py-3 d-flex gap-2 align-items-center cursor-pointer">
                                                                         <input type="radio" id="cash_on_delivery"
-                                                                               class="custom-radio" checked>
+                                                                               class="custom-radio">
                                                                         <img width="20"
                                                                              src="{{ theme_asset(path: 'public/assets/front-end/img/icons/money.png') }}"
                                                                              alt="">
@@ -496,6 +540,68 @@
     <script src="{{ theme_asset(path: 'public/assets/front-end/js/payment.js') }}"></script>
     <script>
         $(document).ready(function() {
+            function updateProceedButtonStatus() {
+                let termsChecked = $('.payment-input-checkbox').length === 0 || $('.payment-input-checkbox:checked').length > 0;
+                let checkedRadio = $('input[type="radio"]:checked');
+                let isOffline = checkedRadio.attr('id') === 'pay_offline';
+                let hasSelectedGateway = checkedRadio.length > 0 && !isOffline;
+
+                if (termsChecked && hasSelectedGateway) {
+                    $(".proceed_to_next_button").removeClass("disabled").removeAttr("disabled");
+                } else {
+                    $(".proceed_to_next_button").addClass("disabled");
+                }
+
+                if (isOffline) {
+                    $(".pay_offline_card").removeClass("d-none");
+                    $(".proceed_to_next_button").addClass("disabled");
+                } else {
+                    $(".pay_offline_card").addClass("d-none");
+                }
+            }
+
+            function selectPaymentGateway(gateway) {
+                if (!gateway) return;
+
+                // Uncheck all radios across all forms first
+                $('input[type="radio"]').prop('checked', false).removeAttr('checked');
+
+                // Check the target gateway radio
+                let radioInput = $('#' + gateway);
+                if (radioInput.length) {
+                    radioInput.prop('checked', true).attr('checked', 'checked').trigger('change');
+                }
+
+                updateProceedButtonStatus();
+            }
+
+            $(document).on('click', '.ox-payment-option', function() {
+                let gateway = $(this).data('gateway');
+                $('.ox-payment-option').removeClass('active');
+                $(this).addClass('active');
+
+                selectPaymentGateway(gateway);
+            });
+
+            $(document).on('change click', '.payment-input-checkbox', function() {
+                updateProceedButtonStatus();
+            });
+
+            // Initialize default active selection on page load
+            setTimeout(function() {
+                let activeCard = $('.ox-payment-option.active');
+                if (!activeCard.length) {
+                    activeCard = $('.ox-payment-option').first();
+                    activeCard.addClass('active');
+                }
+                if (activeCard.length) {
+                    let gateway = activeCard.data('gateway');
+                    selectPaymentGateway(gateway);
+                } else {
+                    updateProceedButtonStatus();
+                }
+            }, 100);
+
             $('#order_note').on('change', function() {
                 let orderNote = $(this).val();
                 $.post({

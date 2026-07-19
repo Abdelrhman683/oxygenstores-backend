@@ -139,10 +139,11 @@
                         $currentBranch = $currentBranchId
                             ? \App\Models\Branch::find($currentBranchId)
                             : null;
+                        $selectedCityName = session('branch_city_name') ?? request()->cookie('selected_branch_city_name');
                     @endphp
                     <div class="action-item d-none d-md-inline-flex cursor-pointer" data-toggle="modal" data-target="#branchModal" style="cursor: pointer;" id="branch-selector-btn">
                         <i class="fa fa-map-marker"></i>
-                        <span class="d-none d-lg-block">الفرع (<span id="current-branch-name">{{ $currentBranch?->name ?? 'اختر الفرع' }}</span>)</span>
+                        <span class="d-none d-lg-block">الفرع (<span id="current-branch-name">{{ $selectedCityName ?? $currentBranch?->name ?? 'اختر الفرع' }}</span>)</span>
                     </div>
                     <span class="separator-line d-none d-md-inline-block">|</span>
                     <a href="{{route('wishlists')}}" class="action-item action_item_heart d-none d-lg-inline-flex">
@@ -370,6 +371,22 @@
                     $showBranchSelector = !session()->has('branch_id')
                         && !(auth('customer')->check() && auth('customer')->user()->branch_id)
                         && !(session('guest_id') && \App\Models\GuestUser::where('id', session('guest_id'))->whereNotNull('branch_id')->exists());
+
+                    $dbBranchId = getSelectedBranchId();
+                    $selectedCityName = session('branch_city_name') ?? request()->cookie('selected_branch_city_name');
+                    
+                    // If no explicit city stored in session/cookie, infer from current branch name
+                    if (!$selectedCityName && $currentBranch && $dbBranchId) {
+                        foreach ($cities as $c) {
+                            $cBranchId = $cityToBranchMap[$c->term_id] ?? null;
+                            if ($cBranchId == $dbBranchId && str_contains($currentBranch->name, $c->name)) {
+                                $selectedCityName = $c->name;
+                                break;
+                            }
+                        }
+                    }
+
+                    $selectedFound = false;
                 @endphp
                 @foreach($cities as $city)
                     @php
@@ -377,8 +394,18 @@
                         $lat = $branchLats[$branchId] ?? null;
                         $lng = $branchLngs[$branchId] ?? null;
                         
-                        $dbBranchId = getSelectedBranchId();
-                        $isActive = ($dbBranchId && $dbBranchId == $branchId);
+                        $isActive = false;
+                        if ($branchId && $dbBranchId && $dbBranchId == $branchId && !$selectedFound) {
+                            if ($selectedCityName) {
+                                if (trim($city->name) === trim($selectedCityName)) {
+                                    $isActive = true;
+                                    $selectedFound = true;
+                                }
+                            } else {
+                                $isActive = true;
+                                $selectedFound = true;
+                            }
+                        }
                     @endphp
                     @if($branchId)
                         <button type="button"
@@ -512,7 +539,8 @@
                         method: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}',
-                            branch_id: '{{ \Illuminate\Support\Facades\DB::table("branches")->where("name", "like", "%الرياض%")->orWhere("name", "like", "%Riyadh%")->value("id") ?? 1 }}'
+                            branch_id: '{{ \Illuminate\Support\Facades\DB::table("branches")->where("name", "like", "%الرياض%")->orWhere("name", "like", "%Riyadh%")->value("id") ?? 1 }}',
+                            city_name: 'الرياض'
                         },
                         success: function(res) {
                             if (res.success) {

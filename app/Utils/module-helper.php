@@ -78,13 +78,15 @@ if (!function_exists('digital_payment_success')) {
                             $order->is_guest = 0;
                         }
 
-                        $order->order_status = 'confirmed';
+                        $order->order_status = 'processing';
                         $order->payment_status = 'paid';
                         $order->payment_method = $paymentData['payment_method'];
                         $order->transaction_ref = $paymentData['transaction_id'];
                         $order->save();
 
-                        OrderManager::add_order_status_history($orderId, $order->customer_id, 'confirmed', 'customer');
+                        CartManager::cartCleanByCartGroupIds(cartGroupIDs: [$order->order_group_id]);
+
+                        OrderManager::add_order_status_history($orderId, $order->customer_id, 'processing', 'customer');
 
                         OrderManager::getAddOrderTransactionsOnGenerateOrder(order: $order);
 
@@ -135,7 +137,7 @@ if (!function_exists('digital_payment_success')) {
                     'is_guest' => $additionalData['is_guest_in_order'] ?? 0,
                     'guest_id' => ($additionalData['is_guest_in_order'] ?? 0) ? $additionalData['customer_id'] : null,
                     'customer_id' => $additionalData['customer_id'],
-                    'order_status' => 'confirmed',
+                    'order_status' => 'processing',
                     'payment_method' => $paymentData['payment_method'],
                     'payment_status' => 'paid',
                     'transaction_ref' => $paymentData['transaction_id'],

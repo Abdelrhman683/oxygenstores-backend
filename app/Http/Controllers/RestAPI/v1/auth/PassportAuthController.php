@@ -146,6 +146,8 @@ class PassportAuthController extends Controller
                 $user->updated_at = now();
                 $user->save();
 
+                CartManager::cartListSessionToDatabase($request);
+
                 return response()->json(['token' => $token, 'status' => true], 200);
             } else {
                 if (isset($user->temp_block_time) && Carbon::parse($user->temp_block_time)->DiffInSeconds() <= $tempBlockTime) {

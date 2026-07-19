@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Payment_Methods;
 
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\PaymentRequest;
 use App\Models\ShippingAddress;
 use App\Models\User;
@@ -68,13 +69,34 @@ class TabbyPaymentController extends Controller
 
         $customer_id = $additional->customer_id ?? null;
         $is_guest    = (int)($additional->is_guest ?? 0);
-        $address_id  = $additional->address_id ?? null;
+        $address_id         = $additional->address_id ?? null;
+        $billing_address_id = $additional->billing_address_id ?? null;
 
-        // ─── عنوان الشحن الحقيقي ───────────────────────────────────────
+        // ─── عنوان الشحن والفاتورة الحقيقي ─────────────────────────────
         $shipping_address = $address_id ? ShippingAddress::find($address_id) : null;
+        $billing_address  = $billing_address_id ? ShippingAddress::find($billing_address_id) : null;
 
-        // ─── منتجات السلة الحقيقية ─────────────────────────────────────
-        $items = $this->buildCartItems($customer_id, $is_guest, $payment_data);
+        // ─── منتجات السلة أو الطلب الحقيقية ─────────────────────────────
+        $items = $this->buildCartItems($customer_id, $is_guest, $payment_data, $additional);
+
+        // ─── هاتف وبريد المشترِي بتنسيق متوافق مع تابي ──────────────────────────
+        $raw_phone = $shipping_address->phone ?? ($billing_address->phone ?? ($payer->phone ?? null));
+        $raw_email = $shipping_address->email ?? ($billing_address->email ?? ($payer->email ?? null));
+        if ($customer_id) {
+            $customer_obj = User::find($customer_id);
+            if ($customer_obj) {
+                if (empty($raw_phone)) {
+                    $raw_phone = $customer_obj->phone ?? null;
+                }
+                if (empty($raw_email)) {
+                    $raw_email = $customer_obj->email ?? null;
+                }
+            }
+        }
+        $buyer_phone = $this->formatTabbyPhone($raw_phone);
+        $phone_digits = preg_replace('/[^\d]/', '', $buyer_phone);
+        $fallback_email = !empty($phone_digits) ? 'c' . $phone_digits . '@customer.store' : 'customer@store.com';
+        $buyer_email = filter_var($raw_email, FILTER_VALIDATE_EMAIL) ? $raw_email : $fallback_email;
 
         // ─── سجل العميل ────────────────────────────────────────────────
         $loyalty_level    = 0;
@@ -114,9 +136,9 @@ class TabbyPaymentController extends Controller
                 'currency'    => $currency,
                 'description' => 'Payment for order #' . $payment_data->id,
                 'buyer'       => [
-                    'phone' => $payer->phone ?? '',
-                    'email' => $payer->email ?? '',
-                    'name'  => $payer->name  ?? 'Customer',
+                    'phone' => $buyer_phone,
+                    'email' => $buyer_email,
+                    'name'  => !empty($payer->name) ? $payer->name : ($shipping_address->contact_person_name ?? 'Customer'),
                     'dob'   => '1990-01-01',
                 ],
                 'buyer_history' => [
@@ -135,10 +157,11 @@ class TabbyPaymentController extends Controller
                     'city'    => $shipping_address->city    ?? ($payer->city    ?? 'Riyadh'),
                     'address' => $shipping_address->address ?? ($payer->address ?? 'N/A'),
                     'zip'     => $shipping_address->zip     ?? ($payer->zip     ?? '11111'),
+                    'phone'   => $buyer_phone,
                 ],
                 'order_history' => $order_history,
             ],
-            'merchant_code' => $this->merchant_code ?? '',
+            'merchant_code' => !empty($this->merchant_code) ? $this->merchant_code : 'SA',
             'lang'          => 'ar',
             'merchant_urls' => [
                 'success' => route('tabby.callback', ['payment_id' => $payment_data->id, 'status' => 'success']),
@@ -283,38 +306,138 @@ class TabbyPaymentController extends Controller
 
     // ─── Helper Methods ────────────────────────────────────────────────
 
-    private function buildCartItems($customer_id, int $is_guest, $payment_data): array
+    private function formatTabbyPhone(?string $phone): string
     {
-        if (!$customer_id) {
+        if (empty($phone)) {
+            return '';
+        }
+        $cleaned = preg_replace('/[^\d+]/', '', trim($phone));
+        if (str_starts_with($cleaned, '00966')) {
+            return '+' . substr($cleaned, 2);
+        }
+        if (str_starts_with($cleaned, '966')) {
+            return '+' . $cleaned;
+        }
+        if (str_starts_with($cleaned, '05')) {
+            return '+966' . substr($cleaned, 1);
+        }
+        if (str_starts_with($cleaned, '5') && strlen($cleaned) == 9) {
+            return '+966' . $cleaned;
+        }
+        if (!str_starts_with($cleaned, '+') && strlen($cleaned) > 0) {
+            return '+' . $cleaned;
+        }
+        return $cleaned;
+    }
+
+    private function buildCartItems($customer_id, int $is_guest, $payment_data, $additional = null): array
+    {
+        $items = [];
+        $additional = is_array($additional) ? (object)$additional : $additional;
+        $order_ids  = $additional->order_ids ?? null;
+
+        // 1. Fetch from OrderDetail if order_ids exist in additional data
+        if (!empty($order_ids)) {
+            $order_ids_array = [];
+            if (is_array($order_ids)) {
+                $order_ids_array = $order_ids;
+            } elseif (is_string($order_ids)) {
+                $decoded = json_decode($order_ids, true);
+                $order_ids_array = is_array($decoded) ? $decoded : [$order_ids];
+            } elseif (is_numeric($order_ids)) {
+                $order_ids_array = [(int)$order_ids];
+            }
+
+            if (!empty($order_ids_array)) {
+                $order_details = OrderDetail::whereIn('order_id', $order_ids_array)->get();
+                foreach ($order_details as $detail) {
+                    $product_info = json_decode($detail->product_details ?? '{}', true);
+                    $title        = $product_info['name'] ?? ($detail->product_id ? 'Product #' . $detail->product_id : 'Product');
+                    $unit_price   = max(0.01, ($detail->price ?? 0) - ($detail->discount ?? 0));
+                    $qty          = max(1, (int)($detail->qty ?? 1));
+                    $thumbnail    = $product_info['thumbnail'] ?? null;
+                    $image_url    = $thumbnail
+                        ? asset('storage/app/public/product/' . $thumbnail)
+                        : asset('public/assets/back-end/img/logo.png');
+                    $product_url  = url('/product/' . ($product_info['slug'] ?? $detail->product_id));
+
+                    $items[] = [
+                        'title'           => (string)$title,
+                        'quantity'        => $qty,
+                        'unit_price'      => number_format($unit_price, 2, '.', ''),
+                        'discount_amount' => '0.00',
+                        'reference_id'    => (string)($detail->product_id ?? $detail->id),
+                        'image_url'       => $image_url,
+                        'product_url'     => $product_url,
+                        'category'        => 'General',
+                    ];
+                }
+            }
+        }
+
+        // 2. Fetch from OrderDetail if attribute is order
+        if (empty($items) && ($payment_data->attribute ?? '') === 'order' && !empty($payment_data->attribute_id)) {
+            $order_details = OrderDetail::where('order_id', $payment_data->attribute_id)->get();
+            foreach ($order_details as $detail) {
+                $product_info = json_decode($detail->product_details ?? '{}', true);
+                $title        = $product_info['name'] ?? ($detail->product_id ? 'Product #' . $detail->product_id : 'Product');
+                $unit_price   = max(0.01, ($detail->price ?? 0) - ($detail->discount ?? 0));
+                $qty          = max(1, (int)($detail->qty ?? 1));
+                $thumbnail    = $product_info['thumbnail'] ?? null;
+                $image_url    = $thumbnail
+                    ? asset('storage/app/public/product/' . $thumbnail)
+                    : asset('public/assets/back-end/img/logo.png');
+                $product_url  = url('/product/' . ($product_info['slug'] ?? $detail->product_id));
+
+                $items[] = [
+                    'title'           => (string)$title,
+                    'quantity'        => $qty,
+                    'unit_price'      => number_format($unit_price, 2, '.', ''),
+                    'discount_amount' => '0.00',
+                    'reference_id'    => (string)($detail->product_id ?? $detail->id),
+                    'image_url'       => $image_url,
+                    'product_url'     => $product_url,
+                    'category'        => 'General',
+                ];
+            }
+        }
+
+        // 3. Fetch from Cart
+        $customer_id = $customer_id ?? $payment_data->payer_id ?? null;
+        if (empty($items) && $customer_id) {
+            $cart_items = Cart::where('customer_id', $customer_id)
+                ->where('is_guest', $is_guest)
+                ->get();
+
+            if ($cart_items->isEmpty()) {
+                $cart_items = Cart::where('customer_id', $customer_id)->get();
+            }
+
+            foreach ($cart_items as $cart) {
+                $unit_price  = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
+                $product_url = url('/product/' . ($cart->slug ?? $cart->product_id));
+                $image_url   = $cart->thumbnail
+                    ? asset('storage/app/public/product/' . $cart->thumbnail)
+                    : asset('public/assets/back-end/img/logo.png');
+
+                $items[] = [
+                    'title'           => (string)($cart->name ?? 'Product'),
+                    'quantity'        => max(1, (int)($cart->quantity ?? 1)),
+                    'unit_price'      => number_format($unit_price, 2, '.', ''),
+                    'discount_amount' => '0.00',
+                    'reference_id'    => (string)$cart->product_id,
+                    'image_url'       => $image_url,
+                    'product_url'     => $product_url,
+                    'category'        => 'General',
+                ];
+            }
+        }
+
+        if (empty($items)) {
             return $this->fallbackItem($payment_data);
         }
 
-        $cart_items = Cart::where('customer_id', $customer_id)
-            ->where('is_guest', $is_guest)
-            ->get();
-
-        if ($cart_items->isEmpty()) {
-            return $this->fallbackItem($payment_data);
-        }
-
-        return $cart_items->map(function ($cart) {
-            $unit_price  = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
-            $product_url = url('/product/' . ($cart->slug ?? $cart->product_id));
-            $image_url   = $cart->thumbnail
-                ? asset('storage/app/public/product/' . $cart->thumbnail)
-                : asset('public/assets/back-end/img/logo.png');
-
-            return [
-                'title'           => $cart->name ?? 'Product',
-                'quantity'        => max(1, (int)($cart->quantity ?? 1)),
-                'unit_price'      => number_format($unit_price, 2, '.', ''),
-                'discount_amount' => '0.00',
-                'reference_id'    => (string)$cart->product_id,
-                'image_url'       => $image_url,
-                'product_url'     => $product_url,
-                'category'        => 'General',
-            ];
-        })->toArray();
+        return $items;
     }
 
     private function fallbackItem($payment_data): array

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Payment_Methods;
 
 use App\Models\Cart;
+use App\Models\OrderDetail;
 use App\Models\PaymentRequest;
 use App\Models\ShippingAddress;
 use App\Models\User;
@@ -77,32 +78,8 @@ class PaymobController extends Controller
         $payer            = json_decode($payment_data['payer_information']);
         $shipping_address = $address_id ? ShippingAddress::find($address_id) : null;
 
-        // ─── منتجات السلة الحقيقية ─────────────────────────────────────
-        $items = [];
-        if ($customer_id) {
-            $cart_items = Cart::where('customer_id', $customer_id)
-                ->where('is_guest', $is_guest)
-                ->get();
-
-            foreach ($cart_items as $cart) {
-                $unit_price = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
-                $items[] = [
-                    'name'        => $cart->name ?? 'Product',
-                    'amount'      => round($unit_price * 100),
-                    'description' => 'Product ID: ' . $cart->product_id,
-                    'quantity'    => max(1, (int)($cart->quantity ?? 1)),
-                ];
-            }
-        }
-
-        if (empty($items)) {
-            $items[] = [
-                'name'        => $business_name,
-                'amount'      => round($payment_data->payment_amount * 100),
-                'description' => 'payable amount',
-                'quantity'    => 1,
-            ];
-        }
+        // ─── منتجات السلة أو الطلب الحقيقية ─────────────────────────────
+        $items = $this->buildPaymobItems($payment_data, $additional, $business_name);
 
         $url = $this->base_url . '/v1/intention/';
         $config = $this->config_values;
@@ -222,5 +199,127 @@ class PaymobController extends Controller
             call_user_func($payment_data->failure_hook, $payment_data);
         }
         return $this->payment_response($payment_data, 'fail');
+    }
+
+    private function buildPaymobItems(PaymentRequest $payment_data, object|array $additional, string $business_name): array
+    {
+        $items = [];
+        $additional = is_array($additional) ? (object)$additional : $additional;
+        $customer_id = $additional->customer_id ?? $payment_data->payer_id ?? null;
+        $is_guest    = (int)($additional->is_guest ?? 0);
+        $order_ids   = $additional->order_ids ?? null;
+
+        // 1. Fetch from OrderDetail if order_ids exist in additional data
+        if (!empty($order_ids)) {
+            $order_ids_array = [];
+            if (is_array($order_ids)) {
+                $order_ids_array = $order_ids;
+            } elseif (is_string($order_ids)) {
+                $decoded = json_decode($order_ids, true);
+                $order_ids_array = is_array($decoded) ? $decoded : [$order_ids];
+            } elseif (is_numeric($order_ids)) {
+                $order_ids_array = [(int)$order_ids];
+            }
+
+            if (!empty($order_ids_array)) {
+                $order_details = OrderDetail::whereIn('order_id', $order_ids_array)->get();
+                foreach ($order_details as $detail) {
+                    $product_info = json_decode($detail->product_details ?? '{}', true);
+                    $name         = $product_info['name'] ?? ($detail->product_id ? 'Product #' . $detail->product_id : 'Product');
+                    $unit_price   = max(0.01, ($detail->price ?? 0) - ($detail->discount ?? 0));
+                    $qty          = max(1, (int)($detail->qty ?? 1));
+                    $items[] = [
+                        'name'        => (string)$name,
+                        'amount'      => (int)round($unit_price * 100),
+                        'description' => 'Product ID: ' . ($detail->product_id ?? ''),
+                        'quantity'    => $qty,
+                    ];
+                }
+            }
+        }
+
+        // 2. Fetch from OrderDetail if attribute is order
+        if (empty($items) && ($payment_data->attribute ?? '') === 'order' && !empty($payment_data->attribute_id)) {
+            $order_details = OrderDetail::where('order_id', $payment_data->attribute_id)->get();
+            foreach ($order_details as $detail) {
+                $product_info = json_decode($detail->product_details ?? '{}', true);
+                $name         = $product_info['name'] ?? ($detail->product_id ? 'Product #' . $detail->product_id : 'Product');
+                $unit_price   = max(0.01, ($detail->price ?? 0) - ($detail->discount ?? 0));
+                $qty          = max(1, (int)($detail->qty ?? 1));
+                $items[] = [
+                    'name'        => (string)$name,
+                    'amount'      => (int)round($unit_price * 100),
+                    'description' => 'Product ID: ' . ($detail->product_id ?? ''),
+                    'quantity'    => $qty,
+                ];
+            }
+        }
+
+        // 3. Fetch from Cart if items still empty
+        if (empty($items) && $customer_id) {
+            $cart_items = Cart::where('customer_id', $customer_id)
+                ->where('is_guest', $is_guest)
+                ->get();
+
+            if ($cart_items->isEmpty()) {
+                $cart_items = Cart::where('customer_id', $customer_id)->get();
+            }
+
+            foreach ($cart_items as $cart) {
+                $unit_price = max(0.01, ($cart->price ?? 0) - ($cart->discount ?? 0));
+                $qty        = max(1, (int)($cart->quantity ?? 1));
+                $items[] = [
+                    'name'        => (string)($cart->name ?? 'Product'),
+                    'amount'      => (int)round($unit_price * 100),
+                    'description' => 'Product ID: ' . $cart->product_id,
+                    'quantity'    => $qty,
+                ];
+            }
+        }
+
+        // 4. Adjust items total to match overall intention amount
+        $total_payment_cents = (int)round($payment_data->payment_amount * 100);
+
+        if (empty($items)) {
+            $items[] = [
+                'name'        => (string)$business_name,
+                'amount'      => $total_payment_cents,
+                'description' => 'Payable Amount',
+                'quantity'    => 1,
+            ];
+        } else {
+            $sum_items_cents = 0;
+            foreach ($items as $item) {
+                $sum_items_cents += ($item['amount'] * $item['quantity']);
+            }
+
+            $diff = $total_payment_cents - $sum_items_cents;
+            if ($diff > 0) {
+                $items[] = [
+                    'name'        => 'Shipping & Extra Fees',
+                    'amount'      => $diff,
+                    'description' => 'Shipping cost, taxes, or additional fees',
+                    'quantity'    => 1,
+                ];
+            } elseif ($diff < 0) {
+                $abs_diff = abs($diff);
+                for ($i = count($items) - 1; $i >= 0; $i--) {
+                    $item_total = $items[$i]['amount'] * $items[$i]['quantity'];
+                    if ($item_total > $abs_diff) {
+                        $unit_deduct = (int)floor($abs_diff / $items[$i]['quantity']);
+                        if ($unit_deduct > 0 && ($items[$i]['amount'] - $unit_deduct) > 0) {
+                            $items[$i]['amount'] -= $unit_deduct;
+                            $abs_diff -= ($unit_deduct * $items[$i]['quantity']);
+                        } else {
+                            $items[$i]['amount'] = max(1, $items[$i]['amount'] - $abs_diff);
+                            $abs_diff = 0;
+                        }
+                    }
+                    if ($abs_diff <= 0) break;
+                }
+            }
+        }
+
+        return $items;
     }
 }

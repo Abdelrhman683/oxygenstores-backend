@@ -7110,4 +7110,5 @@ return [
 	"Your_Order_ID" => "Your Order ID",
 	"keep_it_handy_for_tracking." => "Keep it handy for tracking.",
 	"Explore_More_Items" => "Explore More Items",
+	"select_offline_payment_method" => "Select offline payment method",
 ];

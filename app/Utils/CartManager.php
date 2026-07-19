@@ -22,30 +22,51 @@ class CartManager
     public static function cartListSessionToDatabase($request = null): void
     {
         $user = Helpers::getCustomerInformation($request);
-        if (session()->has('guest_id') || (!is_null($request) && !is_null($request->guest_id)) ) {
-            $guestId = session('guest_id') ?? $request->guest_id;
+        if ($user == 'offline' || !isset($user['id'])) {
+            return;
+        }
+
+        $guestId = session('guest_id') ?? (!is_null($request) && isset($request->guest_id) ? $request->guest_id : request('guest_id'));
+
+        if ($guestId) {
             $cartList = Cart::where(['is_guest' => 1, 'customer_id' => $guestId])->get();
             foreach ($cartList as $cart) {
-                $databaseCart = Cart::where([
-                    'customer_id' => $user['id'],
-                    'seller_id' => $cart['seller_id'],
-                    'seller_is' => $cart['seller_is']
-                ])->first();
-
-                Cart::where([
+                $existingCustomerItem = Cart::where([
                     'customer_id' => $user['id'],
                     'product_id' => $cart['product_id'],
                     'variant' => $cart['variant'],
                     'seller_id' => $cart['seller_id'],
                     'seller_is' => $cart['seller_is']
-                ])->delete();
+                ])->first();
 
-                $cart->cart_group_id = isset($databaseCart) ? $databaseCart['cart_group_id'] : str_replace('guest', $user['id'], $cart['cart_group_id']);
-                $cart->customer_id = $user['id'];
-                $cart->is_guest = 0;
-                $cart->save();
+                if ($existingCustomerItem) {
+                    $existingCustomerItem->quantity += $cart->quantity;
+                    $existingCustomerItem->save();
+                    $cart->delete();
+                } else {
+                    $databaseCart = Cart::where([
+                        'customer_id' => $user['id'],
+                        'seller_id' => $cart['seller_id'],
+                        'seller_is' => $cart['seller_is']
+                    ])->first();
+
+                    $oldCartGroupId = $cart->cart_group_id;
+                    $newCartGroupId = isset($databaseCart) ? $databaseCart['cart_group_id'] : str_replace('guest', $user['id'], $cart['cart_group_id']);
+
+                    $cart->cart_group_id = $newCartGroupId;
+                    $cart->customer_id = $user['id'];
+                    $cart->is_guest = 0;
+                    $cart->save();
+
+                    if ($oldCartGroupId != $newCartGroupId) {
+                        CartShipping::where('cart_group_id', $oldCartGroupId)->update(['cart_group_id' => $newCartGroupId]);
+                    }
+                }
             }
+            session()->forget('guest_id');
         }
+
+        cacheRemoveByType(type: 'carts');
     }
 
     public static function getCartListQuery($groupId = null, $type = null): Collection|array

@@ -27,6 +27,11 @@ class BranchController extends Controller
         session(['branch_id' => $branchId]);
         cookie()->queue('selected_branch_id', $branchId, 60 * 24 * 30);
 
+        if ($request->filled('city_name')) {
+            session(['branch_city_name' => $request->city_name]);
+            cookie()->queue('selected_branch_city_name', $request->city_name, 60 * 24 * 30);
+        }
+
         if (Auth::guard('customer')->check()) {
             // Logged-in customer: persist branch_id in the users table
             Auth::guard('customer')->user()->update(['branch_id' => $branchId]);

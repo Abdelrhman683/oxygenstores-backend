@@ -593,31 +593,24 @@ class OrderController extends BaseController
             ]);
         }
 
-        if ($order['payment_method'] == 'offline_payment' && $order['payment_status'] == 'unpaid') {
+        if ($order['payment_method'] == 'offline_payment' && $order['payment_status'] == 'unpaid' && $request['order_status'] !== 'delivered') {
             return response()->json([
                 'status' => 0,
                 'message' => translate('Please confirm the offline payment information before changing the order status.'),
             ]);
         }
 
-        if ($order['payment_method'] !== 'cash_on_delivery' && $order['edit_due_amount'] > 0 && $order?->latestEditHistory?->order_due_payment_method !== 'cash_on_delivery' && $order?->latestEditHistory?->order_due_payment_status == 'unpaid') {
+        if ($order['payment_method'] !== 'cash_on_delivery' && $order['edit_due_amount'] > 0 && $order?->latestEditHistory?->order_due_payment_method !== 'cash_on_delivery' && $order?->latestEditHistory?->order_due_payment_status == 'unpaid' && $request['order_status'] !== 'delivered') {
             return response()->json([
                 'status' => 0,
                 'message' => translate('Please confirm the due payment has been paid before changing the order status.'),
             ]);
         }
 
-        if ($order['payment_method'] !== 'cash_on_delivery' && $order['edit_return_amount'] > 0 && $order?->latestEditHistory?->order_due_payment_method !== 'cash_on_delivery' && $order?->latestEditHistory?->order_return_payment_status == 'pending') {
+        if ($order['payment_method'] !== 'cash_on_delivery' && $order['edit_return_amount'] > 0 && $order?->latestEditHistory?->order_due_payment_method !== 'cash_on_delivery' && $order?->latestEditHistory?->order_return_payment_status == 'pending' && $request['order_status'] !== 'delivered') {
             return response()->json([
                 'status' => 0,
                 'message' => translate('Please return the amount first before changing the order status.'),
-            ]);
-        }
-
-        if ($order['payment_method'] != 'cash_on_delivery' && $request['order_status'] == 'delivered' && $order['payment_status'] != 'paid') {
-            return response()->json([
-                'status' => 0,
-                'message' => translate('Please_update_the_payment_status_first'),
             ]);
         }
 
@@ -656,6 +649,7 @@ class OrderController extends BaseController
             $this->orderRepo->update(id: $request['id'], data: ['payment_status' => 'paid', 'is_pause' => 0]);
             $this->orderDetailRepo->updateWhere(params: ['order_id' => $order['id']], data: ['delivery_status' => $request['order_status'], 'payment_status' => 'paid']);
             $this->orderDetailRepo->updateWhere(params: ['order_id' => $order['id'], 'refund_started_at' => null], data: ['refund_started_at' => now()]);
+            \App\Utils\CartManager::cartCleanByCartGroupIds(cartGroupIDs: [$order->order_group_id]);
         }
         event(new OrderStatusEvent(key: $request['order_status'], type: 'customer', order: $order));
         if ($request['order_status'] == 'canceled') {

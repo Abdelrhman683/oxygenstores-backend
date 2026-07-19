@@ -1444,7 +1444,9 @@ class OrderManager
             }
         }
 
-        CartManager::cartCleanByCartGroupIds(cartGroupIDs: collect($vendorWiseCartList)?->pluck('cart_group_id')->toArray() ?? []);
+        if (isset($data['payment_status']) && $data['payment_status'] == 'paid') {
+            CartManager::cartCleanByCartGroupIds(cartGroupIDs: collect($vendorWiseCartList)?->pluck('cart_group_id')->toArray() ?? []);
+        }
 
         session()->forget('coupon_code');
         session()->forget('coupon_type');

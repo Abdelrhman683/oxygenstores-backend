@@ -210,7 +210,7 @@
         <div class="pt-4">
             @if (str_contains(request()->url(), 'checkout-payment'))
                 <label class="custom-control custom-checkbox mb-3 d-flex user-select-none cursor-pointer">
-                    <input type="checkbox" class="custom-control-input payment-input-checkbox">
+                    <input type="checkbox" class="custom-control-input payment-input-checkbox" checked>
                     <span class="custom-control-label">
                 <span>{{ translate('i_agree_to_Your') }}</span>
                 <a class="font-size-sm text-primary d-inline" target="_blank"

@@ -218,13 +218,11 @@
                                 <select id="bulk-order-status" class="form-control form-select form-select-sm w-auto" style="min-width: 150px;">
                                     <option value="">--- {{ translate('select_status') }} ---</option>
                                     <option value="pending">{{ translate('pending') }}</option>
+                                    <option value="processing">{{ translate('processing') }}</option>
                                     <option value="confirmed">{{ translate('confirmed') }}</option>
-                                    <option value="processing">{{ translate('Packaging') }}</option>
-                                    <option value="out_for_delivery">{{ translate('out_for_delivery') }}</option>
                                     <option value="delivered">{{ translate('delivered') }}</option>
                                     <option value="returned">{{ translate('returned') }}</option>
-                                    <option value="failed">{{ translate('failed_to_deliver') }}</option>
-                                    <option value="canceled">{{ translate('canceled') }}</option>
+                                    <option value="on_hold">{{ translate('on_hold') }}</option>
                                 </select>
                                 <button type="button" id="apply-bulk-status" class="btn btn-primary btn-sm">{{ translate('Apply') }}</button>
                             </div>
@@ -350,13 +348,11 @@
                                     <td class="text-center">
                                         <select class="form-control form-select form-select-sm inline-order-status" data-order-id="{{ $order['id'] }}" style="min-width: 145px; font-size: 12px; padding-right: 2rem;">
                                             <option value="pending" {{ $order['order_status'] == 'pending' ? 'selected' : '' }}>{{ translate('pending') }}</option>
+                                            <option value="processing" {{ $order['order_status'] == 'processing' ? 'selected' : '' }}>{{ translate('processing') }}</option>
                                             <option value="confirmed" {{ $order['order_status'] == 'confirmed' ? 'selected' : '' }}>{{ translate('confirmed') }}</option>
-                                            <option value="processing" {{ $order['order_status'] == 'processing' ? 'selected' : '' }}>{{ translate('Packaging') }}</option>
-                                            <option value="out_for_delivery" {{ $order['order_status'] == 'out_for_delivery' ? 'selected' : '' }}>{{ translate('out_for_delivery') }}</option>
                                             <option value="delivered" {{ $order['order_status'] == 'delivered' ? 'selected' : '' }}>{{ translate('delivered') }}</option>
                                             <option value="returned" {{ $order['order_status'] == 'returned' ? 'selected' : '' }}>{{ translate('returned') }}</option>
-                                            <option value="failed" {{ $order['order_status'] == 'failed' ? 'selected' : '' }}>{{ translate('failed_to_deliver') }}</option>
-                                            <option value="canceled" {{ $order['order_status'] == 'canceled' ? 'selected' : '' }}>{{ translate('canceled') }}</option>
+                                            <option value="on_hold" {{ in_array($order['order_status'], ['on_hold', 'out_for_delivery']) ? 'selected' : '' }}>{{ translate('on_hold') }}</option>
                                         </select>
                                     </td>
                                     <td>
