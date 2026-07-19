@@ -19,7 +19,7 @@ class CartManager
 {
     use VatTaxManagement;
 
-    public static function cartListSessionToDatabase($request = null): void
+    public static function cartListSessionToDatabase($request = null, bool $overrideOldCart = false): void
     {
         $user = Helpers::getCustomerInformation($request);
         if ($user == 'offline' || !isset($user['id'])) {
@@ -30,36 +30,42 @@ class CartManager
 
         if ($guestId) {
             $cartList = Cart::where(['is_guest' => 1, 'customer_id' => $guestId])->get();
-            foreach ($cartList as $cart) {
-                $existingCustomerItem = Cart::where([
-                    'customer_id' => $user['id'],
-                    'product_id' => $cart['product_id'],
-                    'variant' => $cart['variant'],
-                    'seller_id' => $cart['seller_id'],
-                    'seller_is' => $cart['seller_is']
-                ])->first();
+            if ($cartList->count() > 0) {
+                if ($overrideOldCart) {
+                    Cart::where(['is_guest' => 0, 'customer_id' => $user['id']])->delete();
+                }
 
-                if ($existingCustomerItem) {
-                    $existingCustomerItem->quantity += $cart->quantity;
-                    $existingCustomerItem->save();
-                    $cart->delete();
-                } else {
-                    $databaseCart = Cart::where([
+                foreach ($cartList as $cart) {
+                    $existingCustomerItem = Cart::where([
                         'customer_id' => $user['id'],
+                        'product_id' => $cart['product_id'],
+                        'variant' => $cart['variant'],
                         'seller_id' => $cart['seller_id'],
                         'seller_is' => $cart['seller_is']
                     ])->first();
 
-                    $oldCartGroupId = $cart->cart_group_id;
-                    $newCartGroupId = isset($databaseCart) ? $databaseCart['cart_group_id'] : str_replace('guest', $user['id'], $cart['cart_group_id']);
+                    if ($existingCustomerItem) {
+                        $existingCustomerItem->quantity += $cart->quantity;
+                        $existingCustomerItem->save();
+                        $cart->delete();
+                    } else {
+                        $databaseCart = Cart::where([
+                            'customer_id' => $user['id'],
+                            'seller_id' => $cart['seller_id'],
+                            'seller_is' => $cart['seller_is']
+                        ])->first();
 
-                    $cart->cart_group_id = $newCartGroupId;
-                    $cart->customer_id = $user['id'];
-                    $cart->is_guest = 0;
-                    $cart->save();
+                        $oldCartGroupId = $cart->cart_group_id;
+                        $newCartGroupId = isset($databaseCart) ? $databaseCart['cart_group_id'] : str_replace('guest', $user['id'], $cart['cart_group_id']);
 
-                    if ($oldCartGroupId != $newCartGroupId) {
-                        CartShipping::where('cart_group_id', $oldCartGroupId)->update(['cart_group_id' => $newCartGroupId]);
+                        $cart->cart_group_id = $newCartGroupId;
+                        $cart->customer_id = $user['id'];
+                        $cart->is_guest = 0;
+                        $cart->save();
+
+                        if ($oldCartGroupId != $newCartGroupId) {
+                            CartShipping::where('cart_group_id', $oldCartGroupId)->update(['cart_group_id' => $newCartGroupId]);
+                        }
                     }
                 }
             }

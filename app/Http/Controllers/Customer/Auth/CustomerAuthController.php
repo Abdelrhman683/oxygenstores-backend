@@ -826,8 +826,20 @@ class CustomerAuthController extends Controller
         if ($tokenVerifyStatus) {
             $this->phoneOrEmailVerificationRepo->delete(params: ['phone_or_email' => $identity]);
 
-            // Register or Login user
-            $user = \App\Models\User::where(['phone' => $phone])->first();
+            // Register or Login user: flexible phone matching (exact, cleaned digits, last 9 digits, with/without country code)
+            $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
+            $last9 = strlen($cleanPhone) >= 9 ? substr($cleanPhone, -9) : $cleanPhone;
+
+            $user = \App\Models\User::where(function($q) use ($phone, $cleanPhone, $last9) {
+                $q->where('phone', $phone)
+                  ->orWhere('phone', $cleanPhone)
+                  ->orWhere('phone', 'like', '%' . $last9);
+                if ($cleanPhone) {
+                    $q->orWhere('phone', '+' . $cleanPhone)
+                      ->orWhere('phone', '0' . $last9);
+                }
+            })->first();
+
             if (!$user) {
                 // Register a new customer
                 $name = $request['name'] ?? 'Guest_' . rand(1000, 9999);
@@ -859,7 +871,7 @@ class CustomerAuthController extends Controller
 
             auth('customer')->login($user);
             CustomerManager::updateCustomerSessionData(userId: auth('customer')->id());
-            CartManager::cartListSessionToDatabase();
+            CartManager::cartListSessionToDatabase(request: null, overrideOldCart: true);
 
             return response()->json([
                 'status' => 'success',

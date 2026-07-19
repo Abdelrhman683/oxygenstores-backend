@@ -440,10 +440,32 @@
             let tempSelectedBranchId   = null;
             let tempSelectedBranchName = null;
 
+            function syncSelectedBranch() {
+                let $activeCard = $('.region-card.active').first();
+                if (!$activeCard.length) {
+                    $activeCard = $('.region-card').first();
+                    if ($activeCard.length) {
+                        $activeCard.addClass('active');
+                    }
+                }
+                if ($activeCard.length) {
+                    tempSelectedBranchId   = $activeCard.data('branch-id');
+                    tempSelectedBranchName = $activeCard.data('branch-name');
+                }
+            }
+
+            // Sync on document ready
+            syncSelectedBranch();
+
             function showBranchModal() {
+                syncSelectedBranch();
                 $('#branchModal').modal({ backdrop: 'static', keyboard: false });
                 $('#branchModal').modal('show');
             }
+
+            $('#branchModal').on('show.bs.modal shown.bs.modal', function () {
+                syncSelectedBranch();
+            });
 
             function getDistance(lat1, lon1, lat2, lon2) {
                 const R = 6371; // Radius of the earth in km
@@ -565,6 +587,10 @@
 
             // Save branch
             $('#save-branch-btn').on('click', function() {
+                if (!tempSelectedBranchId) {
+                    syncSelectedBranch();
+                }
+
                 if (!tempSelectedBranchId) {
                     alert('يرجى اختيار فرع أولاً');
                     return;
