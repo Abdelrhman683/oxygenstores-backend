@@ -263,7 +263,7 @@
             <div class="banner-grid-row top-row">
 
                 <div class="banner-grid-card "
-                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-2-1.webp') }}'); background-size:cover; background-position:center;">
+                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-2-1.webp') }}'); background-size:cover;background-repeat: no-repeat;">
                     <div class="banner-card-overlay"></div>
                     <div class="banner-wave-pattern"></div>
                     <div class="banner-card-content">
@@ -273,7 +273,7 @@
                 </div>
 
                 <div class="banner-grid-card "
-                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-1-1.webp') }}'); background-size:cover; background-position:center;">
+                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-1-1.webp') }}'); background-size:cover;    background-repeat: no-repeat;">
                     <div class="banner-card-overlay"></div>
                     <div class="banner-wave-pattern"></div>
                     <div class="banner-card-content">
@@ -287,7 +287,7 @@
             <div class="banner-grid-row bottom-row">
 
                 <div class="banner-grid-wide "
-                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-3.webp') }}'); background-size:cover; background-position:center;">
+                     style="background-image:url('{{ dynamicAsset(path: 'public/assets/front-end/img/Group-3.webp') }}'); background-size:cover;    background-repeat: no-repeat;">
                     <div class="banner-card-overlay"></div>
                     <div class="banner-wave-pattern"></div>
                     <div class="banner-card-content">
