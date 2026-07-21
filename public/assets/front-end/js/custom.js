@@ -1352,15 +1352,18 @@ function commonFunctionalityForProductView() {
         }
     });
 
-    $(".product-add-to-cart-button").on("click", function () {
+    $(document).off("click", ".product-add-to-cart-button").on("click", ".product-add-to-cart-button", function () {
         let formId = $(this).attr("data-form") || $(this).data("form");
         let productCartForm;
         if (formId) {
             productCartForm = $(formId);
         }
         if (!productCartForm || !productCartForm.length) {
-            let parentElement = $(this).closest(".product-cart-option-container");
+            let parentElement = $(this).closest(".product-cart-option-container, .premium-card");
             productCartForm = parentElement.find(".addToCartDynamicForm");
+        }
+        if (!productCartForm || !productCartForm.length) {
+            productCartForm = $(this).siblings(".addToCartDynamicForm");
         }
         if (!productCartForm || !productCartForm.length) {
             productCartForm = $(".add-to-cart-details-form");

@@ -1,9 +1,19 @@
 @php
     $overallRating = getOverallRating($product?->reviews);
     $wishlist_status = Auth::guard('customer')->check() ? \App\Models\Wishlist::where('customer_id', Auth::guard('customer')->id())->where('product_id', $product->id)->count() : (session()->has('wish_list') && in_array($product->id, session('wish_list')) ? 1 : 0);
+    $hasVariations = false;
+    if (!empty($product->colors) && count(json_decode($product->colors)) > 0) {
+        $hasVariations = true;
+    }
+    if (!empty($product->choice_options)) {
+        $choices = json_decode($product->choice_options, true);
+        if (!empty($choices) && count($choices) > 0) {
+            $hasVariations = true;
+        }
+    }
 @endphp
 
-<div class="premium-card">
+<div class="premium-card product-cart-option-container">
     <div class="premium-product-media">
         @if($product->getActiveCouponCode())
             <span class="premium-promo-badge">
@@ -86,6 +96,16 @@
                 @csrf
                 <input type="hidden" name="id" value="{{ $product->id }}">
                 <input type="hidden" name="quantity" value="{{ $product->minimum_order_qty ?? 1 }}">
+                @if(!empty($product->colors) && count(json_decode($product->colors)) > 0)
+                    <input type="hidden" name="color" value="{{ json_decode($product->colors)[0] }}">
+                @endif
+                @if(!empty($product->choice_options))
+                    @foreach (json_decode($product->choice_options) as $choice)
+                        @if(!empty($choice->options) && count($choice->options) > 0)
+                            <input type="hidden" name="{{ $choice->name }}" value="{{ $choice->options[0] }}">
+                        @endif
+                    @endforeach
+                @endif
             </form>
 
             <button class="premium-add-to-cart product-add-to-cart-button"

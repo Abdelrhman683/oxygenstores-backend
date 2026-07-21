@@ -93,14 +93,13 @@
                                     'showProductsFilter' => true,
                             ])
                         </div>
+        </form>
                         <div class="row" id="ajax-products-view">
                             @include('web-views.products._ajax-products', ['products' => $products])
                         </div>
                     </section>
                 </div>
             </div>
-
-        </form>
 
     </div>
 

@@ -73,8 +73,7 @@
 
                         </div>
                         <div class="sidebar-overlay"></div>
-                    </aside>
-
+        </form>
                     <section class="col-lg-9">
                         <div class="row" id="ajax-products-view">
                             @include('web-views.products._ajax-products', ['products' => $products])
@@ -82,8 +81,6 @@
                     </section>
                 </div>
             </div>
-
-        </form>
 
     </div>
 
