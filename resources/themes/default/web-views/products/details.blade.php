@@ -178,6 +178,14 @@
                                         </div>
                                     </div>
 
+                                    <div class="text-center w-100 mt-2">
+                                        @if($product->isAirConditioner())
+                                            <span class="product-details-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
+                                        @else
+                                            <span class="product-details-tax-badge">السعر شامل الضريبة والتوصيل</span>
+                                        @endif
+                                    </div>
+
                                 </div>
                             </div>
 

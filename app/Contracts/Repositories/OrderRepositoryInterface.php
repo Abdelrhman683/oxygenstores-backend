@@ -134,4 +134,9 @@ interface OrderRepositoryInterface extends RepositoryInterface
      * @return Model|null
      */
     public function getNextFirstOrderWhere(int $id, array $params = [], array $relations = []): ?Model;
+
+    /**
+     * @return int
+     */
+    public function getOldestOrderYear(): int;
 }

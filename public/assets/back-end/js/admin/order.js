@@ -32,21 +32,39 @@ $("#filter").change(function() {
     }
 });
 
-$("#date_type").change(function() {
-    let val = $(this).val();
-    $('#from_div').toggle(val === 'custom_date');
-    $('#to_div').toggle(val === 'custom_date');
+function handleCustomDateVisibility() {
+    let dateType = $("#date_type").val();
+    let subType = $("#custom_date_type").val();
 
-    if(val === 'custom_date'){
-        $('#from_date').attr('required','required');
-        $('#to_date').attr('required','required');
-        $('.filter-btn').attr('class','filter-btn col-12 text-right');
-    }else{
-        $('#from_date').val(null).removeAttr('required')
-        $('#to_date').val(null).removeAttr('required')
-        $('.filter-btn').attr('class','col-sm-6 col-md-3 filter-btn');
+    if (dateType === 'custom_date') {
+        $('#custom_date_type_div').show();
+
+        if (subType === 'month') {
+            $('#from_div, #to_div').hide();
+            $('#month_div, #year_div').show();
+            $('#from_date, #to_date').removeAttr('required');
+            $('#custom_month, #custom_year').attr('required', 'required');
+        } else if (subType === 'year') {
+            $('#from_div, #to_div, #month_div').hide();
+            $('#year_div').show();
+            $('#from_date, #to_date, #custom_month').removeAttr('required');
+            $('#custom_year').attr('required', 'required');
+        } else {
+            $('#from_div, #to_div').show();
+            $('#month_div, #year_div').hide();
+            $('#from_date, #to_date').attr('required', 'required');
+            $('#custom_month, #custom_year').removeAttr('required');
+        }
+    } else {
+        $('#custom_date_type_div, #from_div, #to_div, #month_div, #year_div').hide();
+        $('#from_date, #to_date, #custom_month, #custom_year').removeAttr('required');
     }
-}).change();
+}
+
+$("#date_type, #custom_date_type").change(function() {
+    handleCustomDateVisibility();
+});
+handleCustomDateVisibility();
 
 $('#from_date,#to_date').change(function () {
     let fr = $('#from_date').val();

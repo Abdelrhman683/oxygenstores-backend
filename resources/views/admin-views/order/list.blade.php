@@ -176,21 +176,48 @@
                                 </div>
                             </form>
 
-                            <a type="button" class="btn btn-outline-primary"
-                               href="{{ route('admin.orders.export-excel', [
-                                                    'delivery_man_id' => request('delivery_man_id'),
-                                                    'status' => $status, 'from' => $from, 'to' => $to,
-                                                    'filter' => $filter, 'searchValue' => $searchValue,
-                                                    'seller_id' => $vendorId,
-                                                    'customer_id' => $customerId,
-                                                    'date_type' => $dateType,
-                                                    'payment_status' => request('payment_status'),
-                                                    'order_current_status' => request('order_current_status'),
-                                                    'order_amount_settlement' => request('order_amount_settlement')
-                                                    ]) }}">
-                                <i class="fi fi-sr-inbox-in"></i>
-                                <span class="fs-12">{{ translate('export') }}</span>
-                            </a>
+                            @php
+                                $exportParams = [
+                                    'delivery_man_id' => request('delivery_man_id'),
+                                    'status' => $status,
+                                    'from' => $from,
+                                    'to' => $to,
+                                    'filter' => $filter,
+                                    'searchValue' => $searchValue,
+                                    'seller_id' => $vendorId,
+                                    'customer_id' => $customerId,
+                                    'date_type' => $dateType,
+                                    'custom_date_type' => request('custom_date_type'),
+                                    'custom_month' => request('custom_month'),
+                                    'custom_year' => request('custom_year'),
+                                    'payment_status' => request('payment_status'),
+                                    'order_current_status' => request('order_current_status'),
+                                    'order_amount_settlement' => request('order_amount_settlement')
+                                ];
+                            @endphp
+
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fi fi-sr-inbox-in"></i>
+                                    <span class="fs-12">{{ translate('export') }}</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2"
+                                           href="{{ route('admin.orders.export-excel', array_merge($exportParams, ['export_type' => 'detailed'])) }}">
+                                            <i class="fi fi-rr-document"></i>
+                                            <span>{{ translate('تقرير مفصل') }}</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center gap-2"
+                                           href="{{ route('admin.orders.export-excel', array_merge($exportParams, ['export_type' => 'summary'])) }}">
+                                            <i class="fi fi-rr-stats"></i>
+                                            <span>{{ translate('تقرير شامل') }}</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                             <div class="position-relative">
                                 @if((request('delivery_man_id') || $from || $to || $filter || $searchValue || $vendorId || $customerId || $dateType))
                                     <div

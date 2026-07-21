@@ -644,6 +644,17 @@ class Product extends Model
 
     public function isAirConditioner(): bool
     {
+        if (str_contains($this->name ?? '', 'صحراو') || str_contains(strtolower($this->slug ?? ''), 'desert')) {
+            return false;
+        }
+
+        $categoriesToCheck = collect([$this->category, $this->subCategory, $this->subSubCategory])->filter();
+        foreach ($categoriesToCheck as $cat) {
+            if (str_contains($cat->name ?? '', 'صحراو') || str_contains(strtolower($cat->slug ?? ''), 'desert')) {
+                return false;
+            }
+        }
+
         if ($this->category_id == 1 || $this->sub_category_id == 1 || $this->sub_sub_category_id == 1) {
             return true;
         }
@@ -656,9 +667,8 @@ class Product extends Model
             return true;
         }
 
-        $categoriesToCheck = collect([$this->category, $this->subCategory, $this->subSubCategory])->filter();
         foreach ($categoriesToCheck as $cat) {
-            if (str_contains($cat->name, 'مكيف') || str_contains($cat->name, 'تكييف') || str_contains($cat->slug, 'mkyf') || str_contains($cat->slug, 'conditioner')) {
+            if (str_contains($cat->name ?? '', 'مكيف') || str_contains($cat->name ?? '', 'تكييف') || str_contains($cat->slug ?? '', 'mkyf') || str_contains($cat->slug ?? '', 'conditioner')) {
                 return true;
             }
         }

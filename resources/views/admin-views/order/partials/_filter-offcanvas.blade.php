@@ -39,6 +39,22 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-12" id="custom_date_type_div">
+                        <label for="custom_date_type" class="form-label">{{ translate('Custom_Date_Filter_By') }}</label>
+                        <div class="select-wrapper">
+                            <select class="form-select" name="custom_date_type" id="custom_date_type">
+                                <option value="range" {{ ($customDateType ?? 'range') == 'range' ? 'selected' : '' }}>
+                                    {{ translate('Date_Range') }} ({{ translate('Start_Date') }} - {{ translate('End_Date') }})
+                                </option>
+                                <option value="month" {{ ($customDateType ?? '') == 'month' ? 'selected' : '' }}>
+                                    {{ translate('By_Month_And_Year') }}
+                                </option>
+                                <option value="year" {{ ($customDateType ?? '') == 'year' ? 'selected' : '' }}>
+                                    {{ translate('By_Year') }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-sm-6" id="from_div">
                         <label for="" class="form-label">
                             {{ translate('Start_Date') }}
@@ -59,6 +75,37 @@
                             </span>
                         </label>
                         <input class="form-control" type="date" value="{{ $to }}" name="to" id="to_date">
+                    </div>
+                    <div class="col-sm-6" id="month_div">
+                        <label for="custom_month" class="form-label">{{ translate('Select_Month') }}</label>
+                        <div class="select-wrapper">
+                            <select class="form-select" name="custom_month" id="custom_month">
+                                <option value="">{{ translate('Select_Month') }}</option>
+                                @for ($m = 1; $m <= 12; $m++)
+                                    @php $monthName = date('F', mktime(0, 0, 0, $m, 1)); @endphp
+                                    <option value="{{ $m }}" {{ ($customMonth ?? date('n')) == $m ? 'selected' : '' }}>
+                                        {{ translate($monthName) }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6" id="year_div">
+                        <label for="custom_year" class="form-label">{{ translate('Select_Year') }}</label>
+                        <div class="select-wrapper">
+                            <select class="form-select" name="custom_year" id="custom_year">
+                                <option value="">{{ translate('Select_Year') }}</option>
+                                @php
+                                    $currentYear = (int) date('Y');
+                                    $startYear = isset($minYear) && $minYear ? (int)$minYear : $currentYear;
+                                @endphp
+                                @for ($y = $currentYear; $y >= $startYear; $y--)
+                                    <option value="{{ $y }}" {{ ($customYear ?? $currentYear) == $y ? 'selected' : '' }}>
+                                        {{ $y }}
+                                    </option>
+                                @endfor
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -24,18 +24,17 @@ class OrderRepository implements OrderRepositoryInterface
 {
 
     public function __construct(
-        private readonly Order                        $order,
+        private readonly Order $order,
         private readonly OrderExpectedDeliveryHistory $orderExpectedDeliveryHistory,
-        private readonly Product                      $product,
-        private readonly OrderDetail                  $orderDetail,
-        private readonly AdminWallet                  $adminWallet,
-        private readonly SellerWallet                 $sellerWallet,
-        private readonly Transaction                  $transaction,
-        private readonly OrderTransaction             $orderTransaction,
-        private readonly Shop                         $shop,
-        private readonly OrderEditHistory             $orderEditHistory,
-    )
-    {
+        private readonly Product $product,
+        private readonly OrderDetail $orderDetail,
+        private readonly AdminWallet $adminWallet,
+        private readonly SellerWallet $sellerWallet,
+        private readonly Transaction $transaction,
+        private readonly OrderTransaction $orderTransaction,
+        private readonly Shop $shop,
+        private readonly OrderEditHistory $orderEditHistory,
+    ) {
     }
 
     public function add(array $data): string|object
@@ -658,7 +657,8 @@ class OrderRepository implements OrderRepositoryInterface
         }
         // free delivery over amount transaction end
 
-        if ($order['seller_is'] == 'seller' &&
+        if (
+            $order['seller_is'] == 'seller' &&
             $shippingModel == 'sellerwise_shipping'
         ) {
             $editHistoryAmount = $this->orderEditHistory->where([
@@ -867,5 +867,11 @@ class OrderRepository implements OrderRepositoryInterface
     {
         return $this->order->with($relations)->where($params)->where('id', '>', $id)
             ->orderBy('id', 'asc')->first();
+    }
+
+    public function getOldestOrderYear(): int
+    {
+        $oldestOrder = $this->order->oldest('created_at')->first(['created_at']);
+        return $oldestOrder ? (int) Carbon::parse($oldestOrder->created_at)->format('Y') : (int) date('Y');
     }
 }

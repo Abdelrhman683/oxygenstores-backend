@@ -28,6 +28,8 @@ use Carbon\Carbon;
 use App\Enums\WebConfigKey;
 use App\Utils\OrderManager;
 use App\Exports\OrderExport;
+use App\Exports\OrderDetailedReportExport;
+use App\Exports\OrderSummaryReportExport;
 use App\Traits\PdfGenerator;
 use Exception;
 use Illuminate\Http\Request;
@@ -81,33 +83,32 @@ class OrderController extends BaseController
     }
 
     public function __construct(
-        private readonly AuthorRepositoryInterface                       $authorRepo,
-        private readonly OrderRepositoryInterface                        $orderRepo,
-        private readonly CustomerRepositoryInterface                     $customerRepo,
-        private readonly VendorRepositoryInterface                       $vendorRepo,
-        private readonly BusinessSettingRepositoryInterface              $businessSettingRepo,
-        private readonly DeliveryCountryCodeRepositoryInterface          $deliveryCountryCodeRepo,
-        private readonly DeliveryZipCodeRepositoryInterface              $deliveryZipCodeRepo,
-        private readonly DeliveryManRepository                           $deliveryManRepo,
-        private readonly ShippingAddressRepositoryInterface              $shippingAddressRepo,
+        private readonly AuthorRepositoryInterface $authorRepo,
+        private readonly OrderRepositoryInterface $orderRepo,
+        private readonly CustomerRepositoryInterface $customerRepo,
+        private readonly VendorRepositoryInterface $vendorRepo,
+        private readonly BusinessSettingRepositoryInterface $businessSettingRepo,
+        private readonly DeliveryCountryCodeRepositoryInterface $deliveryCountryCodeRepo,
+        private readonly DeliveryZipCodeRepositoryInterface $deliveryZipCodeRepo,
+        private readonly DeliveryManRepository $deliveryManRepo,
+        private readonly ShippingAddressRepositoryInterface $shippingAddressRepo,
         private readonly OrderExpectedDeliveryHistoryRepositoryInterface $orderExpectedDeliveryHistoryRepo,
-        private readonly OrderDetailRepositoryInterface                  $orderDetailRepo,
-        private readonly DeliveryManWalletRepositoryInterface            $deliveryManWalletRepo,
-        private readonly ProductRepositoryInterface                      $productRepo,
-        private readonly ProductService                                  $productService,
-        private readonly OrderEditService                                $orderEditService,
-        private readonly PublishingHouseRepositoryInterface              $publishingHouseRepo,
-        private readonly DeliveryManTransactionRepositoryInterface       $deliveryManTransactionRepo,
-        private readonly OrderStatusHistoryRepositoryInterface           $orderStatusHistoryRepo,
-        private readonly OrderTransactionRepository                      $orderTransactionRepo,
-        private readonly LoyaltyPointTransactionRepositoryInterface      $loyaltyPointTransactionRepo,
-        private readonly OrderDetailsRewardsRepositoryInterface          $orderDetailsRewardsRepo,
-        private readonly AdminWalletRepositoryInterface                  $adminWalletRepo,
-        private readonly VendorWalletRepositoryInterface                 $vendorWalletRepo,
-        private readonly WalletTransactionRepositoryInterface            $walletTransactionRepo,
-        private readonly OrderEditHistoryRepositoryInterface             $orderEditHistoryRepo,
-    )
-    {
+        private readonly OrderDetailRepositoryInterface $orderDetailRepo,
+        private readonly DeliveryManWalletRepositoryInterface $deliveryManWalletRepo,
+        private readonly ProductRepositoryInterface $productRepo,
+        private readonly ProductService $productService,
+        private readonly OrderEditService $orderEditService,
+        private readonly PublishingHouseRepositoryInterface $publishingHouseRepo,
+        private readonly DeliveryManTransactionRepositoryInterface $deliveryManTransactionRepo,
+        private readonly OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepo,
+        private readonly OrderTransactionRepository $orderTransactionRepo,
+        private readonly LoyaltyPointTransactionRepositoryInterface $loyaltyPointTransactionRepo,
+        private readonly OrderDetailsRewardsRepositoryInterface $orderDetailsRewardsRepo,
+        private readonly AdminWalletRepositoryInterface $adminWalletRepo,
+        private readonly VendorWalletRepositoryInterface $vendorWalletRepo,
+        private readonly WalletTransactionRepositoryInterface $walletTransactionRepo,
+        private readonly OrderEditHistoryRepositoryInterface $orderEditHistoryRepo,
+    ) {
     }
 
     /**
@@ -124,6 +125,22 @@ class OrderController extends BaseController
         $filter = $request['filter'];
         $from = $request['from'];
         $to = $request['to'];
+        $dateType = $request['date_type'];
+
+        $customDateType = $request['custom_date_type'] ?? 'range';
+        $customMonth = $request['custom_month'];
+        $customYear = $request['custom_year'];
+        $minYear = $this->orderRepo->getOldestOrderYear();
+
+        if ($dateType == 'custom_date') {
+            if ($customDateType == 'month' && $customMonth && $customYear) {
+                $from = Carbon::createFromDate($customYear, $customMonth, 1)->startOfMonth()->format('Y-m-d');
+                $to = Carbon::createFromDate($customYear, $customMonth, 1)->endOfMonth()->format('Y-m-d');
+            } elseif ($customDateType == 'year' && $customYear) {
+                $from = Carbon::createFromDate($customYear, 1, 1)->startOfYear()->format('Y-m-d');
+                $to = Carbon::createFromDate($customYear, 12, 31)->endOfYear()->format('Y-m-d');
+            }
+        }
 
         $this->orderRepo->updateWhere(params: ['checked' => 0], data: ['checked' => 1]);
 
@@ -138,7 +155,6 @@ class OrderController extends BaseController
             $vendorIs = 'seller';
         }
 
-        $dateType = $request['date_type'];
         $paymentPaidStatus = $request['payment_status'] ?? [];
         $orderStatus = $request['order_current_status'] ?? [];
 
@@ -146,8 +162,8 @@ class OrderController extends BaseController
             'order_status' => $status == 'all' ? $orderStatus : $status,
             'filter' => $request['filter'] ?? 'all',
             'date_type' => $request['date_type'],
-            'from' => $request['from'],
-            'to' => $request['to'],
+            'from' => $from,
+            'to' => $to,
             'delivery_man_id' => $request['delivery_man_id'],
             'customer_id' => $request['customer_id'],
             'seller_id' => $vendorId,
@@ -172,8 +188,8 @@ class OrderController extends BaseController
         $countFilters = [
             'filter' => $request['filter'] ?? 'all',
             'date_type' => $request['date_type'],
-            'from' => $request['from'],
-            'to' => $request['to'],
+            'from' => $from,
+            'to' => $to,
             'delivery_man_id' => $request['delivery_man_id'],
             'customer_id' => $request['customer_id'],
             'seller_id' => $vendorId,
@@ -261,6 +277,10 @@ class OrderController extends BaseController
             'vendorId',
             'customerId',
             'dateType',
+            'customDateType',
+            'customMonth',
+            'customYear',
+            'minYear',
             'allOrdersInfo',
             'paymentPaidStatus',
             'orderStatus',
@@ -314,7 +334,7 @@ class OrderController extends BaseController
             if (!$order['is_guest']) {
                 $orderEditNotificationEvent[] = [
                     'notification' => true,
-                    'notificationData' => (object)[
+                    'notificationData' => (object) [
                         'key' => 'order_edit_return_amount_message',
                         'type' => 'customer',
                         'order' => $order,
@@ -417,12 +437,30 @@ class OrderController extends BaseController
             $vendorIs = 'seller';
         }
 
+        $dateType = $request['date_type'];
+        $from = $request['from'];
+        $to = $request['to'];
+
+        $customDateType = $request['custom_date_type'] ?? 'range';
+        $customMonth = $request['custom_month'];
+        $customYear = $request['custom_year'];
+
+        if ($dateType == 'custom_date') {
+            if ($customDateType == 'month' && $customMonth && $customYear) {
+                $from = Carbon::createFromDate($customYear, $customMonth, 1)->startOfMonth()->format('Y-m-d');
+                $to = Carbon::createFromDate($customYear, $customMonth, 1)->endOfMonth()->format('Y-m-d');
+            } elseif ($customDateType == 'year' && $customYear) {
+                $from = Carbon::createFromDate($customYear, 1, 1)->startOfYear()->format('Y-m-d');
+                $to = Carbon::createFromDate($customYear, 12, 31)->endOfYear()->format('Y-m-d');
+            }
+        }
+
         $filters = [
             'order_status' => $status,
             'filter' => $request['filter'] ?? 'all',
             'date_type' => $request['date_type'],
-            'from' => $request['from'],
-            'to' => $request['to'],
+            'from' => $from,
+            'to' => $to,
             'delivery_man_id' => $request['delivery_man_id'],
             'customer_id' => $request['customer_id'],
             'seller_id' => $vendorId,
@@ -448,7 +486,14 @@ class OrderController extends BaseController
         if (!empty($orderAmountSettlement)) {
             $filters['has_order_edit_settlement'] = $orderAmountSettlement;
         }
-        $orders = $this->orderRepo->getListWhereIn(orderBy: ['id' => 'desc'], searchValue: $request['searchValue'], filters: $filters, whereIn: $filterWhereIn, relations: ['customer', 'seller.shop'], dataLimit: 'all');
+        $orders = $this->orderRepo->getListWhereIn(
+            orderBy: ['id' => 'desc'],
+            searchValue: $request['searchValue'],
+            filters: $filters,
+            whereIn: $filterWhereIn,
+            relations: ['customer', 'seller.shop', 'details.product.brand', 'shippingAddress', 'billingAddress'],
+            dataLimit: 'all'
+        );
 
         /** order status count  */
         $status_array = [
@@ -479,15 +524,15 @@ class OrderController extends BaseController
         $date_type = $request->date_type ?? '';
         $from = match ($date_type) {
             'this_year' => date('Y-01-01'),
-            'this_month' => date('Y-m-01'),
+            'this_month' => date('Y-01-01'),
             'this_week' => Carbon::now()->subDays(7)->startOfWeek()->format('Y-m-d'),
-            default => $request['from'] ?? '',
+            default => $from ?? '',
         };
         $to = match ($date_type) {
             'this_year' => date('Y-12-31'),
             'this_month' => date('Y-m-t'),
             'this_week' => Carbon::now()->startOfWeek()->format('Y-m-d'),
-            default => $request['to'] ?? '',
+            default => $to ?? '',
         };
         /** end  */
         $seller = [];
@@ -513,7 +558,15 @@ class OrderController extends BaseController
             'date_type' => $date_type,
             'defaultCurrencyCode' => getCurrencyCode(),
         ];
-        return Excel::download(new OrderExport($data), 'Orders.xlsx');
+
+        $exportType = $request->input('export_type', 'detailed');
+        $timestamp = date('Y-m-d_H-i-s');
+
+        if ($exportType === 'summary') {
+            return Excel::download(new OrderSummaryReportExport($data), 'تقرير_شامل_' . $timestamp . '.xlsx');
+        }
+
+        return Excel::download(new OrderDetailedReportExport($data), 'تقرير_مفصل_' . $timestamp . '.xlsx');
     }
 
     public function getView(string|int $id, DeliveryCountryCodeService $service, OrderService $orderService): View|RedirectResponse
@@ -525,9 +578,18 @@ class OrderController extends BaseController
         $zipCodes = $zipRestrictStatus ? $this->deliveryZipCodeRepo->getList(dataLimit: 'all') : 0;
         $companyName = getWebConfig(name: 'company_name');
         $companyWebLogo = getWebConfig(name: 'company_web_logo');
-        $order = $this->orderRepo->getFirstWhere(params: ['id' => $id], relations: ['details.productAllStatus', 'latestEditHistory', 'verificationImages', 'shipping', 'seller.shop', 'offlinePayments', 'deliveryMan', 'orderEditHistory' => function ($query) {
-            return $query->orderBy('id', 'desc');
-        }]);
+        $order = $this->orderRepo->getFirstWhere(params: ['id' => $id], relations: [
+            'details.productAllStatus',
+            'latestEditHistory',
+            'verificationImages',
+            'shipping',
+            'seller.shop',
+            'offlinePayments',
+            'deliveryMan',
+            'orderEditHistory' => function ($query) {
+                return $query->orderBy('id', 'desc');
+            }
+        ]);
 
         if ($order) {
 
@@ -584,9 +646,28 @@ class OrderController extends BaseController
 
             if ($order['order_type'] == 'default_type') {
                 $orderCount = $this->orderRepo->getListWhereCount(filters: ['customer_id' => $order['customer_id']]);
-                return view('admin-views.order.order-details', compact('order', 'linkedOrders',
-                    'deliveryMen', 'totalDelivered', 'companyName', 'companyWebLogo', 'physicalProduct',
-                    'countryRestrictStatus', 'zipRestrictStatus', 'countries', 'zipCodes', 'orderCount', 'isOrderOnlyDigital', 'previousOrder', 'nextOrder', 'allProductsList', 'isOrderEditable', 'orderProductsSession', 'editOrderSummary', 'orderEditPaymentHistory'));
+                return view('admin-views.order.order-details', compact(
+                    'order',
+                    'linkedOrders',
+                    'deliveryMen',
+                    'totalDelivered',
+                    'companyName',
+                    'companyWebLogo',
+                    'physicalProduct',
+                    'countryRestrictStatus',
+                    'zipRestrictStatus',
+                    'countries',
+                    'zipCodes',
+                    'orderCount',
+                    'isOrderOnlyDigital',
+                    'previousOrder',
+                    'nextOrder',
+                    'allProductsList',
+                    'isOrderEditable',
+                    'orderProductsSession',
+                    'editOrderSummary',
+                    'orderEditPaymentHistory'
+                ));
             } else {
                 $orderCount = $this->orderRepo->getListWhereCount(filters: ['customer_id' => $order['customer_id'], 'order_type' => 'POS']);
                 return view('admin-views.pos.order.order-details', compact('order', 'companyName', 'companyWebLogo', 'orderCount', 'previousOrder', 'nextOrder', 'allProductsList', 'isOrderEditable', 'orderProductsSession', 'editOrderSummary'));
@@ -610,19 +691,19 @@ class OrderController extends BaseController
             $logo = $this->businessSettingRepo->getFirstWhere(params: ['type' => 'company_web_logo'])?->value ?? '';
             $this->businessSettingRepo->updateOrInsert(type: 'company_web_logo_png', value: is_array($logo) ? json_encode($logo) : $logo);
         }
-        $mpdfView = PdfView::make('admin-views.order.invoice',
+        $mpdfView = PdfView::make(
+            'admin-views.order.invoice',
             compact('order', 'vendor', 'companyPhone', 'companyEmail', 'companyName', 'companyWebLogo', 'invoiceSettings')
         );
         $this->generatePdf(view: $mpdfView, filePrefix: 'order_invoice_', filePostfix: $order['id'], pdfType: 'invoice');
     }
 
     public function updateStatus(
-        Request                       $request,
+        Request $request,
         DeliveryManTransactionService $deliveryManTransactionService,
-        DeliveryManWalletService      $deliveryManWalletService,
-        OrderStatusHistoryService     $orderStatusHistoryService,
-    ): JsonResponse
-    {
+        DeliveryManWalletService $deliveryManWalletService,
+        OrderStatusHistoryService $orderStatusHistoryService,
+    ): JsonResponse {
         $order = $this->orderRepo->getFirstWhere(params: ['id' => $request['id']], relations: ['customer', 'seller.shop', 'deliveryMan', 'latestEditHistory']);
 
         if (!$order['is_guest'] && !isset($order['customer'])) {
@@ -934,7 +1015,8 @@ class OrderController extends BaseController
             scope: "active",
             filters: ['added_by' => 'in_house'],
             relations: ['brand', 'category', 'seller.shop'],
-            dataLimit: 'all');
+            dataLimit: 'all'
+        );
 
         return response()->json([
             'count' => $products->count(),
@@ -948,9 +1030,16 @@ class OrderController extends BaseController
         $product = $this->productRepo->getFirstWhereWithCount(
             params: ['id' => $request['product_id']],
             withCount: ['reviews'],
-            relations: ['brand', 'category', 'rating', 'tags', 'digitalVariation', 'clearanceSale' => function ($query) {
-                return $query->active();
-            }],
+            relations: [
+                'brand',
+                'category',
+                'rating',
+                'tags',
+                'digitalVariation',
+                'clearanceSale' => function ($query) {
+                    return $query->active();
+                }
+            ],
         );
         $productAuthorIds = $this->productService->getProductAuthorsInfo(product: $product)['ids'];
         $digitalProductAuthors = $this->authorRepo->getListWhere(dataLimit: 'all');
@@ -962,12 +1051,11 @@ class OrderController extends BaseController
     }
 
     public function bulkUpdateStatus(
-        Request                       $request,
+        Request $request,
         DeliveryManTransactionService $deliveryManTransactionService,
-        DeliveryManWalletService      $deliveryManWalletService,
-        OrderStatusHistoryService     $orderStatusHistoryService,
-    ): JsonResponse
-    {
+        DeliveryManWalletService $deliveryManWalletService,
+        OrderStatusHistoryService $orderStatusHistoryService,
+    ): JsonResponse {
         $ids = $request->input('ids', []);
         $newStatus = $request->input('order_status');
 

@@ -160,7 +160,7 @@
                     @if($product->isAirConditioner())
                         <span class="product-details-tax-badge ac-tax-badge">السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</span>
                     @else
-                        <span class="product-details-tax-badge">السعر شامل الضريبة</span>
+                        <span class="product-details-tax-badge">السعر شامل الضريبة والتوصيل</span>
                     @endif
                 </div>
 
@@ -263,7 +263,7 @@
                                 @if($product->isAirConditioner())
                                     <p>السعر شامل الضريبة والتركيب و 4 متر نحاس + ربل او كرسي + تيب</p>
                                 @else
-                                    <p>السعر شامل الضريبة</p>
+                                    <p>السعر شامل الضريبة والتوصيل</p>
                                 @endif
                             </div>
 <div class="preview-stock">
