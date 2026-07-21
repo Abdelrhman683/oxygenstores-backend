@@ -24,69 +24,69 @@
     <meta http-equiv="Content-Type" content="text/html;"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-       @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
 
-@font-face {
-    font-family: 'PingARLT';
-    src: url('../fonts/pingarlt/PingARLT-Light.woff2') format('woff2');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'PingARLT';
+            src: url('/assets/front-end/fonts/pingarlt/PingARLT-Light.woff2') format('woff2');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
 
-@font-face {
-    font-family: 'PingARLT';
-    src: url('../fonts/pingarlt/PingARLT-Regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'PingARLT';
+            src: url('/assets/front-end/fonts/pingarlt/PingARLT-Regular.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
-@font-face {
-    font-family: 'PingARLT';
-    src: url('../fonts/pingarlt/PingARLT-Medium.woff2') format('woff2');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'PingARLT';
+            src: url('/assets/front-end/fonts/pingarlt/PingARLT-Medium.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
 
-@font-face {
-    font-family: 'PingARLT';
-    src: url('../fonts/pingarlt/PingARLT-Bold.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'PingARLT';
+            src: url('/assets/front-end/fonts/pingarlt/PingARLT-Bold.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
 
-@font-face {
-    font-family: 'PingARLT';
-    src: url('../fonts/pingarlt/PingARLT-Heavy.woff2') format('woff2');
-    font-weight: 800;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'PingARLT';
+            src: url('/assets/front-end/fonts/pingarlt/PingARLT-Heavy.woff2') format('woff2');
+            font-weight: 800;
+            font-style: normal;
+            font-display: swap;
+        }
 
-@font-face {
-    font-family: 'PingARLT';
-    src: url('../fonts/pingarlt/PingARLT-Black.woff2') format('woff2');
-    font-weight: 900;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'PingARLT';
+            src: url('/assets/front-end/fonts/pingarlt/PingARLT-Black.woff2') format('woff2');
+            font-weight: 900;
+            font-style: normal;
+            font-display: swap;
+        }
 
-*, body, p, a, span, button, input, h1, h2, h3, h4, h5, h6, div, select, textarea {
-    font-family: 'PingARLT', 'Cairo', 'Tajawal', sans-serif !important;
-}
+        body, p, a, span, button, input, h1, h2, h3, h4, h5, h6, div, select, textarea, td, th {
+            font-family: 'PingARLT', 'Cairo', 'Tajawal', 'xbriyaz', 'FreeSerif', sans-serif;
+        }
 
         * {
             margin: 0;
             padding: 0;
-            line-height: 1.5;
+            line-height: 1.4;
             color: #303030;
         }
 
         body {
-            font-size: 9px !important;
+            font-size: 8px !important;
             color: #303030;
             background-color: #FFFFFF;
         }
@@ -104,13 +104,9 @@
             margin-bottom: 15px;
         }
 
-        .header-table td {
-            vertical-align: middle;
-        }
-
         .color-bar {
             height: 4px;
-            background-color: #FF5A36;
+            background-color: #F26444;
             margin-bottom: 20px;
             width: 100%;
         }
@@ -121,17 +117,17 @@
         }
 
         .invoice-title-ar {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: #000000;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .invoice-title-en {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: #000000;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .bill-cards-table {
@@ -155,22 +151,22 @@
         }
 
         .card-title-en {
-            color: #FF5A36;
-            font-size: 11px;
+            color: #F26444;
+            font-size: 10px;
             font-weight: bold;
             text-align: left;
         }
 
         .card-title-ar {
-            color: #FF5A36;
-            font-size: 11px;
+            color: #F26444;
+            font-size: 10px;
             font-weight: bold;
             text-align: right;
         }
 
         .card-row td {
             padding: 4px 0;
-            font-size: 9px;
+            font-size: 8px;
             vertical-align: top;
         }
 
@@ -215,7 +211,7 @@
 
         .product-table td {
             padding: 8px 6px;
-            font-size: 9px;
+            font-size: 8px;
             border-bottom: 1px solid #EAEAEA;
             vertical-align: middle;
         }
@@ -234,7 +230,7 @@
 
         .totals-row td {
             padding: 5px 0;
-            font-size: 9px;
+            font-size: 8px;
         }
 
         .totals-label-en {
@@ -273,26 +269,31 @@
     <!-- Header -->
     <table class="header-table">
         <tr>
-            <td>
-                <table>
+            <td style="width: 55%; vertical-align: top;">
+                <table style="width: 100%; border-collapse: collapse;">
                     <tr>
-                        <td style="font-size: 9px; color: #7F8185;">تاريخ الفاتورة</td>
-                        <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ date('Y-m-d', strtotime($order['created_at'])) }}</td>
-                        <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Invoice Date</td>
+                        <td style="font-size: 8px; color: #7F8185; text-align: left; padding: 2px 0; width: 30%;">Invoice No.</td>
+                        <td style="padding: 2px 8px; font-weight: bold; font-size: 8px; text-align: center; width: 40%;">{{ $order->id }}</td>
+                        <td style="font-size: 8px; color: #7F8185; text-align: right; padding: 2px 0; width: 30%;">رقم الفاتورة</td>
                     </tr>
                     <tr>
-                        <td style="font-size: 9px; color: #7F8185;">رقم الطلب</td>
-                        <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ $order->id }}</td>
-                        <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Order No.</td>
+                        <td style="font-size: 8px; color: #7F8185; text-align: left; padding: 2px 0;">Invoice Date</td>
+                        <td style="padding: 2px 8px; font-weight: bold; font-size: 8px; text-align: center;">{{ date('Y-m-d', strtotime($order['created_at'])) }}</td>
+                        <td style="font-size: 8px; color: #7F8185; text-align: right; padding: 2px 0;">تاريخ الفاتورة</td>
                     </tr>
                     <tr>
-                        <td style="font-size: 9px; color: #7F8185;">طريقة الدفع</td>
-                        <td style="padding: 2px 8px; font-weight: bold; font-size: 9px; text-align: center;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
-                        <td style="padding-left: 8px; text-align: left; font-size: 9px; color: #7F8185;">Paymet</td>
+                        <td style="font-size: 8px; color: #7F8185; text-align: left; padding: 2px 0;">Order No.</td>
+                        <td style="padding: 2px 8px; font-weight: bold; font-size: 8px; text-align: center;">{{ $order->id }}</td>
+                        <td style="font-size: 8px; color: #7F8185; text-align: right; padding: 2px 0;">رقم الطلب</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: 8px; color: #7F8185; text-align: left; padding: 2px 0;">Payment Method</td>
+                        <td style="padding: 2px 8px; font-weight: bold; font-size: 8px; text-align: center; color: #F26444;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
+                        <td style="font-size: 8px; color: #7F8185; text-align: right; padding: 2px 0;">طريقة الدفع</td>
                     </tr>
                 </table>
             </td>
-            <td style="text-align: left;">
+            <td style="text-align: left; vertical-align: middle; width: 45%;">
                 <img height="45" src="{{ asset('assets/front-end/img/logo.png') }}" alt="OXYGEN Logo" style="object-fit: contain;" onerror="this.src='https://placehold.co/180x50/png?text=OXYGEN'">
             </td>
         </tr>
@@ -314,11 +315,11 @@
             <td class="bill-card-td">
                 <table class="bill-card-inner-table">
                     <tr>
-                        <td class="card-title-en">Bill From</td>
-                        <td class="card-title-ar"></td>
-                        <td class="card-title-ar">الفاتورة من</td>
+                        <td class="card-title-en" style="width: 25%;">Bill From</td>
+                        <td style="width: 50%;"></td>
+                        <td class="card-title-ar" style="width: 25%;">الفاتورة من</td>
                     </tr>
-                    <tr><td colspan="2" style="height: 6px;"></td></tr>
+                    <tr><td colspan="3" style="height: 6px;"></td></tr>
                     <tr class="card-row">
                         <td class="card-label-en">Name</td>
                         <td class="card-value">
@@ -379,11 +380,11 @@
             <td class="bill-card-td">
                 <table class="bill-card-inner-table">
                     <tr>
-                        <td class="card-title-en">Bill To</td>
-                        <td class="card-title-ar"></td>
-                        <td class="card-title-ar">الفاتورة إلى</td>
+                        <td class="card-title-en" style="width: 25%;">Bill To</td>
+                        <td style="width: 50%;"></td>
+                        <td class="card-title-ar" style="width: 25%;">الفاتورة إلى</td>
                     </tr>
-                    <tr><td colspan="2" style="height: 6px;"></td></tr>
+                    <tr><td colspan="3" style="height: 6px;"></td></tr>
                     <tr class="card-row">
                         <td class="card-label-en">Name</td>
                         <td class="card-value">
@@ -516,7 +517,7 @@
                     @if($total_discount > 0)
                         <tr class="totals-row">
                             <td class="totals-label-en">Discount</td>
-                            <td class="totals-value" style="color: #FF5A36;">-{{ webCurrencyConverter(amount: $total_discount) }}</td>
+                            <td class="totals-value" style="color: #F26444;">-{{ webCurrencyConverter(amount: $total_discount) }}</td>
                             <td class="totals-label-ar">خصم</td>
                         </tr>
                     @endif
@@ -533,7 +534,7 @@
                     </tr>
                     <tr class="totals-row">
                         <td class="totals-label-en">Payment method</td>
-                        <td class="totals-value" style="color: #FF5A36;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
+                        <td class="totals-value" style="color: #F26444;">{{ str_replace('_', ' ', $order->payment_method) }}</td>
                         <td class="totals-label-ar">وسيلة الدفع</td>
                     </tr>
                     <tr class="totals-row" style="border-top: 1px solid #D7DAE0;">

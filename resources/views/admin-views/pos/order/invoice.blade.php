@@ -1,4 +1,9 @@
 <link rel="stylesheet" href="{{ dynamicAsset(path: 'public/assets/back-end/css/pos-invoice.css') }}">
+<style>
+    .width-363px, .width-363px * {
+        font-family: 'PingARLT', 'Cairo', 'Tajawal', 'xbriyaz', 'FreeSerif', sans-serif !important;
+    }
+</style>
 <?php
 $orderTotalPriceSummary = \App\Utils\OrderManager::getOrderTotalPriceSummary(order: $order);
 ?>
