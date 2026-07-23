@@ -46,6 +46,18 @@
             'failed' => 'فشل التوصيل',
         ];
 
+        $statusStyles = [
+            'pending' => 'background-color: #e8f4fd; color: #0284c7; font-weight: bold; text-align: center;',
+            'confirmed' => 'background-color: #ecfdf5; color: #059669; font-weight: bold; text-align: center;',
+            'processing' => 'background-color: #fff8f0; color: #ea580c; font-weight: bold; text-align: center;',
+            'out_for_delivery' => 'background-color: #f8fafc; color: #475569; font-weight: bold; text-align: center;',
+            'delivered' => 'background-color: #f0fdf4; color: #16a34a; font-weight: bold; text-align: center;',
+            'canceled' => 'background-color: #fef2f2; color: #dc2626; font-weight: bold; text-align: center;',
+            'returned' => 'background-color: #fef2f2; color: #dc2626; font-weight: bold; text-align: center;',
+            'failed' => 'background-color: #fef2f2; color: #dc2626; font-weight: bold; text-align: center;',
+            'on_hold' => 'background-color: #f8fafc; color: #475569; font-weight: bold; text-align: center;',
+        ];
+
         $paymentMethodTranslations = [
             'cash_on_delivery' => 'الدفع عند الاستلام',
             'pay_by_wallet' => 'الدفع عبر المحفظة',
@@ -70,6 +82,7 @@
             }
 
             $statusArabic = $statusTranslations[$order->order_status] ?? $order->order_status;
+            $currentStatusStyle = $statusStyles[$order->order_status] ?? 'text-align: center;';
             
             $city = '';
             if ($order->shippingAddress) {
@@ -131,7 +144,7 @@
                     <td>{{ number_format($totalInclTax, 2, '.', '') }}</td>
 
                     @if($index === 0)
-                        <td>{{ $statusArabic }}</td>
+                        <td style="{{ $currentStatusStyle }}">{{ $statusArabic }}</td>
                         <td>{{ $city }}</td>
                     @else
                         <td></td>
@@ -154,7 +167,7 @@
                 <td>0.00</td>
                 <td>0.00</td>
                 <td>{{ number_format($order->order_amount, 2, '.', '') }}</td>
-                <td>{{ $statusArabic }}</td>
+                <td style="{{ $currentStatusStyle }}">{{ $statusArabic }}</td>
                 <td>{{ $city }}</td>
             </tr>
         @endif
