@@ -7133,4 +7133,5 @@ return [
 	"December" => "December",
 	"تقرير_مفصل" => "تقرير مفصل",
 	"تقرير_شامل" => "تقرير شامل",
+	"Please_confirm_the_offline_payment_information_before_changing_the_order_status." => "Please confirm the offline payment information before changing the order status.",
 ];

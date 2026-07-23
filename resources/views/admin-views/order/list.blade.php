@@ -2,6 +2,50 @@
 
 @section('title', translate('order_List'))
 
+@push('css_or_js')
+    <style>
+        .inline-order-status {
+            font-weight: 600 !important;
+            border-radius: 6px !important;
+            transition: all 0.2s ease-in-out;
+        }
+        .inline-order-status[data-status="pending"] {
+            background-color: #e8f4fd !important;
+            color: #0284c7 !important;
+            border-color: #bae6fd !important;
+        }
+        .inline-order-status[data-status="confirmed"] {
+            background-color: #ecfdf5 !important;
+            color: #059669 !important;
+            border-color: #a7f3d0 !important;
+        }
+        .inline-order-status[data-status="processing"] {
+            background-color: #fff8f0 !important;
+            color: #ea580c !important;
+            border-color: #ffedd5 !important;
+        }
+        .inline-order-status[data-status="delivered"] {
+            background-color: #f0fdf4 !important;
+            color: #16a34a !important;
+            border-color: #bbf7d0 !important;
+        }
+        .inline-order-status[data-status="returned"] {
+            background-color: #fef2f2 !important;
+            color: #dc2626 !important;
+            border-color: #fecaca !important;
+        }
+        .inline-order-status[data-status="on_hold"] {
+            background-color: #f8fafc !important;
+            color: #475569 !important;
+            border-color: #e2e8f0 !important;
+        }
+        .inline-order-status option {
+            background-color: #ffffff !important;
+            color: #333333 !important;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="content container-fluid">
         <div>
@@ -373,7 +417,7 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-                                        <select class="form-control form-select form-select-sm inline-order-status" data-order-id="{{ $order['id'] }}" style="min-width: 145px; font-size: 12px; padding-right: 2rem;">
+                                        <select class="form-control form-select form-select-sm inline-order-status" data-status="{{ in_array($order['order_status'], ['on_hold', 'out_for_delivery']) ? 'on_hold' : $order['order_status'] }}" data-order-id="{{ $order['id'] }}" style="min-width: 145px; font-size: 12px; padding-right: 2rem;">
                                             <option value="pending" {{ $order['order_status'] == 'pending' ? 'selected' : '' }}>{{ translate('pending') }}</option>
                                             <option value="processing" {{ $order['order_status'] == 'processing' ? 'selected' : '' }}>{{ translate('processing') }}</option>
                                             <option value="confirmed" {{ $order['order_status'] == 'confirmed' ? 'selected' : '' }}>{{ translate('confirmed') }}</option>
@@ -477,6 +521,8 @@
             const newStatus = $select.val();
             const originalVal = $select.data('original') || newStatus;
 
+            $select.attr('data-status', newStatus);
+
             $.ajax({
                 url: ORDER_STATUS_URL,
                 method: 'POST',
@@ -488,11 +534,13 @@
                     } else {
                         toastMagic.error(res.message || '{{ translate("something_went_wrong") }}');
                         $select.val(originalVal);
+                        $select.attr('data-status', originalVal);
                     }
                 },
                 error: function () {
                     toastMagic.error('{{ translate("something_went_wrong") }}');
                     $select.val(originalVal);
+                    $select.attr('data-status', originalVal);
                 }
             });
         });

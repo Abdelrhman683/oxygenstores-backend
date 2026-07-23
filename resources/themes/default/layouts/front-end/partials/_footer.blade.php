@@ -186,7 +186,6 @@
 
 
 
-                    <!-- Left Column: Contact Us -->
                     <div class="col-md-3 text-start">
                         <h6 class="text-uppercase font-weight-bold text-white mb-3 fs-18" style="font-weight: 700 !important; letter-spacing: 0.5px;">أتصل بنا</h6>
                         <ul class="widget-list p-0 d-flex flex-column gap-3 text-white opacity-80 fs-15" style="list-style: none;">
