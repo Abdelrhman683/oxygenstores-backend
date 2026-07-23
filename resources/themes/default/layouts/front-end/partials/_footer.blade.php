@@ -151,7 +151,7 @@
                                     سياسة الخصوصية
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a class="widget-list-link fs-16 hover-yellow" href="{{ route('business-page.view', ['slug' => 'terms-and-conditions']) }}">
                                     الشروط والأحكام
                                 </a>
@@ -180,7 +180,7 @@
                                 <a class="widget-list-link fs-16 hover-yellow" href="{{ route('helpTopic') }}">
                                     الأسئلة الشائعة
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                     </div>
 

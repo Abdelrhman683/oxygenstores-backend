@@ -314,9 +314,6 @@
             text-decoration: none !important;
         }
 
-        .changePassTarget a:hover {
-            color: #e2e8f0 !important;
-        }
 
         .form-check {
             display: flex !important;
